@@ -1,0 +1,2 @@
+tocTab[tocTab.length] = new Array("1.1:1", "", "Configuration", "EARoot/EA1/EA1/EA15.html", "3.png", "10", "0", "", "Logical diagram");
+tocTab[tocTab.length] = new Array("1.1:2", "", "PhpBURN_ConfigurationItem", "EARoot/EA1/EA1/EA17.html", "5.png", "25", "0", "", "Class");
