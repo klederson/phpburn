@@ -35,9 +35,9 @@ $thisConfig = array(
 		 * package configs are not setted up
 		 */
 		'dialect' => 'MySQL',
-		'database' => 'webinsys',
-		'user' => 'phpburn_example',
-		'password' => 'phpburn_example_pass',
+		'database' => 'phpburn_test',
+		'user' => 'phpburn',
+		'password' => 'phpburn',
 		'port' => '3306',
 		'host' => 'localhost',
 
