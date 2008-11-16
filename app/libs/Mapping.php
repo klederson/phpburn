@@ -15,22 +15,24 @@ class PhpBURN_Mapping
 	public function create(PhpBURN_Core &$modelObj,$fromMulti = false) {		
 		$mapObj = $this->getMapping(get_class($modelObj));
 		
+		/*
+		 * @TODO !!!IMPORTANTE!!!
+		 * @TODO Para os multimaps/heranças basta adicionar o campo com o nome da classe pertencente no parentMap assim o o mapa ficará completo e o campo saberá a quem pertence e poderá ser salvo na tabela
+		 */
+		
 		if($mapObj == null) {
 			
 			$mapObj = new PhpBURN_Map($modelObj);
 			$this->addMap($modelObj,$mapObj);
 			
-			//Check for parentMaps ( inhirit )
-			$parentMaps = $this->cascadeMaps(get_class($modelObj));
-			
+				
+			/*
 			if(count($parentMaps) > 0 && $fromMulti != false) {	
 				//Prepare multi-map item
 				$modelObj->_multiMap = true;
 				$mapObj = $this->addMultiMap($parentMaps,$modelObj,$mapObj);
 			}
-			
-			//Here we clone because it is the first model, we cant use the base object as map because we can have troubles with references and stored data
-			$mapObj = clone $mapObj;
+			*/
 			
 			//Here we just set our already cloned $mapObj
 			$modelObj->_mapObj = $mapObj;
@@ -38,6 +40,13 @@ class PhpBURN_Mapping
 			//Makes the mapping into the object
 			//NOTE This must to be here because the _mapping() method into the Model
 			$modelObj->_mapObj->mapThis();
+			
+			//Check for parentMaps ( inhirit )
+			$parentMaps = $this->cascadeMaps($modelObj);
+			
+			//Here we clone because it is the first model, we cant use the base object as map because we can have troubles with references and stored data
+			$mapObj = clone $mapObj;
+			
 		} else {
 			$mapObj = clone $mapObj;
 			$mapObj->modelObj = $modelObj;
@@ -48,6 +57,14 @@ class PhpBURN_Mapping
 		}
 		
 		return $mapObj;
+	}
+	
+	private function isChild(PhpBURN_Core &$modelObj) {
+		if(get_parent_class($modelObj) != 'PhpBURN_Core') {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -91,15 +108,30 @@ class PhpBURN_Mapping
 	 * @param String $class
 	 * @return PhpBURN_MappingItem
 	 */
-	public function cascadeMaps($class) {
-		while($class = get_parent_class($class)) { 
-			if($class != "PhpBURN_Core") {
-				$_class = new $class;
-				$maps[] = $this->create($_class);
-				unset($_class);
-			}
-		}
-		return $maps;
+	public function cascadeMaps(PhpBURN_Core &$modelObj) {
+		//while($this->isChild($modelObj)) { 
+			//if($class != "PhpBURN_Core") {
+				//$_class = new $class;
+				//$maps[] = $this->create($_class);
+				//@TODO aqui a gente clona as propriedades do mapa
+				if($this->isChild($modelObj)) {
+					$class = get_parent_class($modelObj);
+					$_parentMap = $this->getMapping($class);
+					if($_parentMap == null) {
+						$_tmpModelObj = new $class;
+						$_parentMap = $_tmpModelObj->_mapObj;
+					}
+					$cloned = $_parentMap->cloneAttributes();
+					
+					//Put the attributes into this current map as incremental mode
+					$modelObj->_mapObj->setAttributes($cloned);
+					
+	
+					unset($class, $cloned, $_tmpModelObj, $_parentMap);
+				}
+			//}
+		//}
+		//return $maps;
 	}
 }
 ?>

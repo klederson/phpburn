@@ -62,6 +62,20 @@ class PhpBURN_Map implements IMap {
 		}
 	}
 	
+	public function cloneAttributes() {
+		return $this->fields;
+	}
+	
+	public function setAttributes(array $fields, $incremental = true) {
+		if($incremental == true) {
+			foreach($fields as $index => $fieldData) {
+				$this->fields[$index] = $fieldData;
+			}
+		} else {
+			$this->fields = $fields;
+		}
+	}
+	
 	/**
 	 * This maps the model based on its XML Mapping
 	 *
@@ -178,7 +192,7 @@ class PhpBURN_Map implements IMap {
 		$this->fields[$relName]['isExternal'] = false;
 		
 		//For multipMap ONLY
-		$this->fields[$relName]['parentReferences'] = false;
+		$this->fields[$relName]['parentReferences'] = get_class($this->modelObj);
 		
 		//Setup defaultvalue for this field
 		$this->setFieldValue($relName,null);
@@ -211,6 +225,7 @@ class PhpBURN_Map implements IMap {
 		$this->fields[$name]['field']['column'] = $column;
 		$this->fields[$name]['field']['type'] = $type;
 		$this->fields[$name]['field']['length'] = $length;
+		$this->fields[$name]['field']['options'] = count($options) > 0 ? $options : array();
 		
 		//Just for double check it sets false to other kinds of field
 		$this->fields[$name]['isRelationship'] = false;
@@ -219,7 +234,7 @@ class PhpBURN_Map implements IMap {
 		$this->fields[$name]['isExternal'] = false;
 		
 		//For multipMap use ONLY
-		$this->fields[$name]['parentReferences'] = false;
+		$this->fields[$name]['parentReferences'] = get_class($this->modelObj);
 		
 		//Setup defaultvalue for this field
 		$options['defaultvalue'] = $options['defaultvalue'] != null ? $options['defaultvalue'] : null;

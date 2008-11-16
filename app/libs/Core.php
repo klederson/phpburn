@@ -48,7 +48,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	public function __destruct() {
-		unset($this->connObj);
+		unset($this->_connObj, $this->_mapObj, $this->_dialectObj);
 	}
 	
 	public function getConnectionObj() {
@@ -86,15 +86,37 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	//Relationships functions
+	
+	/**
+	 * It puts a WHERE clause when you want to get a link with specific caracteristics
+	 *
+	 * @param String $linkName
+	 * @param String $field
+	 * @param String $condition
+	 */
 	public function _linkWhere($linkName, $field, $condition) {
 		
 	}
 	
-	public function _linkLimit($start, $end = null) {
+	/**
+	 * It sets a limit or pagination in you link call
+	 *
+	 * @param String $linkName
+	 * @param Integer $start
+	 * @param Integer $end
+	 */
+	public function _linkLimit($linkName, $start, $end = null) {
 		
 	}
 	
-	public function _linkOrder($field, $orderType = "ASC") {
+	/**
+	 * It creates a order into your link list
+	 *
+	 * @param String $linkName
+	 * @param String $field
+	 * @param String $orderType
+	 */
+	public function _linkOrder($linkName, $field, $orderType = "ASC") {
 		
 	}
 }
