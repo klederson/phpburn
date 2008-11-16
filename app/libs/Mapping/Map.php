@@ -34,7 +34,7 @@ class PhpBURN_Map implements IMap {
 	 */
 	public $modelObj = null;
 	
-	public function __construct(PhpBURN_Core $modelObj){
+	public function __construct(PhpBURN_Core &$modelObj){
 		$this->modelObj = $modelObj;
 
 		//$this->mapThis($this->modelObj);
@@ -128,6 +128,7 @@ class PhpBURN_Map implements IMap {
 	
 	/**
 	 * This maps the model based on its _objectMap() function
+	 * @TODO Discutir a redundância aqui e analisar os métodos mágicos que podem vir a ser aplicados
 	 */
 	public function mapFromCode() {
 		$this->modelObj->_mapping();
@@ -213,6 +214,8 @@ class PhpBURN_Map implements IMap {
 		
 		//Just for double check it sets false to other kinds of field
 		$this->fields[$name]['isRelationship'] = false;
+		
+		//When it belongs to a child class
 		$this->fields[$name]['isExternal'] = false;
 		
 		//For multipMap use ONLY

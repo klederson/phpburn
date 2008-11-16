@@ -12,7 +12,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @return unknown
 	 */
-	public function create(PhpBURN_Core $modelObj,$fromMulti = false) {		
+	public function create(PhpBURN_Core &$modelObj,$fromMulti = false) {		
 		$mapObj = $this->getMapping(get_class($modelObj));
 		
 		if($mapObj == null) {
@@ -56,7 +56,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @param PhpBURN_Map $mapObj
 	 */
-	public function addMap(PhpBURN_Core $modelObj,PhpBURN_Map $mapObj) {
+	public function addMap(PhpBURN_Core &$modelObj,PhpBURN_Map &$mapObj) {
 		self::$mapping[get_class($modelObj)] = $mapObj;
 	}
 	
@@ -67,7 +67,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @param PhpBURN_Map $mapObj
 	 */
-	public function addMultiMap($parentMaps,PhpBURN_Core $modelObj,PhpBURN_Map $mapObj) {
+	public function addMultiMap($parentMaps,PhpBURN_Core &$modelObj,PhpBURN_Map &$mapObj) {
 		
 	}
 	

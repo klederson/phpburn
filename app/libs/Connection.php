@@ -3,7 +3,7 @@ class PhpBURN_Connection
 {
 	private static $connections = array();
 	
-	public function create(PhpBURN_ConfigurationItem $config) {
+	public function create(PhpBURN_ConfigurationItem &$config) {
 		$conn = $this->getConnection($config->dialect);
 		if(!$conn) {
 			//Create a new connection

@@ -59,6 +59,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 	}
 	
+	public function where($field,$condition) {
+		
+	}
+	
 	public function fetch() {
 		$result = $this->dialect->fetch();
 		if ($result) {
@@ -78,6 +82,19 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	public function delete() {
+		
+	}
+	
+	//Relationships functions
+	public function _linkWhere($linkName, $field, $condition) {
+		
+	}
+	
+	public function _linkLimit($start, $end = null) {
+		
+	}
+	
+	public function _linkOrder($field, $orderType = "ASC") {
 		
 	}
 }
