@@ -1,0 +1,9 @@
+# phpBurn 
+
+[phpBurn][phpburn] is a ORM for [PHP][phpnet] usage, like [hibernate][hn] and [Nhibernate][nhb] it allows you to create more and faster using [OO][woo] concepts and patterns with a log of time gain.
+
+[phpburn]: http://www.phpburn.com/
+[phpnet]: http://www.php.net/
+[hn]: http://www.hibernate.org/
+[nhb]: http://www.hibernate.org/343.html
+[woo]: http://en.wikipedia.org/wiki/Object_oriented
