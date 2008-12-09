@@ -109,29 +109,20 @@ class PhpBURN_Mapping
 	 * @return PhpBURN_MappingItem
 	 */
 	public function cascadeMaps(PhpBURN_Core &$modelObj) {
-		//while($this->isChild($modelObj)) { 
-			//if($class != "PhpBURN_Core") {
-				//$_class = new $class;
-				//$maps[] = $this->create($_class);
-				//@TODO aqui a gente clona as propriedades do mapa
-				if($this->isChild($modelObj)) {
-					$class = get_parent_class($modelObj);
-					$_parentMap = $this->getMapping($class);
-					if($_parentMap == null) {
-						$_tmpModelObj = new $class;
-						$_parentMap = $_tmpModelObj->_mapObj;
-					}
-					$cloned = $_parentMap->cloneAttributes();
-					
-					//Put the attributes into this current map as incremental mode
-					$modelObj->_mapObj->setAttributes($cloned);
-					
-	
-					unset($class, $cloned, $_tmpModelObj, $_parentMap);
-				}
-			//}
-		//}
-		//return $maps;
+		if($this->isChild($modelObj)) {
+			$class = get_parent_class($modelObj);
+			$_parentMap = $this->getMapping($class);
+			if($_parentMap == null) {
+				$_tmpModelObj = new $class;
+				$_parentMap = $_tmpModelObj->_mapObj;
+			}
+			$cloned = $_parentMap->cloneAttributes();
+			
+			//Put the attributes into this current map as incremental mode
+			$modelObj->_mapObj->setAttributes($cloned);
+			
+			unset($class, $cloned, $_tmpModelObj, $_parentMap);
+		}
 	}
 }
 ?>

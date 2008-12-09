@@ -12,6 +12,13 @@ PhpBURN::import('webinsys.Teste','webinsys.subpackage.Teste2');
 //$teste3 = new Teste();
 $teste = new Teste2();
 
+
+$teste->get(1);
+
+$teste->login = "OI";
+$teste->save();
+
+
 //Testando função interna de field
 $teste->_mapObj->setFieldValue('login','ae <br/>');
 

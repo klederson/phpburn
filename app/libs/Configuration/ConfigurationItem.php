@@ -2,7 +2,7 @@
 /**
  * This carries all the configuration for each package
  */
-class PhpBURN_ConfigurationItem {
+class phpBURN_ConfigurationItem {
 	public $package;
 	public $dialect;
 	public $database;

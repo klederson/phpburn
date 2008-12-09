@@ -22,6 +22,7 @@ abstract class PhpBURN {
 		$args = func_get_args();
 		foreach($args as $libname)
 		{
+		
 			$basedir = PHPBURN_INCLUDE_PATH . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR;
 			$libname = preg_replace('@^PhpBURN_@', '', $libname);
 			$newfile = $basedir . str_replace('.', DIRECTORY_SEPARATOR, $libname). '.php';
@@ -115,6 +116,13 @@ abstract class PhpBURN {
 			$content = "error";
 		}
 		return $content;
+	}
+	
+	/**
+	 * Alias for PhpBURN_Views::translateTolkens($string, $tolkens, $lang = null );
+	 */
+	public static function translateTolkens($string, $tolkens, $lang = null) {
+		PhpBURN::load('Extras.PhpBURN_Views');
 	}
 }
 PhpBURN::load('Configuration','Connection', 'IPhpBurn', 'Core', 'Dialect', 'Mapping');
