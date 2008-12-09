@@ -117,13 +117,7 @@ abstract class PhpBURN {
 		}
 		return $content;
 	}
-	
-	/**
-	 * Alias for PhpBURN_Views::translateTolkens($string, $tolkens, $lang = null );
-	 */
-	public static function translateTolkens($string, $tolkens, $lang = null) {
-		PhpBURN::load('Extras.PhpBURN_Views');
-	}
+
 }
 PhpBURN::load('Configuration','Connection', 'IPhpBurn', 'Core', 'Dialect', 'Mapping');
 ?>
