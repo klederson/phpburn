@@ -42,12 +42,12 @@ abstract class PhpBURN_Views implements IViews {
 	 * In case of translation a language must be setted
 	 *
 	 * @param String $template
-	 * @param Array $tolkens
+	 * @param Array $tokens
 	 * @param String $lang
 	 * 
 	 * @version 2.0a
 	 */
-	public static function translateTolkens($template, $tolkens, $lang = null) {
+	public static function translateTokens($template, $tokens, $lang = null) {
 		if(is_array($tolkens)) {
 			preg_match_all("|\[#(.*)#]|U",$template, $out, PREG_SET_ORDER);
 			foreach($out as $index => $arrContent) {
@@ -55,11 +55,11 @@ abstract class PhpBURN_Views implements IViews {
 				for($i = 0; $i < count($pieces); $i++) {
 					$stringArray .= "[$pieces[$i]]";
 				}
-				eval("\$_tmpValue = \$tolkens$stringArray;");
+				eval("\$_tmpValue = \$tokens$stringArray;");
 								
-				$finalArray[$arrContent[1]] = $lang == null ? $_tmpValue : self::translate($_tmpValue, $lang);
-				$template = str_replace("[#$arrContent[1]#]",$finalArray[$arrContent[1]],$template);
-				unset($stringArray,$_tmpValue);
+				$contentValue = $lang == null ? $_tmpValue : self::translate($_tmpValue, $lang);
+				$template = str_replace("[#$arrContent[1]#]",$contentValue,$template);
+				unset($stringArray,$_tmpValue,$contentValue);
 			}
 		} else {
 			$template = preg_replace("/\[#*[A-Za-z0-9.:\-_,]*#\]/","",$template);
