@@ -48,7 +48,7 @@ abstract class PhpBURN_Views implements IViews {
 	 * @version 2.0a
 	 */
 	public static function translateTokens($template, $tokens, $lang = null) {
-		if(is_array($tolkens)) {
+		if(is_array($tokens)) {
 			preg_match_all("|\[#(.*)#]|U",$template, $out, PREG_SET_ORDER);
 			foreach($out as $index => $arrContent) {
 				$pieces = explode(':',$arrContent[1]);
@@ -91,8 +91,30 @@ abstract class PhpBURN_Views implements IViews {
 		bindtextdomain($domain, SYS_BASE_PATH . self::$translationFolder);
 		//Set the domain
 		textdomain($domain);
+		bind_textdomain_codeset($domain, 'UTF-8');
 		
-		return _($content);
+		$return = $content != "" && $content != null && !empty($content) ? _($content) : "";
+		
+		return $return;
+	}
+	
+	/**
+	 * A lazy translator. This can translate all your document without you have to worrie about it.
+	 * You just have to put in your document the original content between TRANSLATE TAGS: [!...!] for example:
+	 * [!home!] or [!Hello there, my name is!] and let this do the rest for you.
+	 * 
+	 * If you are using translations tags you MUST have to use this method.
+	 */
+	public static function lazyTranslate($content, $lang = null, $domain = null, $lazy = false) {
+		preg_match_all("|\[!(.*)!]|U",$content, $out, PREG_SET_ORDER);
+		foreach($out as $index => $arrContent) {
+			$translation = self::translate($arrContent[1], $lang, $domain);
+			
+			$content = str_replace("[!$arrContent[1]!]",$translation,$content);
+			unset($translation);
+		}
+		
+		return $content;
 	}
 	
 	/**
