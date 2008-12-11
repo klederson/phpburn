@@ -74,11 +74,20 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 		
 	public function get() {
-		
 	}
 	
 	public function save() {
-		
+		$fields = array();
+		// if query is an insert
+		$insert = true;
+		foreach ($this->_mapObj->fields as $field => $infos) {
+			$fields[$field] = $this->_mapObj->getFieldValue($field);
+			if ($insert==true && isset($infos['pk']) && $infos['pk']==true && !empty($fields[$field])) {
+				// query will be an update
+				$insert = false;
+			}
+		}
+		//execute query.
 	}
 	
 	public function delete() {
