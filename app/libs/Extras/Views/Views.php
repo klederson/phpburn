@@ -55,15 +55,17 @@ abstract class PhpBURN_Views implements IViews {
 				for($i = 0; $i < count($pieces); $i++) {
 					$stringArray .= "['$pieces[$i]']";
 				}
+
 				eval("\$_tmpValue = \$tokens$stringArray;");
 				
-				
+
 				if($_tmpValue != null) {
-								
+					
 					$contentValue = $lang == null ? $_tmpValue : self::translate($_tmpValue, $lang);
 					$template = str_replace("[#$arrContent[1]#]",$contentValue,$template);
-				
+					
 				}
+
 				unset($stringArray,$_tmpValue,$contentValue);
 			}
 		} else {

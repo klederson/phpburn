@@ -31,12 +31,15 @@ class PhpBURN_Dialect
 			return self::$dialects[$package];
 		}
 	}
-	
-	
+		
 	private function getDialectClass($dialect = null) {
 		$dialect = $dialect = null ? "MySQL" : $dialect;
 		
 		return "PhpBURN_Dialect_$dialect";
+	}
+	
+	public function callStoreProcedure($name,$attributes = array() ) {
+		
 	}
 }
 ?>

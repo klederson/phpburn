@@ -14,6 +14,18 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	protected $_dialectObj = null;
 	
 	/**
+	 * Persistent methods attributes
+	 */
+	protected $_where = array();
+	protected $_orderBy = null;
+	protected $_limit = null;
+	
+	protected $_join = null;
+	protected $_joinLeft = null;
+	protected $_joinRight = null;
+	protected $_joinInner = null;
+	
+	/**
 	 * This is an automatic configuration when a model inherit another PhpBURN Model
 	 * than the model will use two or more mapItens. 
 	 * @example class MyNewModel extends ParentModel {
@@ -42,7 +54,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_connObj = clone $connManager->create(PhpBURN_Configuration::getConfig($this->_package));
 		
 		//Setting Up the dialect Obj
-		//TODO Organizar a seleção do dialeto
+		//@TODO Organizar a seleção do dialeto
 		$dialectManager = new PhpBURN_Dialect();
 		$this->_dialectObj = clone $dialectManager->create(PhpBURN_Configuration::getConfig($this->_package),$this);
 	}
@@ -59,7 +71,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 	}
 	
-	public function where($field,$condition) {
+	public function where($condition,$overrideOthers = false) {
 		
 	}
 	
@@ -85,7 +97,27 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 	}
 	
+	public function order() {
+		
+	}
+	
+	public function limit() {
+		
+	}
+	
 	//Relationships functions
+	
+	public function _getLink($name, $linkWhere = null) {
+		$parms = func_get_args();
+		
+		if($linkWhere != null && isset($linkWhere)) {
+			$this->_linkWhere($linkWhere);
+		}
+		
+		if(isset($parms[2])) {		
+			$this->_linkLimit($parms[2],$parms[3]);	
+		}
+	}
 	
 	/**
 	 * It puts a WHERE clause when you want to get a link with specific caracteristics

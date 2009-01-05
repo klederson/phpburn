@@ -1,5 +1,5 @@
 <?php
-PhpBurn::load("Dialect.IDialect");
+PhpBURN::load("Dialect.IDialect");
 
 class PhpBURN_Dialect_MySQL implements IDialect {
 	
