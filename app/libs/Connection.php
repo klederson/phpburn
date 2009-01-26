@@ -4,7 +4,7 @@ class PhpBURN_Connection
 	private static $connections = array();
 	
 	public function create(PhpBURN_ConfigurationItem &$config) {
-		$conn = $this->getConnection($config->dialect);
+		$conn = self::getConnection($config->package);
 		if(!$conn) {
 			//Create a new connection
 			
@@ -12,7 +12,7 @@ class PhpBURN_Connection
 			PhpBURN::load('Connection.IConnection');
 			
 			if(PhpBURN::load("Connection.$config->dialect") != "error") {
-				$className = $this->getConnectionClass($config->dialect);
+				$className = self::getConnectionClass($config->dialect);
 				$connectionClass = new $className;
 				
 				$connectionClass->setHost($config->host);

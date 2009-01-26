@@ -119,5 +119,5 @@ abstract class PhpBURN {
 	}
 
 }
-PhpBURN::load('Configuration','Connection', 'IPhpBurn', 'Core', 'Dialect', 'Mapping');
+PhpBURN::load('Configuration','Connection', 'IPhpBurn', 'Core', 'Dialect', 'Mapping','Exception','Message');
 ?>

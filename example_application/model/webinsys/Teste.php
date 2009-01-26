@@ -1,7 +1,7 @@
 <?php
 class Teste extends PhpBURN_Core {
 	public $_package = 'webinsys';
-	public $_tablename = 'users';
+	public $_tablename = 'teste';
 	
 	public $id;
 	public $login;

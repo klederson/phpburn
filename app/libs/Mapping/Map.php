@@ -250,8 +250,8 @@ class PhpBURN_Map implements IMap {
 	 */
 	public function checkColumns($value,$index,$myCompare) {
 		if($index == 'column' && $value == $myCompare) {
-			//TODO Create here an Exception
-			print "Duplicated column: $myCompare";
+			//TODO Send an Exeption Message: [!Duplicated Column!]: $myCompare
+			print "[!Duplicated column!]: $myCompare";
 			exit;
 		}
 	}
@@ -292,6 +292,25 @@ class PhpBURN_Map implements IMap {
 	public function setFieldValue($field,$value) {
 		$this->fields[$field]['#value'] = $value;
 		$this->getFieldValue($field);
+	}
+	
+	/**
+	 * Validate a field based in its rules in Dialect Type
+	 * @param String $fieldName
+	 * @return unknown_type
+	 */
+	public function validateField($fieldName) {
+		$keyExist = array_key_exists($fieldName, $this->fields);
+		
+		if($keyExist == true || $this->fields[$fieldName]['isRelationship'] == false) {
+			return $this->modelObj->_dialectObj->validateValue($this->fields[$fieldName]['#value'],$this->fields[$fieldName]['type'], $this->fields[$fieldName]['length']);
+		} else {
+			//TODO Send an Exception Message: "[!This field doesn't exist or is a Relationship!]: <strong>". get_class($this->modelObj) ."->$fieldName </strong>"
+			print "[!This field doesn't exist or is a Relationship!]: <strong>". get_class($this->modelObj) ."->$fieldName </strong>";
+			return false;
+		}
+		
+		return false;
 	}
 	
 	/**

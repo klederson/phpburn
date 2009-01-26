@@ -1,10 +1,10 @@
 <?php
 /**
- * This class has been adapted from Lumine 1.8
+ * This class has been adapted from Lumine 1.0
  * The original idea is from:
  * @author Hugo Ferreira da Silva
  * 
- * It has been modified and implemented by:
+ * It has been modified and implemented into PhpBURN by:
  * 
  * @author Klederson Bueno Bezerra da Silva
  *
@@ -12,20 +12,20 @@
 class PhpBURN_Connection_MySQL
 {
 
-	const CLOSED           = 0;
-	const OPEN             = 1;
+	const CLOSED							= 0;
+	const OPEN								= 1;
 
-	const SERVER_VERSION   = 10;
-	const CLIENT_VERSION   = 11;
-	const HOST_INFO        = 12;
-	const PROTOCOL_VERSION = 13;
-	const RANDOM_FUNCTION  = 'rand()';
+	const SERVER_VERSION				= 10;
+	const CLIENT_VERSION				= 11;
+	const HOST_INFO						= 12;
+	const PROTOCOL_VERSION			= 13;
+	const RANDOM_FUNCTION			= 'rand()';
 	
-	const ESCAPE_CHAR      = '\\';
+	const ESCAPE_CHAR					= '\\';
 	
 	protected $_event_types = array(
-		'preExecute','posExecute','preConnect','posConnect','preClose','posClose',
-		'onExecuteError','onConnectionError'
+		'preExecute','posExecute','preConnect','onConnectSucess','preClose','posClose',
+		'onExecuteError','onConnectError'
 	);
 	
 	private $conn_id;
@@ -51,14 +51,14 @@ class PhpBURN_Connection_MySQL
 	
 	public function connect()
 	{
-		//print $this->getDatabase();
+		
 		if($this->conn_id && $this->state == self::OPEN)
 		{
 			mysql_select_db($this->getDatabase(), $this->conn_id);
 			return true;
 		}
-
-		//$this->dispatchEvent('preConnect', $this);
+		
+		//TODO preConnect actions should be called from here
 		
 		$hostString = $this->getHost();
 		if($this->getPort() != '') 
@@ -81,17 +81,18 @@ class PhpBURN_Connection_MySQL
 		if( !$this->conn_id )
 		{
 			$this->state = self::CLOSED;
-			$msg = 'N�o foi poss�vel conectar no banco de dados: ' . $this->getDatabase().' - '.$this->getErrorMsg();
+			$msg = '[!Database connection error!]: ' . $this->getDatabase().' - '.$this->getErrorMsg();
 			
-			//$this->dispatchEvent('onConnectionError', $this, $msg);
+			//TODO onConnectError actions should be called from here
 			
 			return false;
 		}
 		
-		// seleciona o banco
+		//Selecting database
 		mysql_select_db($this->getDatabase(), $this->conn_id);
 		$this->state = self::OPEN;
-		//$this->dispatchEvent('posConnect', $this);
+		
+		//TODO onConnectSucess actions should be called from here
 		
 		return true;
 	}
@@ -395,7 +396,7 @@ class PhpBURN_Connection_MySQL
 		return self::ESCAPE_CHAR;
 	}
 	
-	// transa��es
+	//Transactions
 	public function begin($transactionID=null)
 	{
 		$this->executeSQL("BEGIN");
@@ -410,7 +411,7 @@ class PhpBURN_Connection_MySQL
 	}
 	
 	public function __destruct() {
-
+		self::close();
 	}
 }
 

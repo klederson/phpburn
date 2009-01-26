@@ -9,7 +9,6 @@ interface IPhpBurn {
 	public function order();
 	
 	public function limit();
-	
-	public function _getLink();
+
 }
 ?>

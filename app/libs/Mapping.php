@@ -13,17 +13,16 @@ class PhpBURN_Mapping
 	 * @return unknown
 	 */
 	public function create(PhpBURN_Core &$modelObj,$fromMulti = false) {		
-		$mapObj = $this->getMapping(get_class($modelObj));
+		$mapObj = self::getMapping(get_class($modelObj));
 		
 		/*
-		 * @TODO !!!IMPORTANTE!!!
 		 * @TODO Para os multimaps/heranças basta adicionar o campo com o nome da classe pertencente no parentMap assim o o mapa ficará completo e o campo saberá a quem pertence e poderá ser salvo na tabela
 		 */
 		
 		if($mapObj == null) {
 			
 			$mapObj = new PhpBURN_Map($modelObj);
-			$this->addMap($modelObj,$mapObj);
+			self::addMap($modelObj,$mapObj);
 			
 				
 			/*
@@ -42,7 +41,7 @@ class PhpBURN_Mapping
 			$modelObj->_mapObj->mapThis();
 			
 			//Check for parentMaps ( inhirit )
-			$parentMaps = $this->cascadeMaps($modelObj);
+			$parentMaps = self::cascadeMaps($modelObj);
 			
 			//Here we clone because it is the first model, we cant use the base object as map because we can have troubles with references and stored data
 			$mapObj = clone $mapObj;
@@ -109,9 +108,9 @@ class PhpBURN_Mapping
 	 * @return PhpBURN_MappingItem
 	 */
 	public function cascadeMaps(PhpBURN_Core &$modelObj) {
-		if($this->isChild($modelObj)) {
+		if(self::isChild($modelObj)) {
 			$class = get_parent_class($modelObj);
-			$_parentMap = $this->getMapping($class);
+			$_parentMap = self::getMapping($class);
 			if($_parentMap == null) {
 				$_tmpModelObj = new $class;
 				$_parentMap = $_tmpModelObj->_mapObj;

@@ -4,7 +4,7 @@ class PhpBURN_Dialect
 	private static $dialects = array();
 	
 	public function create(PhpBURN_ConfigurationItem $config,PhpBURN_Core $obj) {
-		$dialect = $this->getDialect($config->dialect);
+		$dialect = self::getDialect($config->dialect);
 		if(!$dialect) {
 			//Create a new dialect
 			
@@ -12,7 +12,7 @@ class PhpBURN_Dialect
 			PhpBURN::load('Dialect.IDialect');
 			
 			if(PhpBURN::load("Dialect.$config->dialect") != "error") {
-				$className = $this->getDialectClass($config->dialect);
+				$className = self::getDialectClass($config->dialect);
 				$dialectClass = new $className($obj);
 				
 				$dialect = self::$dialects[$config->package] = $dialectClass;
@@ -38,7 +38,7 @@ class PhpBURN_Dialect
 		return "PhpBURN_Dialect_$dialect";
 	}
 	
-	public function callStoreProcedure($name,$attributes = array() ) {
+	public function callStoredProcedure($name,$attributes = array() ) {
 		
 	}
 }
