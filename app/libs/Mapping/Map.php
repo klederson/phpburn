@@ -78,7 +78,7 @@ class PhpBURN_Map implements IMap {
 	
 	/**
 	 * This maps the model based on its XML Mapping
-	 *
+	 * @TODO Change it to DOMElement instead SimpleXML
 	 * @param PhpBURN_Core $modelObj
 	 * @param SimpleXMLElement $xmlMap
 	 */

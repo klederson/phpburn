@@ -3,27 +3,42 @@
  * All phpBurn classes should extend this
  */
 abstract class PhpBURN_Core implements IPhpBurn {
+	/* The structure of the constants follow the concept
+	 * The two first numbers identify the TYPE of constant for example:
+	 * 100001, 10 means that integer corresponds to a SQL DATABASE constant, 00 means it corresponds to an QUERY and 01 at the end corresponds to the SELECT query
+	 * For more information see the detailed documentation with all constants indexes.
+	 * 
+	 * It has been made to make easier to identify an number in debugs and other stuffs.
+	 */
 	
 	//Relationship types
-	const ONE_TO_ONE = 1;
-	const ONE_TO_MANY = 2;
-	const MANY_TO_MANY = 3;
+	const ONE_TO_ONE 						= 100101;
+	const ONE_TO_MANY 						= 100102;
+	const MANY_TO_MANY 					= 100103;
 	
+	//Query types
+	//@TODO We do not use the term SQL because in the future we want to expand phpBURN to NON-SQL databases and/or even possibles new kinds of database such as CouchDB
+	const QUERY_SELECT						= 100001;
+	const QUERY_SELECT_COUNT			= 100002;
+	const QUERY_UPDATE						= 100003;
+	const QUERY_INSERT						= 100004;
+	const QUERY_DELETE						= 100005;
+	const QUERY_MULTI_INSERT			= 100006;
+	
+	//Internal objects
 	protected $_connObj = null;
 	public  $_mapObj = null;
 	protected $_dialectObj = null;
 	
-	/**
-	 * Persistent methods attributes
-	 */
+	//Persistent methods storage
 	public $_where = array();
 	protected $_orderBy = null;
 	protected $_limit = null;
-	
-	protected $_join = null;
-	protected $_joinLeft = null;
-	protected $_joinRight = null;
-	protected $_joinInner = null;
+		//join storage
+		protected $_join = array();
+		protected $_joinLeft = array();
+		protected $_joinRight = array();
+		protected $_joinInner = array();
 	
 	/**
 	 * This is an automatic configuration when a model inherit another PhpBURN Model
@@ -91,6 +106,43 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_dialectObj->find($pk);
 		
 		return $resultSetAmount;
+	}
+	
+	/**
+	 * This function is going to retrive you the prepared QUERY for execution based on your dialect (MySQL, PostgreeSQL, Oracle, SQLite, etc )
+	 * 
+	 * The original idea is from Hugo Ferreira da Silva in the Lumine Base code we just take and re-design it to our needs.
+	 * 
+	 * @param Integer $type
+	 * @param Mixed $opt
+	 * @return String
+	 */
+	public function _getQUERY( $type = self::QUERY_SELECT, $opt = null )
+	{
+		switch($type)
+		{
+			case self::QUERY_SELECT:
+				return $this->_dialectObj->_selectQUERY();
+			
+			case self::QUERY_SELECT_COUNT:
+				return $this->_dialectObj->_selectQUERY(true, $opt);
+				
+			case self::QUERY_UPDATE:
+				return $this->_dialectObj->_updateQUERY( $opt );
+				
+			case self::QUERY_DELETE:
+				return $this->_dialectObj->_deleteQUERY( $opt );
+			
+			case self::QUERY_INSERT:
+				return $this->_dialectObj->_insertQUERY( $opt );
+
+			case self::QUERY_MULTI_INSERT;
+				return $this->_dialectObj->_getMultiInsertQUERY( $opt );
+		}
+		
+		//@TODO Insert here an exeption message: "[!Unsuported SQL type!]: $type"
+		print "[!Unsuported SQL type!]: $type";
+		exit();
 	}
 	
 	/**
