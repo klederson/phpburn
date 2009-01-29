@@ -13,46 +13,72 @@ class PhpBURN_Exception implements IException
   const FILE    = '10004';
   
   private $message;
+  private $output;
 
 	public function log($message)
 	{
 	  $message = "[" .date('d/m/Y H:i:s') ."] - (" .number_format(memory_get_usage()/1048576, 2, ',', ' ') ." MB) - " .$message;
 	  $messageObj = new PhpBURN_Message($message);
+	  $this->firebugMode = FirePHP::LOG;
 	  $this->setMessage($messageObj);
+	  return $this->output();
 	}
 	
 	public function debug($message)
 	{
 	  $message = "[" .date('d/m/Y H:i:s') ."] - (" .number_format(memory_get_usage()/1048576, 2, ',', ' ') ." MB) - " .$message;
 	  $messageObj = new PhpBURN_Message($message);
+	  $this->firebugMode = FirePHP::INFO;
 	  $this->setMessage($messageObj);
+	  return $this->output();
 	}
 	
 	public function warning($message)
 	{
 		$message = "[" .date('d/m/Y H:i:s') ."] - (" .number_format(memory_get_usage()/1048576, 2, ',', ' ') ." MB) - " .$message;
     $messageObj = new PhpBURN_Message($message);
+    $this->firebugMode = FirePHP::WARN;
 		$this->setMessage($messageObj);
+		return $this->output();
 	}
 
 	public function error($message)
 	{
 		$message = "[" .date('d/m/Y H:i:s') ."] - (" .number_format(memory_get_usage()/1048576, 2, ',', ' ') ." MB) - " .$message;
 		$messageObj = new PhpBURN_Message($message);
+		$this->firebugMode = FirePHP::ERROR;
 		$this->setMessage($messageObj);
+		return $this->output();
 	}
 	
 	public function setMessage(PhpBURN_Message $message = null) {
 	  $this->message = $message;
 	}
 	
-	public function setOutput($mode) {
+	public function setOutput($mode, $path = '') {
 	  $this->output = $mode;
 	  return true;
 	}
 	
 	public function output() {
-	  return $this->message->getMessage();
+	  switch($this->output) {
+	    case self::BROWSER:
+	      print $this->message->getMessage();
+      break;
+      case self::FIREBUG:
+				$firephp = FirePHP::getInstance(true);
+				$firephp->fb($this->message->getMessage(), $this->firebugMode);
+      break;
+      case self::CONSOLE:
+        print $this->message->getMessage();
+      break;
+      case self::FILE:
+        print $this->message->getMessage();
+      break;
+      default:
+        return $this->message->getMessage();
+      break;
+	  }
 	}
 }
 ?>
