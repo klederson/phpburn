@@ -1,6 +1,10 @@
 <?php
 
 class PhpBURN_Message {
+	const LOG = 0;
+	const DEBUG = 1;
+	const WARNING = 2;
+	const ERROR = 3;
 	const EMPTY_DATABASE = 10;
 	const EMPTY_DATABASE_USER = 11;
 	const EMPTY_DATABASE_PASSWORD = 12;
@@ -12,50 +16,38 @@ class PhpBURN_Message {
 
 	public $message = null;
 
-	function __construct($msg) {
-		switch ($msg) {
+	function __construct($message) {
+		switch ($message) {
 			case EMPTY_DATABASE:
-				$m = _('Database option is empty.');
-				break;
-			
+				$msg = 'Database option is empty.';
+			break;
 			case EMPTY_DATABASE_USER:
-				$m = _('Database user option is empty.');
-				break;
-			
+				$msg = 'Database user option is empty.';
+			break;
 			case EMPTY_DATABASE_PASSWORD:
-				$m = _('Database password option is empty.');
-				break;
-			
+				$msg = 'Database password option is empty.';
+			break;
 			case EMPTY_CLASSPATH:
-				$m = _('Classpath option is empty.');
-				break;
-			
+				$msg = 'Classpath option is empty.';
+			break;
 			case EMPTY_DIALECT:
-				$m = _('Dialect option is empty.');
-				break;
-			
+				$msg = 'Dialect option is empty.';
+			break;
 			case EMPTY_DATABASE_PORT:
-				$m = _('Database port is empty.');
-				break;
-			
+				$msg = 'Database port is empty.';
+			break;
 			case EMPTY_DATABASE_HOST:
-				$m = _('Database host is empty.');
-				break;
-			
+  			$msg = 'Database host is empty.';
+			break;
 			case EMPTY_PACKAGEORTABLE:
-				$m = _('Package or table option is empty.');
-				break;
-			default:
-				$m = _('Unknown message.');
-				break;
+				$msg = 'Package or table option is empty.';
+			break;
 		}
-		$this->message = $m;
+		$this->message = $message;
 	}
-
 	public function getMessage() {
 		return $this->message;
 	}
-
 }
 
 ?>
