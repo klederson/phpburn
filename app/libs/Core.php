@@ -69,6 +69,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		//Setting Up the dialect object ( _dialectObj )
 		$this->_dialectObj = clone PhpBURN_Dialect::create(PhpBURN_Configuration::getConfig($this->_package),$this);
 		
+		//Add Exception Object
+		$this->_exceptionObj = new PhpBURN_Exception();
+		
+		//Set default output
+		$this->_exceptionObj->setOutput(PhpBURN_Exception::FIREBUG);
+		
 		//Then now we have all set... let's rock!
 		$this->_initialize();
 	}
@@ -76,8 +82,6 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	final private function _initialize() {
 		//Opening the database connection for this object
 		$this->_connObj->connect();
-		
-		
 	}
 	
 	/**
@@ -174,6 +178,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Boolean $override
 	 */
 	public function where($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
+		
+		$this->_exceptionObj->log('teste');
 		
 		$conditions = array();
 		$conditions['start'] = $condition_start;

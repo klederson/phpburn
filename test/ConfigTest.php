@@ -2,10 +2,6 @@
 require_once 'PHPUnit/Framework.php';
 
 class ConfigTest extends PHPUnit_Framework_TestCase {
-	function pending() {
-		$this->markTestIncomplete();
-	}
-	
 	function testIfExistsConfigFile() {
 		$this->assertFileExists('../example_application/config.php');
 	}
