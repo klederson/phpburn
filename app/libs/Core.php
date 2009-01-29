@@ -122,22 +122,22 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		switch($type)
 		{
 			case self::QUERY_SELECT:
-				return $this->_dialectObj->_selectQUERY();
+				return $this->_dialectObj->_getSelectQuery();
 			
 			case self::QUERY_SELECT_COUNT:
-				return $this->_dialectObj->_selectQUERY(true, $opt);
+				return $this->_dialectObj->_getSelectQuery(true, $opt);
 				
 			case self::QUERY_UPDATE:
-				return $this->_dialectObj->_updateQUERY( $opt );
+				return $this->_dialectObj->_getUpdateQuery( $opt );
 				
 			case self::QUERY_DELETE:
-				return $this->_dialectObj->_deleteQUERY( $opt );
+				return $this->_dialectObj->_getDeleteQuery( $opt );
 			
 			case self::QUERY_INSERT:
-				return $this->_dialectObj->_insertQUERY( $opt );
+				return $this->_dialectObj->_getInsertQuery( $opt );
 
 			case self::QUERY_MULTI_INSERT;
-				return $this->_dialectObj->_getMultiInsertQUERY( $opt );
+				return $this->_dialectObj->_getMultiInsertQuery( $opt );
 		}
 		
 		//@TODO Insert here an exeption message: "[!Unsuported SQL type!]: $type"

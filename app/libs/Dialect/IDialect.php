@@ -29,6 +29,13 @@ interface IDialect
 	public function getPointer();
 	public function setPointer($pointer);
 	
+	/* Database methods */
+	public function _getSelectQuery();
+	public function _getUpdateQuery();
+	public function _getInsertQuery();
+	public function _getDeleteQuery();
+	public function _getMultiInsertQuery();
+	
 	/* Other methods */
 	public function getErrorMsg();
 	
