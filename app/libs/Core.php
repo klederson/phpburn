@@ -26,19 +26,19 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	const QUERY_MULTI_INSERT			= 100006;
 	
 	//Internal objects
-	protected $_connObj = null;
-	public  $_mapObj = null;
-	protected $_dialectObj = null;
+	protected $_connObj						= null;
+	public  $_mapObj							= null;
+	protected $_dialectObj					= null;
 	
 	//Persistent methods storage
-	public $_where = array();
-	protected $_orderBy = null;
-	protected $_limit = null;
+	public $_where								= array();
+	protected $_orderBy						= null;
+	protected $_limit							= null;
 		//join storage
-		protected $_join = array();
-		protected $_joinLeft = array();
-		protected $_joinRight = array();
-		protected $_joinInner = array();
+		protected $_join							= array();
+		protected $_joinLeft					= array();
+		protected $_joinRight					= array();
+		protected $_joinInner					= array();
 	
 	/**
 	 * This is an automatic configuration when a model inherit another PhpBURN Model
@@ -53,7 +53,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * 
 	 * @var Boolean
 	 */
-	public $_multiMap = false;
+	public $_multiMap							= false;
 	
 	public function __construct() {
 		if(!isset($this->_tablename) || !isset($this->_package)) {
@@ -68,12 +68,6 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		//Setting Up the dialect object ( _dialectObj )
 		$this->_dialectObj = clone PhpBURN_Dialect::create(PhpBURN_Configuration::getConfig($this->_package),$this);
-		
-		//Add Exception Object
-		$this->_exceptionObj = new PhpBURN_Exception();
-		
-		//Set default output
-		$this->_exceptionObj->setOutput(PhpBURN_Exception::FIREBUG);
 		
 		//Then now we have all set... let's rock!
 		$this->_initialize();

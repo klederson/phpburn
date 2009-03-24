@@ -1,10 +1,10 @@
 <?php
 PhpBURN::load('Exception.IException');
 PhpBURN::load('Message');
-require_once('FirePHPCore/fb.php');
+//require_once('FirePHPCore/fb.php');
 ob_start();
 
-class PhpBURN_Exception implements IException 
+class PhpBURN_Exception extends Exception implements IException 
 {
 
   const CONSOLE = '10001';
@@ -12,7 +12,7 @@ class PhpBURN_Exception implements IException
   const FIREBUG = '10003';
   const FILE    = '10004';
   
-  private $message;
+  protected $message;
   private $output;
 
 	public function log($message)
