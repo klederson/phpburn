@@ -302,7 +302,7 @@ class PhpBURN_Map implements IMap {
 	public function validateField($fieldName) {
 		$keyExist = array_key_exists($fieldName, $this->fields);
 		
-		if($keyExist == true || $this->fields[$fieldName]['isRelationship'] == false) {
+		if($keyExist == true && $this->fields[$fieldName]['isRelationship'] == false) {
 			return $this->modelObj->_dialectObj->validateValue($this->fields[$fieldName]['#value'],$this->fields[$fieldName]['type'], $this->fields[$fieldName]['length']);
 		} else {
 			//TODO Send an Exception Message: "[!This field doesn't exist or is a Relationship!]: <strong>". get_class($this->modelObj) ."->$fieldName </strong>"

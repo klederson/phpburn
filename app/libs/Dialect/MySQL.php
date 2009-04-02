@@ -1,9 +1,11 @@
 <?php
+PhpBURN::load('Dialect.Dialect_Operations');
 PhpBURN::load("Dialect.IDialect");
 
-class PhpBURN_Dialect_MySQL implements IDialect {
+
+class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDialect  {
 	
-	private $obj = null;
+	protected $obj = null;
 	private $connection = null;
 	private $resultSet;
 	private $dataSet;
@@ -20,8 +22,10 @@ class PhpBURN_Dialect_MySQL implements IDialect {
 	/* Common Persistent Methods */
 	
 	public function find($pk = null) {
-		$where = $this->checkSearchConditions();
+		//Start checking the model object
+		print $sql = $this->prepareSelect();
 		
+		//$this->execute($sql);
 		
 	}
 
@@ -101,21 +105,12 @@ class PhpBURN_Dialect_MySQL implements IDialect {
 	
 	/* Auxiliar Methods */
 	
-	private function checkSearchConditions() {
-		foreach($this->obj->_where as $index => $conditions) {
-			$sql .= $sql != null ? " $conditions[condition] \r\n" : " \r\n WHERE \r\n";
-			
-			$sql .= '`' . $conditions['start'] . '` ' . $conditions['operator'] . ' "' . $conditions['end'] . '"';
-		}
+	protected function handleSelect() {
 		
-		return $sql;
 	}
 	
-	protected function _prepareSQL($forCount = false, $what = '*')
-	{
-		$sql = "SELECT ";
-				
-		return $sql;
+	public function callStoredProcedure($name,$attributes = array() ) {
+		
 	}
 
 	/* Navigational Methods */

@@ -1,6 +1,9 @@
 <?php
 /**
- * All phpBurn classes should extend this
+ * All phpBurn classes should extend thi
+ * 
+ * @author Kléderson Bueno <klederson@klederson.com>
+ * @version 0.37
  */
 abstract class PhpBURN_Core implements IPhpBurn {
 	/* The structure of the constants follow the concept
@@ -26,19 +29,19 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	const QUERY_MULTI_INSERT			= 100006;
 	
 	//Internal objects
-	protected $_connObj						= null;
-	public  $_mapObj							= null;
-	protected $_dialectObj					= null;
+	public $_connObj							= null;
+	public $_mapObj							= null;
+	public $_dialectObj							= null;
+	
+	//Fields mapping
+	public $_fields								= array();
 	
 	//Persistent methods storage
 	public $_where								= array();
-	protected $_orderBy						= null;
-	protected $_limit							= null;
-		//join storage
-		protected $_join							= array();
-		protected $_joinLeft					= array();
-		protected $_joinRight					= array();
-		protected $_joinInner					= array();
+	public $_orderBy							= null;
+	public $_limit									= null;
+	public $_select								= array();
+	public $_join									= array();
 	
 	/**
 	 * This is an automatic configuration when a model inherit another PhpBURN Model
@@ -111,6 +114,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * 
 	 * The original idea is from Hugo Ferreira da Silva in the Lumine Base code we just take and re-design it to our needs.
 	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
+	 * 
 	 * @param Integer $type
 	 * @param Mixed $opt
 	 * @return String
@@ -144,7 +150,47 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	/**
+	 * join Function inserts a JOIN clause in the get()/find() method and than returns the join result in a array into the object
+	 * Ex. $obj->join('users');
+	 * returns $obj->_users->name and $obj->_users->login (but only as object not a PhpBURN model if you want methods in user use _getLink())
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
+	 * 
+	 * @param String $tableName
+	 * @param String $fieldLeft
+	 * @param String $fieldRight
+	 * @param String $operator
+	 * @param String $joinType
+	 */
+	public function join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN') {
+		$this->_join[$tableName]['fieldLeft'] = $fieldLeft;
+		$this->_join[$tableName]['fieldRight'] = $fieldRight;
+		$this->_join[$tableName]['operator'] = $operator;
+		$this->_join[$tableName]['type'] = $joinType;
+	}
+	
+	public function joinLeft($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
+		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'LEFT JOIN');
+	}
+	
+	public function joinRight($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
+		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'RIGHT JOIN');
+	}
+	
+	public function joinInner($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
+		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'INNER JOIN');
+	}
+	
+	public function joinOutter($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
+		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'OUTTER JOIN');
+	}
+	
+	/**
 	 * Validate Field(s) value(s) based on mapping instructions and dialect rules
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
 	 * 
 	 * @param String $fieldName
 	 * @return Boolean
@@ -162,18 +208,28 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		return true;
 	}
+	
+	public function where($conditions) {
+		array_push($this->_where, $conditions);
+	}
 		
 	/**
+	 * SuperWhere (swhere)
+	 * 
 	 * This method allow your model to add various WHERE conditions before your get, search or find call.
+	 * However it uses a new way of define your conditions and keep ALL compatibility when database change.
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
 	 * 
 	 * @param String $condition_start
 	 * @param String $stringOperator
 	 * @param String/Integer $conditon_end
 	 * @param Boolean $override
 	 */
-	public function where($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
+	public function swhere($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
 		
-		$this->_exceptionObj->log('teste');
+		//$this->_exceptionObj->log('teste');
 		
 		$conditions = array();
 		$conditions['start'] = $condition_start;
@@ -205,6 +261,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	/**
 	 * Searchs the native spoken language operator and converts into a programatic operator based on $this->operatorsTable .
 	 * FIXME Discover another ( and more inteligent ) solution for this case and also move the operatorsTable too.
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
+	 * 
 	 * @param String $operator
 	 * @return String
 	 */
@@ -222,6 +282,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return $operator;
 	}
 	
+	/**
+	 * fetch() moves the cursor to the next result into the dataset
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
+	 * 
+	 * @return PhpBURN_Core
+	 */
 	public function fetch() {
 		$result = $this->dialect->fetch();
 		if ($result) {
@@ -277,6 +345,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	/**
 	 * It puts a WHERE clause when you want to get a link with specific caracteristics
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
 	 *
 	 * @param String $linkName
 	 * @param String $field
@@ -288,6 +359,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	/**
 	 * It sets a limit or pagination in you link call
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
 	 *
 	 * @param String $linkName
 	 * @param Integer $start
@@ -299,6 +373,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	/**
 	 * It creates a order into your link list
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
 	 *
 	 * @param String $linkName
 	 * @param String $field

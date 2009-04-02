@@ -38,8 +38,5 @@ class PhpBURN_Dialect
 		return "PhpBURN_Dialect_$dialect";
 	}
 	
-	public function callStoredProcedure($name,$attributes = array() ) {
-		
-	}
 }
 ?>

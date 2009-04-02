@@ -1,14 +1,17 @@
 <?php
 require_once('config.php');
-require_once('phpBurn.php');
+require_once('app/phpBurn.php');
 
 $config = new PhpBURN_Configuration($thisConfig);
 
-PhpBURN::import('webinsys.Teste','webinsys.subpackage.Teste2');
+PhpBURN::import('webinsys.Users');
 
-$teste = new Teste();
+$teste = new Users();
 
-$teste->where('login','eq','teste 1');
+$teste->swhere('login','=','teste 1');
+
+$teste->join('albums');
+$teste->join('teste','users.id','teste.id_user');
 
 $teste->find();
 
