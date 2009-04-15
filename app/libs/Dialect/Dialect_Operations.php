@@ -1,10 +1,10 @@
 <?php
-class PhpBURN_Dialect_Operations {
-	
-	
+abstract class PhpBURN_Dialect_Operations {
 	
 	/**
 	 * Prepares the SQL Query for SELECT complete with Joins and all needed for a SELECT.
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
 	 * 
 	 * @return String $sql
 	 */

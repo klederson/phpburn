@@ -19,6 +19,7 @@ interface IDialect
 	public function getDataset();
 	public function setDataset(array $dataset);
 	public function execute($sql); //The main method
+	public function resultToObject(array $resultSet);
 	
 	/* Navigational Methods */
 	public function moveNext();

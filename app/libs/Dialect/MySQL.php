@@ -7,6 +7,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 	
 	protected $obj = null;
 	private $connection = null;
+	private $connObj = null;
 	private $resultSet;
 	private $dataSet;
 	private $mode;
@@ -14,6 +15,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 		
 	function __construct(PhpBurn_Core $obj) {
 		$this->obj = &$obj;
+		$this->connObj = &$obj->_connObj;		
 	}
 	function __destruct() {
 		unset($this);
@@ -25,7 +27,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 		//Start checking the model object
 		print $sql = $this->prepareSelect();
 		
-		//$this->execute($sql);
+		$this->execute($sql);
 		
 	}
 
@@ -101,6 +103,10 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 		$this->setDataSet($dataSet);
 		$this->setPointer(0);
 		return true;
+	}
+	
+	public function resultToObject(array $resultSet) {
+		
 	}
 	
 	/* Auxiliar Methods */

@@ -338,7 +338,8 @@ class PhpBURN_Connection_MySQL
 			$msg = $this->getErrorMsg();
 			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
 			//throw new PhpBURN_Exception() TODO CREATE EXCETION CLASS AND INPUT AN EXCEPTION HERE;
-		}
+		} 
+		$this->close();
 		//$this->dispatchEvent('posExecute', $this, $sql);
 		return $rs;
 	}
