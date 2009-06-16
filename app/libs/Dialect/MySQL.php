@@ -1,48 +1,32 @@
 <?php
-PhpBURN::load('Dialect.Dialect_Operations');
+PhpBURN::load('Dialect.Dialect');
 PhpBURN::load("Dialect.IDialect");
 
-
-class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDialect  {
-	
-	protected $obj = null;
-	private $connection = null;
-	private $connObj = null;
-	private $resultSet;
-	private $dataSet;
-	private $mode;
-	private $pointer;
+/**
+ * This class manages all content, queries and result stuff in a system level and for all database driver interaction level
+ * it calls PhpBURN_Connection object that is the main responsable between the application data and database interaction
+ * 
+ * @author Klederson Bueno <klederson@klederson.com>
+ *
+ */
+class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 		
-	function __construct(PhpBurn_Core $obj) {
-		$this->obj = &$obj;
-		$this->connObj = &$obj->_connObj;		
-	}
-	function __destruct() {
-		unset($this);
-	}
-	
 	/* Common Persistent Methods */
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/Dialect/PhpBURN_Dialect#find()
+	 */
 	public function find($pk = null) {
-		//Start checking the model object
-		print $sql = $this->prepareSelect();
-		
-		$this->execute($sql);
-		
+		return parent::find($pk);
 	}
-
-	public function save() {
+	
+	public function distinct($field) {
 		
 	}
 	
-	public function delete() {
+	public function unixTimestamp($field) {
 		
-	}
-	
-	public function num_rows() {
-		if (!isset($this->resultSet) && empty($this->resultSet))
-			return 0;
-		return $this->getConnection()->num_rows($this->resultSet);
 	}
 	
 	public function affected_rows() {
@@ -51,7 +35,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 		return $this->getConnection()->affected_rows();
 	}
 	
-	public function fetch() {
+	/*public function fetch() {
 		$point = $this->getPointer();
 		$this->moveNext();
 		if ($point > $this->getLast()) {
@@ -59,7 +43,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 			return false;
 		}
 		return $this->fetch_row($point);
-	}
+	}*/
 	
 	public function fetch_row($rowNumber) {
 		if (!isset($this->dataSet) && !isset($this->dataSet[$rowNumber]))
@@ -68,45 +52,22 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 	}
 	
 	/* Functional Methods */
-	
-	public function setConnection($connection) {
-		$this->connection = &$connection;
-	}
-	
-	public function getConnection() {
-		return $this->connection;
-	}
-	
-	public function setMysqlMode($mode = "") {
-		$this->mode = $mode;
 		
-		if (empty($mode))
-			$this->setMysqlMode(MYSQL_ASSOC);
-	}
-	
-	public function setDataSet(array $dataSet) {
-		$this->dataSet = $dataSet;
-	}
-	
-	public function getDataSet() {
-		return $this->dataSet;
-	}
-	
-	public function execute($sql, $mode = "") {
-		if (!isset($this->connection) && empty($this->connection))
-			return false;
-		$this->setMysqlMode($mode);
-		$this->resultSet = $this->connection->executeSQL($sql);
-		while ($row = mysql_fetch_array($this->resultSet, $this->mode)) {
-			$dataSet[] = $row;
-		}
-		$this->setDataSet($dataSet);
-		$this->setPointer(0);
-		return true;
-	}
-	
 	public function resultToObject(array $resultSet) {
 		
+	}
+	
+	public function setLimit($offset = null, $limit = null) {
+		if($offset == null && $limit == null)
+		{
+			return;
+		} else if($offset == null && $limit != null) {
+			return sprintf("LIMIT %d", $limit);
+		} else if($offset != null && $limit == null) {
+			return sprintf("LIMIT %d", $offset);
+		} else {
+			return sprintf("LIMIT %d, %d", $offset, $limit);
+		}
 	}
 	
 	/* Auxiliar Methods */
@@ -115,59 +76,15 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect_Operations implements IDiale
 		
 	}
 	
-	public function callStoredProcedure($name,$attributes = array() ) {
-		
+	public function callStoredProcedure($name,$attributes = array(), $alias = null) {
+		$alias = $alias = null ? $name : $alias;
 	}
 
-	/* Navigational Methods */
-	
-	public function moveNext() {
-		$this->pointer++;
-	}
-	
-	public function movePrev() {
-		$this->pointer--;
-	}
-	
-	public function moveFirst() {
-		$this->pointer = 0;
-	}
-	
-	public function moveLast() {
-		$this->pointer = $this->num_rows() - 1;
-	}
-	
-	public function getLast() {
-		return $this->num_rows() - 1;
-	}
-	
-	public function getPointer() {
-		return $this->pointer;
-	}
-	
-	public function setPointer($pointer) {
-		$this->pointer = $pointer;
-	}
-	
-	/* Database methods */
-	public function _getSelectQuery() {
+	public function setMysqlMode($mode = "") {
+		$this->getConnection()->mode = $mode;
 		
-	}
-	
-	public function _getUpdateQuery() {
-		
-	}
-	
-	public function _getInsertQuery() {
-		
-	}
-	
-	public function _getDeleteQuery() {
-		
-	}
-	
-	public function _getMultiInsertQuery() {
-		
+		if (empty($mode))
+			$this->getConnection()>mode(MYSQL_ASSOC);
 	}
 	
 	

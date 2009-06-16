@@ -34,7 +34,7 @@ abstract class PhpBURN_Views implements IViews {
 	//Defines the main language of the view
 	public static $lang = 'pt_BR';
 	public static $domain = 'system';
-	public static $translationFolder = 'locale/';
+	public $translationFolder = 'locale/';
 	
 	
 	/**

@@ -11,6 +11,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * 100001, 10 means that integer corresponds to a SQL DATABASE constant, 00 means it corresponds to an QUERY and 01 at the end corresponds to the SELECT query
 	 * For more information see the detailed documentation with all constants indexes.
 	 * 
+	 * TABLE OF REFERENCE:
+	 * 10XXXX = SQL DATABASE
+	 * 1000XX = QUERY TYPE
+	 * 1001XX = QUERY TYPE RELATIONSHIP
+	 * 1002XX = DATABASE CONNECTION
+	 * 
 	 * It has been made to make easier to identify an number in debugs and other stuffs.
 	 */
 	
@@ -67,10 +73,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		PhpBURN_Mapping::create($this);
 		
 		//Setting Up the connection object ( _connObj )
-		$this->_connObj = &PhpBURN_Connection::create(PhpBURN_Configuration::getConfig($this->_package));
+		$this->_connObj = &PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
 		
 		//Setting Up the dialect object ( _dialectObj )
-		$this->_dialectObj = clone PhpBURN_Dialect::create(PhpBURN_Configuration::getConfig($this->_package),$this);
+		$this->_dialectObj = clone PhpBURN_DialectManager::create(PhpBURN_Configuration::getConfig($this->_package),$this);
 		
 		//Then now we have all set... let's rock!
 		$this->_initialize();
@@ -103,10 +109,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $sql
 	 * @return Integer
 	 */
-	public function find($pk = null) {
-		$this->_dialectObj->find($pk);
-		
-		return $resultSetAmount;
+	public function find($pk = null) {		
+		return $this->_dialectObj->find($pk);
 	}
 	
 	/**
@@ -291,7 +295,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return PhpBURN_Core
 	 */
 	public function fetch() {
-		$result = $this->dialect->fetch();
+		$result = $this->_dialectObj->fetch();
 		if ($result) {
 			foreach ($result as $key => $value) {
 				$this->$key = $value;
@@ -325,8 +329,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 	}
 	
-	public function limit() {
-		
+	public function limit($offset = null, $limit = null) {
+		$this->_limit = $limit == null ? $offset : $offset . ',' . $limit;
 	}
 	
 	//Relationships functions
@@ -367,7 +371,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Integer $start
 	 * @param Integer $end
 	 */
-	public function _linkLimit($linkName, $start, $end = null) {
+	public function _linkLimit($linkName, $offset = null, $limit = null) {
 		
 	}
 	

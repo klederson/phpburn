@@ -1,5 +1,10 @@
 <?php
+PhpBURN::load('Connection.IConnection');
 /**
+ * This class is responsable for connect the application to the database and perform the queries in a driver-level
+ * Than translate the results and resultSets to the application trought Dialect
+ * 
+ * 
  * This class has been adapted from Lumine 1.0
  * The original idea is from:
  * @author Hugo Ferreira da Silva
@@ -9,11 +14,11 @@
  * @author Klederson Bueno Bezerra da Silva
  *
  */
-class PhpBURN_Connection_MySQL
+class PhpBURN_Connection_MySQL implements IConnection
 {
 
-	const CLOSED							= 0;
-	const OPEN								= 1;
+	const CLOSED							= 100201;
+	const OPEN								= 100202;
 
 	const SERVER_VERSION				= 10;
 	const CLIENT_VERSION				= 11;
@@ -36,6 +41,8 @@ class PhpBURN_Connection_MySQL
 	private $host;
 	private $options;
 	private $state;
+	
+	public $mode = MYSQL_ASSOC;
 	
 	private static $instance = null;
 	
@@ -336,26 +343,13 @@ class PhpBURN_Connection_MySQL
 		if( ! $rs )
 		{
 			$msg = $this->getErrorMsg();
+//			@TODO Insert here an exeption message: "[!Database error:!] $msg"			
+			print "[!Database error:!] $msg";
 			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
-			//throw new PhpBURN_Exception() TODO CREATE EXCETION CLASS AND INPUT AN EXCEPTION HERE;
 		} 
-		$this->close();
+		//$this->close();
 		//$this->dispatchEvent('posExecute', $this, $sql);
 		return $rs;
-	}
-	
-	public function setLimit($offset = null, $limit = null) 
-	{
-		if($offset == null && $limit == null)
-		{
-			return;
-		} else if($offset == null && $limit != null) {
-			return sprintf("LIMIT %d", $limit);
-		} else if($offset != null && $limit == null) {
-			return sprintf("LIMIT %d", $offset);
-		} else {
-			return sprintf("LIMIT %d, %d", $offset, $limit);
-		}
 	}
 	
 	public function escape($str) 
@@ -371,6 +365,10 @@ class PhpBURN_Connection_MySQL
 	public function escapeBlob($blob)
 	{
 		return $this->escape( $blob );
+	}
+	
+	public function escapeBFile($bfile) {
+		
 	}
 	
 	public function affected_rows()
@@ -395,6 +393,10 @@ class PhpBURN_Connection_MySQL
 	public function getEscapeChar()
 	{
 		return self::ESCAPE_CHAR;
+	}
+	
+	public function fetch($rs) {
+		return mysql_fetch_array($rs, $this->mode);
 	}
 	
 	//Transactions

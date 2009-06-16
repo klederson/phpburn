@@ -37,7 +37,6 @@ interface IConnection
 	public function describe($tablename);
 	
 	public function executeSQL($sql);
-	public function setLimit($offset = null, $limit = null);
 	public function escape($str);
 	public function escapeBlob($blob);
 	public function affected_rows();

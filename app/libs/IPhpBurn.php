@@ -8,7 +8,7 @@ interface IPhpBurn {
 	
 	public function order();
 	
-	public function limit();
+	public function limit($offset = null, $limit = null);
 
 }
 ?>

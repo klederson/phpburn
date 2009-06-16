@@ -4,16 +4,25 @@ require_once('app/phpBurn.php');
 
 $config = new PhpBURN_Configuration($thisConfig);
 
-PhpBURN::import('webinsys.Users');
+PhpBURN::import('webinsys.subpackage.Users3');
 
 $teste = new Users();
 
-$teste->swhere('login','=','teste 1');
+//$teste->swhere('login','=','teste 1');
+$teste->limit(0,10);
 
-$teste->join('albums');
-$teste->join('teste','users.id','teste.id_user');
+//$teste->join('albums');
+//$teste->join('teste','users.id','teste.id_user');
 
 $teste->find();
+
+while($teste->fetch()) {
+	print "<br/>";
+	print $teste->login;
+	print "::";
+	print $teste->pass;
+	
+}
 
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";

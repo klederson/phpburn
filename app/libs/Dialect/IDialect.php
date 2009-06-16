@@ -8,7 +8,6 @@ interface IDialect
 	public function find($pk = null); //Performs a search/select into the database based on parms
 	public function save(); //Insert and Update
 	public function delete(); //Remove the register from database
-	public function num_rows();
 	public function affected_rows();
 	public function fetch();
 	public function fetch_row($rowNumber);
@@ -20,6 +19,7 @@ interface IDialect
 	public function setDataset(array $dataset);
 	public function execute($sql); //The main method
 	public function resultToObject(array $resultSet);
+	public function setLimit($offset = null, $limit = null);
 	
 	/* Navigational Methods */
 	public function moveNext();
@@ -29,13 +29,6 @@ interface IDialect
 	public function getLast();
 	public function getPointer();
 	public function setPointer($pointer);
-	
-	/* Database methods */
-	public function _getSelectQuery();
-	public function _getUpdateQuery();
-	public function _getInsertQuery();
-	public function _getDeleteQuery();
-	public function _getMultiInsertQuery();
 	
 	/* Other methods */
 	public function getErrorMsg();
