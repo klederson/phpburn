@@ -46,7 +46,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 	public function affected_rows() {
 		if (!isset($this->resultSet) && empty($this->resultSet))
 			return false;
-		return $this->getConnection()->affected_rows();
+		return $this->getModel()->getConnection()->affected_rows();
 	}
 	
 	public function fetch_row($rowNumber) {

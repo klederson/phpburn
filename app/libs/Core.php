@@ -73,7 +73,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		PhpBURN_Mapping::create($this);
 		
 		//Setting Up the connection object ( _connObj )
-		$this->_connObj = &PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
+		//$this->_connObj = &PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
 		
 		//Setting Up the dialect object ( _dialectObj )
 		$this->_dialectObj = clone PhpBURN_DialectManager::create(PhpBURN_Configuration::getConfig($this->_package),$this);
@@ -399,7 +399,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @see app/libs/Connection(Folder)
 	 */
 	public function getConnection() {
-		return $this->_connObj;
+		//return $this->_connObj;
+		return PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
 	}
 }
 ?>

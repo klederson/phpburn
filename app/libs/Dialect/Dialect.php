@@ -37,11 +37,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//$this->setDataSet($dataSet);
 		
 		//Returns the amount result
-		return $this->getConnection()->affected_rows($this->resultSet);
+		return $this->getModel()->getConnection()->affected_rows($this->resultSet);
 	}
 	
 	public function fetch() {
-		$data = is_array($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getConnection()->fetch($this->resultSet);
+		$data = is_array($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
 		if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
 			$this->dataSet[$this->getPointer()] = $data;
 		}
@@ -62,18 +62,18 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 */
 	protected function prepareSelect() {		
 		//Creating the selectable fields
-		if(count($this->modelObj->_select) <= 0) {
+		if(count($this->getModel()->_select) <= 0) {
 			//Selecting from the map
-			foreach($this->modelObj->getMap()->fields as $index => $value) {
+			foreach($this->getModel()->getMap()->fields as $index => $value) {
 				//Parsing non-relationship fields
 				if(!$value['isRelationship'] && $value['field']['column'] != null) {
 					$fields .= $fields == null ? "" : ", ";
-					$fields .= sprintf("%s.%s AS %s", $this->modelObj->_tablename,$value['field']['column'], $index);
+					$fields .= sprintf("%s.%s AS %s", $this->getModel()->_tablename,$value['field']['column'], $index);
 				}
 			}
-		} elseif(count($this->modelObj->_select) > 0) {
+		} elseif(count($this->getModel()->_select) > 0) {
 			//Select based ONLY in the $obj->select(); method
-			foreach($this->modelObj->_select as $index => $value) {
+			foreach($this->getModel()->_select as $index => $value) {
 				$fields .= $fields == null ? "" : ", ";
 				$fields .= sprintf("%s AS %s", $value['value'], $value['alias']);
 			}
@@ -85,10 +85,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		//Defnine FROM tables
-		$from = 'FROM ' . $this->modelObj->_tablename;
+		$from = 'FROM ' . $this->getModel()->_tablename;
 		
-		if(count($this->modelObj->_join) > 0) {
-			foreach($this->modelObj->_join as $index => $value) {
+		if(count($this->getModel()->_join) > 0) {
+			foreach($this->getModel()->_join as $index => $value) {
 				$joinString .= $joinString != null ? ' ' : null;
 				$joinString .= sprintf('%s %s', $value['type'], $index);
 				if($value['fieldLeft']  != null && $value['fieldRight']  != null) {
@@ -97,10 +97,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			}			
 		}
 				
-		if(count($this->modelObj->_where) > 0) {
+		if(count($this->getModel()->_where) > 0) {
 			//Define conditions
 			$conditions = 'WHERE ';
-			foreach($this->modelObj->_where as $index => $value) {
+			foreach($this->getModel()->_where as $index => $value) {
 				//Checking swhere and where
 				if(!is_array($value)) {
 					//Normal where
@@ -113,18 +113,18 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			}
 		}
 		
-		if(count($this->modelObj->_orderBy) > 0) {
+		if(count($this->getModel()->_orderBy) > 0) {
 			//Define OrderBY
 			$orderBy = 'ORDER BY ';
-			foreach($this->modelObj->_orderBy as $index => $value) {
+			foreach($this->getModel()->_orderBy as $index => $value) {
 				$orderConditions .= $orderConditions == null ? "" : ", " . $value['type'];
 				$orderConditions .= $value['field'];
 			}
 		}
 		
-		if($this->modelObj->_limit != null) {
+		if($this->getModel()->_limit != null) {
 			//Define Limit
-			$limits = explode(',',$this->modelObj->_limit);
+			$limits = explode(',',$this->getModel()->_limit);
 			$limit = $this->setLimit($limits[0],$limits[1]);
 		}
 		
@@ -142,7 +142,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @param String $sql
 	 */
 	public function execute($sql) {
-		$this->resultSet = &$this->getConnection()->executeSQL($sql);
+		$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
 	}
 	
 	public function save() {
@@ -173,7 +173,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		//Pre-defined parms
-		$tableName = &$this->modelObj->_tablename;
+		$tableName = &$this->getModel()->_tablename;
 		
 		//Constructing the SQL
 		return $sql = sprintf("INSERT INTO %s ( %s ) VALUES ( %s ) ", $tableName, $insertFields, $insertValues);
@@ -191,7 +191,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		//Pre-defined parms
-		$tableName = &$this->modelObj->_tablename;
+		$tableName = &$this->getModel()->_tablename;
 		
 		//To see more about pkField Structure see addField at MapObject
 		$pkField = &$this->getMap()->getPrimaryKey();
@@ -229,11 +229,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#getConnection()
 	 */
 	public function getConnection() {
-		return $this->modelObj->getConnection();
+		return $this->getModel()->getConnection();
 	}
 	
 	public function getMap() {
-		return $this->modelObj->getMap();
+		return $this->getModel()->getMap();
 	}
 	
 	public function getModel() {
