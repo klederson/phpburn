@@ -377,6 +377,27 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	/**
+	 * Auxiliar Method : Begins a Transaction
+	 */
+	public function begin() {
+		$this->getConnection()->begin();
+	}
+	
+	/**
+	 * Auxiliar Method : Begins a Transaction
+	 */
+	public function commit() {
+		$this->getConnection()->commit();
+	}
+	
+	/**
+	 * Auxiliar Method : Begins a Transaction
+	 */
+	public function rollback() {
+		$this->getConnection()->rollback();
+	}
+	
+	/**
 	 * Auxiliar Method : Gets the Map Object for the model
 	 * @return PhpBURN_Map
 	 */

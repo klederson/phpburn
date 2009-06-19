@@ -22,7 +22,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 */
 	public function find($pk = null) {
 		//Prepare the SELECT SQL Query
-		$sql = $this->prepareSelect();
+		$sql = $this->prepareSelect($pk);
 		
 		//Clear actual dataSet
 		$this->clearDataSet();
@@ -60,7 +60,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * 
 	 * @return String $sql
 	 */
-	protected function prepareSelect() {		
+	protected function prepareSelect($pk = null) {		
 		//Creating the selectable fields
 		if(count($this->getModel()->_select) <= 0) {
 			//Selecting from the map
@@ -111,6 +111,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$whereConditions .= sprintf("%s %s '%s'",$value['start'],$value['operator'],addslashes($value['end']));
 				}
 			}
+		}
+		
+		if($pk != null) {
+				$pkField = $this->getModel()->getMap()->getPrimaryKey();
+				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk) : sprintf("AND %s='%s'",$pkField['field']['alias'],$pk);
 		}
 		
 		if(count($this->getModel()->_orderBy) > 0) {
