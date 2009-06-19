@@ -8,6 +8,7 @@ class Users extends PhpBURN_Core {
 	public $pass;
 	public $status;
 	public $created;
+	public $checked;
 	
 	/**
 	 * Here we setup all mapping fields without user XML

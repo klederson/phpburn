@@ -7,9 +7,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	protected $pointer;
 		
 	function __construct(PhpBurn_Core $obj) {
-		$this->obj = &$obj;
-		$this->setConnection(($obj->_connObj));
-		//$this->connObj = &$obj->_connObj;
+		$this->modelObj = &$obj;
 	}
 	
 	function __destruct() {
@@ -64,33 +62,33 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 */
 	protected function prepareSelect() {		
 		//Creating the selectable fields
-		if(count($this->obj->_select) <= 0) {
+		if(count($this->modelObj->_select) <= 0) {
 			//Selecting from the map
-			foreach($this->obj->_mapObj->fields as $index => $value) {
+			foreach($this->modelObj->getMap()->fields as $index => $value) {
 				//Parsing non-relationship fields
 				if(!$value['isRelationship'] && $value['field']['column'] != null) {
 					$fields .= $fields == null ? "" : ", ";
-					$fields .= sprintf("%s.%s AS %s", $this->obj->_tablename,$value['field']['column'], $index);
+					$fields .= sprintf("%s.%s AS %s", $this->modelObj->_tablename,$value['field']['column'], $index);
 				}
 			}
-		} elseif(count($this->obj->_select) > 0) {
+		} elseif(count($this->modelObj->_select) > 0) {
 			//Select based ONLY in the $obj->select(); method
-			foreach($this->obj->_select as $index => $value) {
+			foreach($this->modelObj->_select as $index => $value) {
 				$fields .= $fields == null ? "" : ", ";
 				$fields .= sprintf("%s AS %s", $value['value'], $value['alias']);
 			}
 		} else {
-			$model = get_class($this->obj);
+			$model = get_class($this->modelObj);
 //			@TODO Insert here an exeption message: "[!$model is not an mapped or valid PhpBURN Model!]"			
 			print "[!$model is not an mapped or valid PhpBURN Model!]";
 			exit;
 		}
 		
 		//Defnine FROM tables
-		$from = 'FROM ' . $this->obj->_tablename;
+		$from = 'FROM ' . $this->modelObj->_tablename;
 		
-		if(count($this->obj->_join) > 0) {
-			foreach($this->obj->_join as $index => $value) {
+		if(count($this->modelObj->_join) > 0) {
+			foreach($this->modelObj->_join as $index => $value) {
 				$joinString .= $joinString != null ? ' ' : null;
 				$joinString .= sprintf('%s %s', $value['type'], $index);
 				if($value['fieldLeft']  != null && $value['fieldRight']  != null) {
@@ -99,10 +97,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			}			
 		}
 				
-		if(count($this->obj->_where) > 0) {
+		if(count($this->modelObj->_where) > 0) {
 			//Define conditions
 			$conditions = 'WHERE ';
-			foreach($this->obj->_where as $index => $value) {
+			foreach($this->modelObj->_where as $index => $value) {
 				//Checking swhere and where
 				if(!is_array($value)) {
 					//Normal where
@@ -115,18 +113,18 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			}
 		}
 		
-		if(count($this->obj->_orderBy) > 0) {
+		if(count($this->modelObj->_orderBy) > 0) {
 			//Define OrderBY
 			$orderBy = 'ORDER BY ';
-			foreach($this->obj->_orderBy as $index => $value) {
+			foreach($this->modelObj->_orderBy as $index => $value) {
 				$orderConditions .= $orderConditions == null ? "" : ", " . $value['type'];
 				$orderConditions .= $value['field'];
 			}
 		}
 		
-		if($this->obj->_limit != null) {
+		if($this->modelObj->_limit != null) {
 			//Define Limit
-			$limits = explode(',',$this->obj->_limit);
+			$limits = explode(',',$this->modelObj->_limit);
 			$limit = $this->setLimit($limits[0],$limits[1]);
 		}
 		
@@ -148,7 +146,47 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	}
 	
 	public function save() {
+		$isInsert = true;
 		
+		//Verify if the PK value has been set
+		$pkField = $this->getMap()->getPrimaryKey();
+		if(isset($this->getModel()->$pkField['field']['alias']) && !empty($this->getModel()->$pkField['field']['alias']) ) {
+			$isInsert = false;
+		}
+		
+		//Preparing the SQL
+		$sql = $isInsert == true ? $this->prepareInsert() : $this->prepareUpdate();
+	}
+	
+	public function prepareInsert() {
+		print "Rá";
+	}
+	
+	public function prepareUpdate() {
+		$updatedFields = null;
+		//Checking each MAPPED field looking in cache for changes in field value, if existis it will be updated, if not we just update the right fields
+		foreach ($this->getMap()->fields as $field => $infos) {
+			if($this->getModel()->$field != $infos['#value']) {
+				$updatedFields = $updatedFields == null ? '' : ', ';
+				$updatedFields .= sprintf("%s='%s'", $field, addslashes($this->getModel()->$field));
+			}
+		}
+		
+		//Pre-defined parms
+		$tableName = &$this->modelObj->_tablename;
+		
+		//To see more about pkField Structure see addField at MapObject
+		$pkField = &$this->getMap()->getPrimaryKey();
+		
+		//Constructing the SQL
+		$sql = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s'", $tableName, $updatedFields, $pkField['field']['column'], $pkField['#value']) : null;
+		
+		if($sql == null) {
+			
+		} else {
+			print $sql;
+		}
+		//$this->execute($sql);
 	}
 	
 	public function delete() {
@@ -172,7 +210,15 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#getConnection()
 	 */
 	public function getConnection() {
-		return $this->connection;
+		return $this->modelObj->getConnection();
+	}
+	
+	public function getMap() {
+		return $this->modelObj->getMap();
+	}
+	
+	public function getModel() {
+		return $this->modelObj;
 	}
 	
 	

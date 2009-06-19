@@ -21,29 +21,33 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 		return parent::find($pk);
 	}
 	
+	/**
+	 * Distinct Fields in a query
+	 * 
+	 * @param $field
+	 */
 	public function distinct($field) {
 		
 	}
 	
+	/**
+	 * Select a Field as a UnixTimestamp
+	 * 
+	 * @param $field
+	 */
 	public function unixTimestamp($field) {
 		
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/Dialect/IDialect#affected_rows()
+	 */
 	public function affected_rows() {
 		if (!isset($this->resultSet) && empty($this->resultSet))
 			return false;
 		return $this->getConnection()->affected_rows();
 	}
-	
-	/*public function fetch() {
-		$point = $this->getPointer();
-		$this->moveNext();
-		if ($point > $this->getLast()) {
-			$this->moveFirst();
-			return false;
-		}
-		return $this->fetch_row($point);
-	}*/
 	
 	public function fetch_row($rowNumber) {
 		if (!isset($this->dataSet) && !isset($this->dataSet[$rowNumber]))

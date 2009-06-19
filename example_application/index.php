@@ -18,11 +18,17 @@ $teste->find();
 
 while($teste->fetch()) {
 	print "<br/>";
-	print $teste->login;
-	print "::";
-	print $teste->pass;
-	
+	print $teste->id;
+	$teste->login = "Oi";
+	print "<br/>";	
 }
+
+$teste->save();
+print "<hr/>";
+$teste2 = new Users();
+$teste2->login = "OEE";
+$teste2->nome = "fuck";
+$teste2->save();
 
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";

@@ -84,7 +84,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	final private function _initialize() {
 		//Opening the database connection for this object
-		$this->_connObj->connect();
+		$this->getConnection()->connect();
 	}
 	
 	/**
@@ -94,14 +94,6 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		//Cleaning memory and activating __destruct triggers
 		unset($this->_connObj, $this->_mapObj, $this->_dialectObj);
 	}
-	
-	/**
-	 * Just a method to get the object into _connObj attribute
-	 * @return PhpBURN_Connection_*
-	 */
-	public function getConnectionObj() {
-		return $this->_connObj;
-	}
 
 	/**
 	 * This method search a content based in many arguments like: where, order, primary key, etc.
@@ -110,7 +102,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return Integer
 	 */
 	public function find($pk = null) {		
-		return $this->_dialectObj->find($pk);
+		return $this->getDialect()->find($pk);
 	}
 	
 	/**
@@ -130,22 +122,22 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		switch($type)
 		{
 			case self::QUERY_SELECT:
-				return $this->_dialectObj->_getSelectQuery();
+				return $this->getDialect()->_getSelectQuery();
 			
 			case self::QUERY_SELECT_COUNT:
-				return $this->_dialectObj->_getSelectQuery(true, $opt);
+				return $this->getDialect()->_getSelectQuery(true, $opt);
 				
 			case self::QUERY_UPDATE:
-				return $this->_dialectObj->_getUpdateQuery( $opt );
+				return $this->getDialect()->_getUpdateQuery( $opt );
 				
 			case self::QUERY_DELETE:
-				return $this->_dialectObj->_getDeleteQuery( $opt );
+				return $this->getDialect()->_getDeleteQuery( $opt );
 			
 			case self::QUERY_INSERT:
-				return $this->_dialectObj->_getInsertQuery( $opt );
+				return $this->getDialect()->_getInsertQuery( $opt );
 
 			case self::QUERY_MULTI_INSERT;
-				return $this->_dialectObj->_getMultiInsertQuery( $opt );
+				return $this->getDialect()->_getMultiInsertQuery( $opt );
 		}
 		
 		//@TODO Insert here an exeption message: "[!Unsuported SQL type!]: $type"
@@ -202,12 +194,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public function validateFields($fieldName = null) {
 		if( $fieldName == null ) {
 			//Validate all fields
-			foreach($this->_mapObj->fields as $fieldIndex => $fieldContent) {
-				$this->_mapObj->validateField($fieldIndex);
+			foreach($this->getMap()->fields as $fieldIndex => $fieldContent) {
+				$this->getMap()->validateField($fieldIndex);
 			}
 		} else {
 			//Validate an specific field
-			$this->_mapObj->validateField($fieldName);
+			$this->getMap()->validateField($fieldName);
 		}
 		
 		return true;
@@ -215,6 +207,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	public function where($conditions) {
 		array_push($this->_where, $conditions);
+	}
+	
+	public function select($field, $alias = null) {
+		$alias = $alias == null ? $field : $alias;
+		array_push($this->_select, array('value'=>$field, 'alias'=>$alias));
 	}
 		
 	/**
@@ -295,10 +292,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return PhpBURN_Core
 	 */
 	public function fetch() {
-		$result = $this->_dialectObj->fetch();
+		$result = $this->getDialect()->fetch();
 		if ($result) {
 			foreach ($result as $key => $value) {
-				$this->$key = $value;
+				$this->getMap()->setFieldValue($key,$value);
 			}
 		}
 		return $result;
@@ -308,17 +305,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	public function save() {
-		$fields = array();
-		// if query is an insert
-		$insert = true;
-		foreach ($this->_mapObj->fields as $field => $infos) {
-			$fields[$field] = $this->_mapObj->getFieldValue($field);
-			if ($insert==true && isset($infos['pk']) && $infos['pk']==true && !empty($fields[$field])) {
-				// query will be an update
-				$insert = false;
-			}
-		}
-		//execute query.
+		$this->getDialect()->save();
 	}
 	
 	public function delete() {
@@ -387,6 +374,32 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 */
 	public function _linkOrder($linkName, $field, $orderType = "ASC") {
 		
+	}
+	
+	/**
+	 * Auxiliar Method : Gets the Map Object for the model
+	 * @return PhpBURN_Map
+	 */
+	public function getMap() {
+		return $this->_mapObj;
+	}
+	
+	/**
+	 * Auxiliar Method : Gets the Dialect Object for the model
+	 * @return PhpBURN_Dialect_(DatabaseType)
+	 * @see app/libs/Dialect(Folder)
+	 */
+	public function getDialect() {
+		return $this->_dialectObj;
+	}
+	
+	/**
+	 * Auxiliar Method : Gets the Connection Object for the model
+	 * @return PhpBURN_Connection_(DatabaseType)
+	 * @see app/libs/Connection(Folder)
+	 */
+	public function getConnection() {
+		return $this->_connObj;
 	}
 }
 ?>

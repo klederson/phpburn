@@ -91,7 +91,7 @@ class PhpBURN_Map implements IMap {
 					$options = array();
 					$options['notnull'] = (string)$xmlAttribute->attributes()->notnull;
 					$options['autoincrement'] = (string)$xmlAttribute->attributes()->autoincrement;
-					$options['pk'] = (string)$xmlAttribute->attributes()->pk;
+					$options['primary'] = (string)$xmlAttribute->attributes()->primary;
 					$options['defaultvalue'] = (string)$xmlAttribute->attributes()->defaultvalue;
 					
 					$this->addField((string)$xmlAttribute->attributes()->name,(string)$xmlAttribute->attributes()->column,(string)$xmlAttribute->attributes()->datatype,(string)$xmlAttribute->attributes()->lenght,$options);
@@ -222,6 +222,7 @@ class PhpBURN_Map implements IMap {
 		
 		//Setup a simple field		
 		$this->fields[$name]['field']['type'] = $type;
+		$this->fields[$name]['field']['alias'] = $name;
 		$this->fields[$name]['field']['column'] = $column;
 		$this->fields[$name]['field']['type'] = $type;
 		$this->fields[$name]['field']['length'] = $length;
@@ -239,6 +240,20 @@ class PhpBURN_Map implements IMap {
 		//Setup defaultvalue for this field
 		$options['defaultvalue'] = $options['defaultvalue'] != null ? $options['defaultvalue'] : null;
 		$this->setFieldValue($name,$options['defaultvalue']);
+	}
+	
+	public function getPrimaryKey() {
+		//Check for a PK field
+		foreach($this->fields as $index => $content) {
+			if($content['field']['options']['primary'] == true) {
+				return $content;
+			}
+		}
+		
+		$modelName = get_class($this->modelObj);
+		//TODO Send an Exeption Message: "[!There is no PrimaryKey for this model. How did you did it?]";
+		print "[!There is no Primary Key for $modelName model. How did you did it?]";
+		exit;
 	}
 	
 	/**
@@ -290,8 +305,16 @@ class PhpBURN_Map implements IMap {
 	 * @param unknown_type $value
 	 */
 	public function setFieldValue($field,$value) {
+		$fields = new ArrayObject($this->fields);
+		$test = $fields->offsetExists($field);
+		if($test === false) {
+			//TODO Send an Warning Message:"[!Warning!] : [!This field doesn't exist in the Mapping!]: <strong>". get_class($this->modelObj) ."->$field </strong>";
+			print "[!Warning!]: [!This field doesn't exist in the Mapping!]: <strong>". get_class($this->modelObj) ."->$field </strong>";
+		}
+		
 		$this->fields[$field]['#value'] = $value;
 		$this->getFieldValue($field);
+		
 	}
 	
 	/**

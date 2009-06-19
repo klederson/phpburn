@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpburn>
 <class name="Users" database="webinsys" package="webinsys" tablename="users">
-	<attribute type="column" name="id" column="id" datatype="int" lenght="(10)" notnull="true" autoincrement="true" defaultvalue="0" />
+	<attribute type="column" name="id" column="id" datatype="int" lenght="(10)" notnull="true" autoincrement="true" defaultvalue="0" primary="true"/>
 	<attribute type="column" name="login" column="login" datatype="varchar" lenght="(255)" notnull="true" />
 	
 	<attribute type="column" name="pass" column="pass" datatype="varchar" lenght="(255)" notnull="true" />
 	<attribute type="column" name="status" column="status" datatype="enum" lenght="('waiting','active','suspense','blocked','deleted')" notnull="true" defaultvalue="waiting" />
 	<attribute type="column" name="created" column="created" datatype="timestamp" lenght="" notnull="true" defaultvalue="CURRENT_TIMESTAMP" />
 	<attribute type="column" name="last_login" column="last_login" datatype="timestamp" lenght="" notnull="true" defaultvalue="" />
+	<attribute type="column" name="checked" column="checked" datatype="enum" lenght="('1','2')" notnull="true" defaultvalue="" />
 	
 	<!-- relationships -->
 	<attribute type="relationship" name="albums"> 
