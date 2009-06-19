@@ -156,10 +156,27 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		//Preparing the SQL
 		$sql = $isInsert == true ? $this->prepareInsert() : $this->prepareUpdate();
+		
+		$this->execute($sql);
 	}
 	
 	public function prepareInsert() {
-		print "Rá";
+		foreach ($this->getMap()->fields as $field => $infos) {
+			if($infos['isRelationship'] != true) {
+				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
+				$insertFields .= $insertFields == null ? '' : ', ';
+				$insertFields .= $field;
+				$value = $this->getMap()->getFieldValue($field) == '' ? 'NULL' : $this->getMap()->getFieldValue($field);
+				$insertValues .= $insertValues == null ? '' : ', ';
+				$insertValues .= sprintf("'%s'", $value);
+			}
+		}
+		
+		//Pre-defined parms
+		$tableName = &$this->modelObj->_tablename;
+		
+		//Constructing the SQL
+		return $sql = sprintf("INSERT INTO %s ( %s ) VALUES ( %s ) ", $tableName, $insertFields, $insertValues);
 	}
 	
 	public function prepareUpdate() {
@@ -167,7 +184,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//Checking each MAPPED field looking in cache for changes in field value, if existis it will be updated, if not we just update the right fields
 		foreach ($this->getMap()->fields as $field => $infos) {
 			if($this->getModel()->$field != $infos['#value']) {
-				$updatedFields = $updatedFields == null ? '' : ', ';
+				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
+				$updatedFields .= $updatedFields == null ? '' : ', ';
 				$updatedFields .= sprintf("%s='%s'", $field, addslashes($this->getModel()->$field));
 			}
 		}
@@ -182,9 +200,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		$sql = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s'", $tableName, $updatedFields, $pkField['field']['column'], $pkField['#value']) : null;
 		
 		if($sql == null) {
-			
+			//TODO Send an Warning Message: "[!Warning!] : [!There is nothing to save in $modelName model.!]"
+			print "[!Warning!] : [!There is nothing to save in $modelName model.!]";
 		} else {
-			print $sql;
+			return $sql;
 		}
 		//$this->execute($sql);
 	}

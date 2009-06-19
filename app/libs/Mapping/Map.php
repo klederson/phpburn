@@ -251,8 +251,8 @@ class PhpBURN_Map implements IMap {
 		}
 		
 		$modelName = get_class($this->modelObj);
-		//TODO Send an Exeption Message: "[!There is no PrimaryKey for this model. How did you did it?]";
-		print "[!There is no Primary Key for $modelName model. How did you did it?]";
+		//TODO Send an Exeption Message: "[!There is no PrimaryKey for this model. How did you did it?!]";
+		print "[!There is no Primary Key for $modelName model. How did you did it?!]";
 		exit;
 	}
 	
