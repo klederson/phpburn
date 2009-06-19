@@ -3,6 +3,11 @@ PhpBURN::load('Mapping.IMap');
 
 class PhpBURN_Map implements IMap {
 	
+	//Relationship types
+	const ONE_TO_ONE 						= 100101;
+	const ONE_TO_MANY 						= 100102;
+	const MANY_TO_MANY 					= 100103;
+	
 	/**
 	 * This attribute carries all mapping information such as relationships, witch field is witch column, etc.
 	 * This is mapped only once and is cached for all the objects from the same type.
@@ -103,13 +108,13 @@ class PhpBURN_Map implements IMap {
 					/* FIXME Create a way to call a Model constant */
 					switch((string)$xmlAttribute->relationship[0]->attributes()->type) {
 						case 'ONE_TO_ONE':
-							$relType = 1;
+							$relType = self::ONE_TO_ONE;
 						break;
 						case 'ONE_TO_MANY':
-							$relType = 2;
+							$relType = self::ONE_TO_MANY;
 						break;
 						case 'MANY_TO_MANY':
-							$relType = 3;
+							$relType = self::ONE_TO_MANY;
 						break;
 					}
 					$relType = !is_numeric($relType) ? 1 : $relType;
@@ -179,6 +184,7 @@ class PhpBURN_Map implements IMap {
 		
 		//Setup the relationship
 		$this->fields[$relName]['isRelationship'] = array();
+			$this->fields[$relName]['isRelationship']['alias'] = $relName;
 			$this->fields[$relName]['isRelationship']['type'] = $relType;
 			$this->fields[$relName]['isRelationship']['foreignClass'] = $foreignClass;
 			$this->fields[$relName]['isRelationship']['thisKey'] = $thisKey;
@@ -251,9 +257,29 @@ class PhpBURN_Map implements IMap {
 		}
 		
 		$modelName = get_class($this->modelObj);
-		//TODO Send an Exeption Message: "[!There is no PrimaryKey for this model. How did you did it?!]";
-		print "[!There is no Primary Key for $modelName model. How did you did it?!]";
+		//TODO Send an Exeption Message: "[!There is no Primary Key for <b>$modelName</b> model. How did you did it?!]";
+		print "[!There is no Primary Key for <b>$modelName</b> model. How did you did it?!]";
 		exit;
+	}
+	
+	public function getRelationShip($name, $returnData = false) {
+		if(!is_array($this->fields[$name]['isRelationship']) || count($this->fields[$name]['isRelationship']) <= 0) {
+			$modelName = get_class($this->getModel());
+			//TODO Send an Warning Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
+			//print "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
+			return false;
+			//exit;
+		}
+		
+		if($returnData == true) {
+			return $this->getRelationShipData($name);
+		} else {
+			return true;
+		}
+	}
+	
+	private function getRelationShipData($name) {
+		return $this->fields[$name]['isRelationship'];
 	}
 	
 	/**
@@ -296,6 +322,10 @@ class PhpBURN_Map implements IMap {
 	 */
 	public function getFieldValue($field) {
 		return $this->modelObj->$field = $this->fields[$field]['#value'];
+	}
+	
+	public function getModel() {
+		return $this->modelObj;
 	}
 	
 	/**

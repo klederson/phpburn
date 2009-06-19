@@ -27,8 +27,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//Clear actual dataSet
 		$this->clearDataSet();
 		
-		//Executing the SQL
-		$this->execute($sql);
+		if($sql != null) {
+			$this->execute($sql);
+		} else {
+			return false;
+		}
 		
 		//Set cursor at the first position
 		$this->setPointer(0);
@@ -60,7 +63,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * 
 	 * @return String $sql
 	 */
-	protected function prepareSelect($pk = null) {		
+	public function prepareSelect($pk = null) {		
 		//Creating the selectable fields
 		if(count($this->getModel()->_select) <= 0) {
 			//Selecting from the map
@@ -115,7 +118,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		if($pk != null) {
 				$pkField = $this->getModel()->getMap()->getPrimaryKey();
-				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk) : sprintf("AND %s='%s'",$pkField['field']['alias'],$pk);
+				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk) : sprintf("AND %s='%s'",$pkField['field']['alias'],addslashes($pk));
 		}
 		
 		if(count($this->getModel()->_orderBy) > 0) {
@@ -162,18 +165,25 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//Preparing the SQL
 		$sql = $isInsert == true ? $this->prepareInsert() : $this->prepareUpdate();
 		
-		$this->execute($sql);
+		if($sql != null) {
+			$this->execute($sql);
+		} else {
+			return false;
+		}
 	}
 	
 	public function prepareInsert() {
 		foreach ($this->getMap()->fields as $field => $infos) {
-			if($infos['isRelationship'] != true) {
+			if($this->getMap()->getRelationShip($field) != true) {
 				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$insertFields .= $insertFields == null ? '' : ', ';
 				$insertFields .= $field;
 				$value = $this->getMap()->getFieldValue($field) == '' ? 'NULL' : $this->getMap()->getFieldValue($field);
 				$insertValues .= $insertValues == null ? '' : ', ';
 				$insertValues .= sprintf("'%s'", $value);
+			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
+				//print $field . "<br/>";
+				$this->getModel()->$field->save();
 			}
 		}
 		
@@ -188,10 +198,13 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		$updatedFields = null;
 		//Checking each MAPPED field looking in cache for changes in field value, if existis it will be updated, if not we just update the right fields
 		foreach ($this->getMap()->fields as $field => $infos) {
-			if($this->getModel()->$field != $infos['#value']) {
+			if($this->getModel()->$field != $infos['#value'] && $this->getModel()->getMap()->getRelationShip($field) != true) {
 				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$updatedFields .= $updatedFields == null ? '' : ', ';
 				$updatedFields .= sprintf("%s='%s'", $field, addslashes($this->getModel()->$field));
+			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
+				//print $field . "<br/>";
+				$this->getModel()->$field->save();
 			}
 		}
 		
@@ -204,9 +217,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//Constructing the SQL
 		$sql = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s'", $tableName, $updatedFields, $pkField['field']['column'], $pkField['#value']) : null;
 		
+		$modelName = get_class($this->getModel());
 		if($sql == null) {
 			//TODO Send an Warning Message: "[!Warning!] : [!There is nothing to save in $modelName model.!]"
-			print "[!Warning!] : [!There is nothing to save in $modelName model.!]";
+			print "[!Warning!] : [!There is nothing to save in <b>$modelName</b> model.!]<br/>";
 		} else {
 			return $sql;
 		}

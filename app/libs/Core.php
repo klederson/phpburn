@@ -320,9 +320,23 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_limit = $limit == null ? $offset : $offset . ',' . $limit;
 	}
 	
-	//Relationships functions
+//	Relationships functions
 	
-	public function _getLink($name, $linkWhere = null) {
+	public function _getLink($name, $linkWhere = null, $offset = null, $limit = null) {
+		//Cheking if the link existis
+		$fieldInfo = $this->getMap()->getRelationShip($name, true);
+		
+		if($fieldInfo == false) {
+			$modelName = get_class($this);
+//			TODO Send an Exeption Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
+			print "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
+			return false;
+			exit;
+		}
+		
+//		All good let's start rock'n'roll
+
+//		Prepare the Where and LIMIT
 		$parms = func_get_args();
 		
 		if($linkWhere != null && isset($linkWhere)) {
@@ -331,6 +345,49 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		if(isset($parms[2])) {		
 			$this->_linkLimit($parms[2],$parms[3]);	
+		}
+		
+//		Define rules to get it
+		switch($fieldInfo['type']) {
+			case self::ONE_TO_ONE:
+//				Looking for ONE TO ONE relationship
+//				Instance the Class
+				PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']);
+				$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
+				
+//				Define WHERE based on relationship fields
+				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
+				//$this->$fieldInfo['alias']->limit(1);
+
+//				Verify database consistence
+				$amount = $this->$fieldInfo['alias']->find();
+				if( $amount > 1) {
+					$modelName = get_class($this);
+//					TODO Send an Exeption Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
+					print "[!There is an inconsistence for <b>$modelName</b> model in <b>'$name' relationship because we found $amount in a ONE TO ONE relationship</b>?!]";
+					return false;
+					exit;
+				}
+				
+				return $this->$fieldInfo['alias']->fetch();
+			break;
+			case self::ONE_TO_MANY:
+//				Looking for ONE TO MANY relationship
+//				Instance the Class
+				PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']);
+				$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
+				
+//				Define WHERE based on relationship fields
+				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
+				
+				print $this->$fieldInfo['alias']->getDialect()->prepareSelect();
+				
+				return $this->$fieldInfo['alias']->fetch();				
+			break;
+			case self::MANY_TO_MANY:
+//				Looking for MANY TO MANY relationship
+				
+			break;
 		}
 	}
 	

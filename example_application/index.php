@@ -8,7 +8,7 @@ PhpBURN::import('webinsys.subpackage.Users3');
 
 $teste = new Users();
 
-//$teste->swhere('login','=','teste 1');
+$teste->swhere('login','=','teste 1');
 $teste->limit(0,10);
 
 //$teste->join('albums');
@@ -16,11 +16,13 @@ $teste->limit(0,10);
 $teste->find(1);
 
 while($teste->fetch()) {
-	print "<br/>";
-	print $teste->id;
-	print "::";
-	//$teste->getLink('tags');
+	print "<br/><pre>";
+	//print_r($teste);
+	$teste->_getLink('albums');
+	print $teste->albums->user_id;
+	print "</pre>";
 }
+$teste->save();
 
 
 print "<hr>Memory Usage: ";

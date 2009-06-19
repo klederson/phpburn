@@ -9,10 +9,15 @@
 	<attribute type="column" name="created" column="created" datatype="timestamp" lenght="" notnull="true" defaultvalue="CURRENT_TIMESTAMP" />
 	<attribute type="column" name="last_login" column="last_login" datatype="timestamp" lenght="" notnull="true" defaultvalue="" />
 	<attribute type="column" name="checked" column="checked" datatype="enum" lenght="('1','2')" notnull="true" defaultvalue="" />
+	<attribute type="column" name="album_id" column="album_id" datatype="int" lenght="10" notnull="true" defaultvalue="" />
 	
 	<!-- relationships -->
 	<attribute type="relationship" name="albums"> 
-		<relationship package="webinsys" class="Albums" type="ONE_TO_MANY" thisKey="id" relKey="user_id" outKey="null" relOutKey="null" relTable="null" lazy="null" />
+		<relationship package="webinsys" class="Albums" type="ONE_TO_ONE" thisKey="album_id" relKey="id" outKey="null" relOutKey="null" relTable="null" lazy="null" />
+	</attribute>
+	
+	<attribute type="relationship" name="pictures"> 
+		<relationship package="webinsys" class="Pictures" type="ONE_TO_MANY" thisKey="id" relKey="user_id" outKey="null" relOutKey="null" relTable="null" lazy="null" />
 	</attribute>
 	
 	<!--
