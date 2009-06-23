@@ -205,7 +205,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return true;
 	}
 	
-	public function where($conditions) {
+	public function where($conditions, $overrride = false) {
+		if($override == true) {
+			unset($this->_where);
+		}
 		array_push($this->_where, $conditions);
 	}
 	
@@ -339,32 +342,45 @@ abstract class PhpBURN_Core implements IPhpBurn {
 //		Prepare the Where and LIMIT
 		$parms = func_get_args();
 		
-		if($linkWhere != null && isset($linkWhere)) {
-			$this->_linkWhere($linkWhere);
+//		Instance object
+		PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']);
+		$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
+		
+		$linkWhere = $this->getWhereLink($name);
+		$linkLimit = $this->getLimitLink($name);
+		
+//		Setup Where Clause
+		if($linkWhere != null && is_array($linkWhere)) {
+			foreach($linkWhere as $index => $value) {
+				$this->$fieldInfo['alias']->where($value);
+			}
 		}
 		
-		if(isset($parms[2])) {		
-			$this->_linkLimit($parms[2],$parms[3]);	
+//		Setup Where Clause
+		if($linkLimit != null && !empty($linkLimit) ) {
+			$this->$fieldInfo['alias']->limit($linkLimit);
+		}
+		
+//		Setup Limit Clause
+		if(isset($offset)) {		
+			$this->_linkLimit($name,$offset,$limit);	
 		}
 		
 //		Define rules to get it
 		switch($fieldInfo['type']) {
 			case self::ONE_TO_ONE:
-//				Looking for ONE TO ONE relationship
-//				Instance the Class
-				PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']);
-				$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
+//				Looking for ONE TO ONE relationship				
 				
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
-				//$this->$fieldInfo['alias']->limit(1);
 
-//				Verify database consistence
+
+//				Verify database consistence if there's more then one than we have a database problem
 				$amount = $this->$fieldInfo['alias']->find();
 				if( $amount > 1) {
 					$modelName = get_class($this);
 //					TODO Send an Exeption Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
-					print "[!There is an inconsistence for <b>$modelName</b> model in <b>'$name' relationship because we found $amount in a ONE TO ONE relationship</b>?!]";
+					print "[!There is an inconsistence for <b>$modelName</b> model in <b>'$name' relationship because we found $amount in a ONE TO ONE relationship. Using the first match as oficial</b>?!]";
 					return false;
 					exit;
 				}
@@ -373,15 +389,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			break;
 			case self::ONE_TO_MANY:
 //				Looking for ONE TO MANY relationship
-//				Instance the Class
-				PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']);
-				$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
 				
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
-				
-				print $this->$fieldInfo['alias']->getDialect()->prepareSelect();
-				
+								
 				return $this->$fieldInfo['alias']->fetch();				
 			break;
 			case self::MANY_TO_MANY:
@@ -391,18 +402,22 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		}
 	}
 	
+	
 	/**
 	 * It puts a WHERE clause when you want to get a link with specific caracteristics
 	 * 
 	 * @author Kléderson Bueno <klederson@klederson.com>
-	 * @version 0.1a
-	 *
-	 * @param String $linkName
-	 * @param String $field
-	 * @param String $condition
+	 * @version 0.1b
+	 * 
+	 * @param $linkName
+	 * @param $conditions
+	 * @param $override
 	 */
-	public function _linkWhere($linkName, $field, $condition) {
-		
+	public function _linkWhere($linkName, $conditions, $override = false) {
+		if($override == true) {
+			unset($this->_whereLink[$linkName]);
+		}
+		array_push($this->_whereLink[$linkName], $conditions);
 	}
 	
 	/**
@@ -416,7 +431,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Integer $end
 	 */
 	public function _linkLimit($linkName, $offset = null, $limit = null) {
-		
+		$this->_linkLimit[$linkName] = $limit == null ? $offset : $offset . ',' . $limit;
 	}
 	
 	/**
