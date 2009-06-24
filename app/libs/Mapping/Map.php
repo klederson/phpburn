@@ -191,7 +191,7 @@ class PhpBURN_Map implements IMap {
 			$this->fields[$relName]['isRelationship']['relKey'] = $relKey;
 			$this->fields[$relName]['isRelationship']['outKey'] = $outKey;
 			$this->fields[$relName]['isRelationship']['relOutKey'] = $relOutKey;
-			$this->fields[$relName]['isRelationship']['relTabl'] = $relTable;
+			$this->fields[$relName]['isRelationship']['relTable'] = $relTable;
 			$this->fields[$relName]['isRelationship']['lazy'] = $lazy;
 		
 		//For child relationships ONLY

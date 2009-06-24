@@ -205,7 +205,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return true;
 	}
 	
-	public function where($conditions, $overrride = false) {
+	public function where($conditions, $override = false) {
 		if($override == true) {
 			unset($this->_where);
 		}
@@ -395,8 +395,6 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
-
-				print $this->$fieldInfo['alias']->getDialect()->prepareSelect();
 				
 //				Verify database consistence if there's more then one than we have a database problem
 				$amount = $this->$fieldInfo['alias']->find();

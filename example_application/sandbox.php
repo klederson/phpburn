@@ -10,7 +10,7 @@ $teste = new Users();
 
 //$teste->swhere('login','=','teste 1');
 //$teste->where('id=1');
-$teste->limit(0,1);
+$teste->limit(0,5);
 $teste->find();
 //teste->fetch();
 
@@ -21,15 +21,17 @@ $teste->find();
 //$teste->join('teste','users.id','teste.id_user');
 //$teste->find(1);
 
-
+$teste->_linkWhere('albums','1');
+print "<pre>";
 while($teste->fetch()) {
-	print "<br/><pre>";
-//	print_r($teste);
-	$teste->_linkWhere('albums','1');
 	$teste->_getLink('albums');
-	// $teste->albums->user_id;
-	print "</pre>";
+	//print_r($teste);
+	print $teste->id;
+	print "::";
+	print $teste->albums->user_id;
+	print "<br/>";
 }
+print "</pre>";
 /*
 PhpBURN::import('webinsys.Albums');
 $teste->login = "Acid";
