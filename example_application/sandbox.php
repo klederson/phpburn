@@ -21,7 +21,7 @@ $teste->find();
 //$teste->join('teste','users.id','teste.id_user');
 //$teste->find(1);
 
-$teste->_linkWhere('albums','1');
+$teste->_linkWhere('albums','user_id=1');
 print "<pre>";
 while($teste->fetch()) {
 	$teste->_getLink('albums');
