@@ -110,7 +110,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$whereConditions .= addslashes($value);
 				} else {
 					//SuperWhere
-					$whereConditions .= $whereConditions == null ? "" : $value['condition'];
+					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
 					$whereConditions .= sprintf("%s %s '%s'",$value['start'],$value['operator'],addslashes($value['end']));
 				}
 			}

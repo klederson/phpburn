@@ -295,13 +295,31 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return PhpBURN_Core
 	 */
 	public function fetch() {
+		
 		$result = $this->getDialect()->fetch();
 		if ($result) {
+//			Clean old data
+			//$this->_clearData();
 			foreach ($result as $key => $value) {
 				$this->getMap()->setFieldValue($key,$value);
 			}
 		}
 		return $result;
+	}
+	
+	private function _clearData() {
+		foreach($this->getMap()->fields as $index => $value) {
+			$this->getMap()->setFieldValue($index,'');
+		}
+		
+//		Clear all existent data for the model
+		unset($this->_where,$this->_orderBy,$this->_limit,$this->_select,$this->_join);
+		
+		$this->_where								= array();
+		$this->_orderBy								= null;
+		$this->_limit									= null;
+		$this->_select								= array();
+		$this->_join									= array();
 	}
 		
 	public function get() {
@@ -352,7 +370,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 //		Setup Where Clause
 		if($linkWhere != null && is_array($linkWhere)) {
 			foreach($linkWhere as $index => $value) {
-				$this->$fieldInfo['alias']->where($value);
+				foreach($value as $whereCondition) {
+					$this->$fieldInfo['alias']->where($whereCondition);
+				}
 			}
 		}
 		
@@ -366,6 +386,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			$this->_linkLimit($name,$offset,$limit);	
 		}
 		
+		
+		
 //		Define rules to get it
 		switch($fieldInfo['type']) {
 			case self::ONE_TO_ONE:
@@ -374,7 +396,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
 
-
+				print $this->$fieldInfo['alias']->getDialect()->prepareSelect();
+				
 //				Verify database consistence if there's more then one than we have a database problem
 				$amount = $this->$fieldInfo['alias']->find();
 				if( $amount > 1) {
@@ -417,7 +440,20 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		if($override == true) {
 			unset($this->_whereLink[$linkName]);
 		}
+		
+		if(!is_array($this->_whereLink[$linkName])) {
+			$this->_whereLink[$linkName] = array();
+		}
+		
 		array_push($this->_whereLink[$linkName], $conditions);
+	}
+	
+	public function getWhereLink($linkName) {
+		return $this->_whereLink;
+	}
+	
+	public function getLimitLink($linkName) {
+		return $this->_linkLimit[$linkName];
 	}
 	
 	/**

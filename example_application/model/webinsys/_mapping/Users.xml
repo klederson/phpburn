@@ -13,7 +13,7 @@
 	
 	<!-- relationships -->
 	<attribute type="relationship" name="albums"> 
-		<relationship package="webinsys" class="Albums" type="ONE_TO_ONE" thisKey="album_id" relKey="id" outKey="null" relOutKey="null" relTable="null" lazy="null" />
+		<relationship package="webinsys" class="Albums" type="ONE_TO_ONE" thisKey="id" relKey="user_id" outKey="null" relOutKey="null" relTable="null" lazy="null" />
 	</attribute>
 	
 	<attribute type="relationship" name="pictures"> 
