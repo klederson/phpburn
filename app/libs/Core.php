@@ -23,7 +23,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	//Relationship types
 	const ONE_TO_ONE 						= 100101;
 	const ONE_TO_MANY 						= 100102;
-	const MANY_TO_MANY 					= 100103;
+	const MANY_TO_ONE 						= 100103;
+	const MANY_TO_MANY 					= 100104;
 	
 	//Query types
 	//@TODO We do not use the term SQL because in the future we want to expand phpBURN to NON-SQL databases and/or even possibles new kinds of database such as CouchDB
@@ -390,7 +391,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 //		Define rules to get it
 		switch($fieldInfo['type']) {
-			case self::ONE_TO_ONE:
+				case self::ONE_TO_ONE: 
+				case self::MANY_TO_ONE:
 //				Looking for ONE TO ONE relationship				
 				
 //				Define WHERE based on relationship fields
@@ -398,7 +400,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				
 //				Verify database consistence if there's more then one than we have a database problem
 				$amount = $this->$fieldInfo['alias']->find();
-				if( $amount > 1) {
+				if( $amount > 1 && $fieldInfo['type'] == self::ONE_TO_ONE) {
 					$modelName = get_class($this);
 //					TODO Send an Exeption Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
 					print "[!There is an inconsistence for <b>$modelName</b> model in <b>'$name' relationship because we found $amount in a ONE TO ONE relationship. Using the first match as oficial</b>?!]";
@@ -411,6 +413,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			case self::ONE_TO_MANY:
 //				Looking for ONE TO MANY relationship
 				
+				$amount = $this->$fieldInfo['alias']->find();
+				
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
 								
@@ -418,6 +422,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			break;
 			case self::MANY_TO_MANY:
 //				Looking for MANY TO MANY relationship
+
+				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['thisKey'],$fieldInfo['relKey']);
+				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['outKey'],$fieldInfo['relOutKey']);
+				
+				return $this->$fieldInfo['alias']->find();
 				
 			break;
 		}

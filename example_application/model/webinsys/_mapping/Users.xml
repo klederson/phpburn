@@ -2,23 +2,22 @@
 <phpburn>
 <class name="Users" database="webinsys" package="webinsys" tablename="users">
 	<attribute type="column" name="id" column="id" datatype="int" lenght="(10)" notnull="true" autoincrement="true" defaultvalue="0" primary="true"/>
+	<attribute type="column" name="name" column="name" datatype="varchar" lenght="(255)" notnull="true" />
 	<attribute type="column" name="login" column="login" datatype="varchar" lenght="(255)" notnull="true" />
-	
 	<attribute type="column" name="pass" column="pass" datatype="varchar" lenght="(255)" notnull="true" />
 	<attribute type="column" name="status" column="status" datatype="enum" lenght="('waiting','active','suspense','blocked','deleted')" notnull="true" defaultvalue="waiting" />
-	<attribute type="column" name="created" column="created" datatype="timestamp" lenght="" notnull="true" defaultvalue="CURRENT_TIMESTAMP" />
-	<attribute type="column" name="last_login" column="last_login" datatype="timestamp" lenght="" notnull="true" defaultvalue="" />
-	<attribute type="column" name="checked" column="checked" datatype="enum" lenght="('1','2')" notnull="true" defaultvalue="" />
-	<attribute type="column" name="album_id" column="album_id" datatype="int" lenght="10" notnull="true" defaultvalue="" />
+	<attribute type="column" name="id_album" column="id_album" datatype="int" lenght="10" notnull="true" defaultvalue="" />
 	
 	<!-- relationships -->
 	<attribute type="relationship" name="albums"> 
-		<relationship package="webinsys" class="Albums" type="ONE_TO_ONE" thisKey="id" relKey="user_id" outKey="null" relOutKey="null" relTable="null" lazy="null" />
+		<relationship package="webinsys" class="Albums" type="ONE_TO_ONE" thisKey="id_album" relKey="id_album" outKey="null" relOutKey="null" relTable="null" lazy="null" />
 	</attribute>
 	
+	<!--
 	<attribute type="relationship" name="pictures"> 
 		<relationship package="webinsys" class="Pictures" type="ONE_TO_MANY" thisKey="id" relKey="user_id" outKey="null" relOutKey="null" relTable="null" lazy="null" />
 	</attribute>
+	-->
 	
 	<!--
 	<attribute type="relationship" name="albums"> 
@@ -26,9 +25,11 @@
 	</attribute>
 	-->
 	<!-- OUTTABLE SHOULD BE IN THE MODELS DATABASE EVEN IF THE RELATIONSHIP IS WITH A EXTERNAL PACKAGE -->
+	<!--
 	<attribute type="relationship" name="tags"> 
 		<relationship package="webinsys" class="Tags" type="MANY_TO_MANY" thisKey="id" relKey="user_id" outKey="id" relOutKey="tag_id" relTable="user_tags" lazy="null" />
 	</attribute>
+	-->
 	
 	<!-- FOR CHILD OBJECT IN MANY_TO_MANY
 	<attribute type="child" name="tags" >

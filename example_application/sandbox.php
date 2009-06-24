@@ -2,44 +2,47 @@
 require_once('config.php');
 require_once('app/phpBurn.php');
 
+//Loading the configuration file
 $config = new PhpBURN_Configuration($thisConfig);
 
-PhpBURN::import('webinsys.subpackage.Users3');
+//Importing the package file
+PhpBURN::import('webinsys.Users');
 
-$teste = new Users();
+//Instanciate the object
+$user = new Users();
 
-//$teste->swhere('login','=','teste 1');
-//$teste->where('id=1');
-$teste->limit(0,5);
-$teste->find();
-//teste->fetch();
+//Define some limit
+$user->limit(5);
+//Do the search
+$user->find();
 
-//$teste->save();
-
-
-//$teste->join('albums');
-//$teste->join('teste','users.id','teste.id_user');
-//$teste->find(1);
-
-$teste->_linkWhere('albums','user_id=1');
 print "<pre>";
-while($teste->fetch()) {
-	$teste->_getLink('albums');
-	//print_r($teste);
-	print $teste->id;
-	print "::";
-	print $teste->albums->user_id;
-	print "<br/>";
+//Start to navigate into the data
+while($user->fetch()) {
+//	Get the ONE TO ONE Relationship
+	$user->_getLink('albums');
+
+//	A little check if user has an album or not
+	if($user->albums->id_album == null) {
+		print sprintf('The user <i>%s</i> has no album',$user->name);
+	} else {
+//		Set some clauses to MANY_TO_MANY relationships
+		$user->albums->_linkWhere('tags','name LIKE("%teste%")'); //@TODO change to %test% and see the magic
+		
+//		Get MANY_TO_MANY relationship in Albums
+		$amountPictures = $user->albums->_getLink('tags');
+		
+		print sprintf('The user <i>%s</i> has the <b>%s</b> album and %d pictures',$user->name, strtoupper($user->albums->name), $amountPictures);
+		
+		while($user->albums->tags->fetch()) {
+			print "<br/>--";
+			print "Picture Name: " . $user->albums->tags->name;
+			print "--";
+		}		
+	}
+	print "<br/><br/>";
 }
 print "</pre>";
-/*
-PhpBURN::import('webinsys.Albums');
-$teste->login = "Acid";
-$teste->albums = new Albums();
-$teste->albums->user_id = 3;
-
-$teste->save();
-*/
 
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";

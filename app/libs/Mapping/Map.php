@@ -6,7 +6,8 @@ class PhpBURN_Map implements IMap {
 	//Relationship types
 	const ONE_TO_ONE 						= 100101;
 	const ONE_TO_MANY 						= 100102;
-	const MANY_TO_MANY 					= 100103;
+	const MANY_TO_ONE 						= 100103;
+	const MANY_TO_MANY 					= 100104;
 	
 	/**
 	 * This attribute carries all mapping information such as relationships, witch field is witch column, etc.

@@ -95,7 +95,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				$joinString .= $joinString != null ? ' ' : null;
 				$joinString .= sprintf('%s %s', $value['type'], $index);
 				if($value['fieldLeft']  != null && $value['fieldRight']  != null) {
-					$joinString .= sprintf(" ON '%s' %s '%s'", addslashes($value['fieldLeft']), $value['operator'], addslashes($value['fieldRight']));
+					$joinString .= sprintf(" ON `%s`.`%s` %s `%s`.`%s`", $this->getModel()->_tablename, ($value['fieldLeft']), $value['operator'], $index,($value['fieldRight']));
 				}
 			}			
 		}
@@ -107,18 +107,18 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				//Checking swhere and where
 				if(!is_array($value)) {
 					//Normal where
-					$whereConditions .= addslashes($value);
+					$whereConditions .= ($value);
 				} else {
 					//SuperWhere
 					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
-					$whereConditions .= sprintf("%s %s '%s'",$value['start'],$value['operator'],addslashes($value['end']));
+					$whereConditions .= sprintf("%s %s '%s'",$value['start'],$value['operator'],($value['end']));
 				}
 			}
 		}
 		
 		if($pk != null) {
 				$pkField = $this->getModel()->getMap()->getPrimaryKey();
-				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk) : sprintf("AND %s='%s'",$pkField['field']['alias'],addslashes($pk));
+				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk) : sprintf("AND %s='%s'",$pkField['field']['alias'],($pk));
 		}
 		
 		if(count($this->getModel()->_orderBy) > 0) {
@@ -201,7 +201,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			if($this->getModel()->$field != $infos['#value'] && $this->getModel()->getMap()->getRelationShip($field) != true) {
 				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$updatedFields .= $updatedFields == null ? '' : ', ';
-				$updatedFields .= sprintf("%s='%s'", $field, addslashes($this->getModel()->$field));
+				$updatedFields .= sprintf("%s='%s'", $field, ($this->getModel()->$field));
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 				//print $field . "<br/>";
 				$this->getModel()->$field->save();
