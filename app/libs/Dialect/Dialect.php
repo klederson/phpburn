@@ -120,7 +120,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				
 		if(count($this->getModel()->_where) > 0) {
 			//Define conditions
-			$conditions = 'WHERE ';
+			
 			foreach($this->getModel()->_where as $index => $value) {
 				//Checking swhere and where
 				if(!is_array($value)) {
@@ -132,8 +132,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$whereConditions .= sprintf("%s %s '%s'",$value['start'],$value['operator'],($value['end']));
 				}
 			}
+			
+			if($whereConditions != null && isset($whereConditions) && !empty($whereConditions)) {
+        		$conditions = 'WHERE ';
+			}
 		} else {
-			$conditions = 'WHERE ';
 			foreach ($this->getModel()->getMap()->fields as $field => $infos) {
 				if($this->getModel()->getMap()->getRelationShip($field) != true) {
 					$value = $this->getModel()->getMap()->getFieldValue($field);
@@ -142,6 +145,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					}
 					unset($value);
 				}
+			}
+			
+			if($whereConditions != null && isset($whereConditions) && !empty($whereConditions)) {
+        		$conditions = 'WHERE ';
 			}
 		}
 		
@@ -207,7 +214,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			if($this->getModel()->getMap()->getRelationShip($field) != true) {
 				$this->getModel()->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$insertFields .= $insertFields == null ? '' : ', ';
-				$insertFields .= $field;
+				$insertFields .= $infos['field']['column'];;
 				$value = $this->getModel()->getMap()->getFieldValue($field) == '' ? 'NULL' : $this->getModel()->getMap()->getFieldValue($field);
 				$insertValues .= $insertValues == null ? '' : ', ';
 				$insertValues .= sprintf("'%s'", $value);
@@ -231,7 +238,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			if($this->getModel()->$field != $infos['#value'] && $this->getModel()->getMap()->getRelationShip($field) != true) {
 				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$updatedFields .= $updatedFields == null ? '' : ', ';
-				$updatedFields .= sprintf("%s='%s'", $field, ($this->getModel()->$field));
+				$updatedFields .= sprintf("%s='%s'", $infos['field']['column'], ($this->getModel()->$field));
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 				//print $field . "<br/>";
 				$this->getModel()->$field->save();

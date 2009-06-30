@@ -70,6 +70,21 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			throw new PhpBURN_Exeption(PhpBURN_Message::EMPTY_PACKAGEORTABLE);
 		}
 		
+		//Internal objects
+		$this->_connObj								= null;
+		$this->_mapObj								= null;
+		$this->_dialectObj							= null;
+		
+		//Fields mapping
+		$this->_fields									= array();
+		
+		//Persistent methods storage
+		$this->_where								= array();
+		$this->_orderBy								= null;
+		$this->_limit									= null;
+		$this->_select								= array();
+		$this->_join									= array();
+		
 		//Mapping the object ( _mapObj )
 		PhpBURN_Mapping::create($this);
 		
@@ -208,7 +223,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	public function where($conditions, $override = false) {
 		if($override == true) {
-			unset($this->_where);
+			//unset($this->_where);
+			$this->_where = array();
 		}
 		array_push($this->_where, $conditions);
 	}
@@ -536,6 +552,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public function getConnection() {
 		//return $this->_connObj;
 		return PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
+	}
+	
+	public function toArray() {
+		foreach($this->getMap()->fields as $fieldName => $info) {
+			
+		}
 	}
 }
 ?>
