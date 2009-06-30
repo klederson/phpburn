@@ -323,7 +323,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_join									= array();
 	}
 		
-	public function get() {
+	public function get($pk = null) {
+		$this->find();
+		$this->fetch();
 	}
 	
 	public function save() {
