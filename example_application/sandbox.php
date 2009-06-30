@@ -31,7 +31,7 @@ while($user->fetch()) {
 		print sprintf('The user <i>%s</i> has no album',$user->name);
 	} else {
 //		Set some clauses to MANY_TO_MANY relationships
-		$user->albums->_linkWhere('tags','name LIKE("%teste%")'); //@TODO change to %test% and see the magic
+		$user->albums->_linkWhere('tags','name LIKE("%test%")'); //@TODO change to %test% and see the magic
 		
 //		Get MANY_TO_MANY relationship in Albums
 		$amountPictures = $user->albums->_getLink('tags');
@@ -42,7 +42,7 @@ while($user->fetch()) {
 			print "<br/>--";
 			print "Picture Name: " . $user->albums->tags->name;
 			print "--";
-		}		
+		}
 	}
 	print "<br/><br/>";
 }
@@ -51,6 +51,7 @@ print "</pre>";
 $user2 = new Users();
 $user2->get(1);
 print $user2->name;
+$user2->delete();
 
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";

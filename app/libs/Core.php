@@ -332,8 +332,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->getDialect()->save();
 	}
 	
-	public function delete() {
-		
+	public function delete($pk = null) {
+		$this->getDialect()->delete($pk);
 	}
 	
 	public function order() {

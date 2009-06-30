@@ -27,9 +27,12 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//Clear actual dataSet
 		$this->clearDataSet();
 		
+		$modelName = get_class($this->getModel());
+		
 		if($sql != null) {
 			$this->execute($sql);
 		} else {
+			PhpBURN_Message::output("[!No query found!] - <b>$modelName</b>");
 			return false;
 		}
 		
@@ -54,6 +57,22 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		} else {
 			return $data;
 		}
+	}
+	
+	public function prepareDelete($pk) {
+		//Defnine FROM tables
+		$from = 'FROM ' . $this->getModel()->_tablename;
+		
+		$whereConditions = null;
+			
+		$pkField = $this->getModel()->getMap()->getPrimaryKey();
+		$pk = $pk == null ? $this->getModel()->getMap()->getFieldValue($pkField['field']['alias']) : $pk;
+		
+		if(isset($pk) && !empty($pk) && $pk != null) {
+			$whereConditions = sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk);
+		}
+			
+		return $sql = $whereConditions == null ? null : sprintf("DELETE %s %s", $from, $whereConditions);
 	}
 	
 	/**
@@ -149,6 +168,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @param String $sql
 	 */
 	public function execute($sql) {
+		PhpBURN_Message::output("[!Performing the query!]: $sql");
 		$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
 	}
 	
@@ -225,8 +245,17 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//$this->execute($sql);
 	}
 	
-	public function delete() {
+	public function delete($pk = null) {
+//		Getting the DELETE QUERY
+		$sql = $this->prepareDelete($pk);
 		
+		if($sql != null) {
+			$this->execute($sql);
+		} else {
+			$modelName = get_class($this->getModel());
+			PhpBURN_Message::output("[!Nothing to delete!] - <b>$modelName</b>");
+			return false;
+		}
 	}
 	
 	/* Treatment */
