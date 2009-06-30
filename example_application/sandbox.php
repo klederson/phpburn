@@ -10,7 +10,7 @@ $config = new PhpBURN_Configuration($thisConfig);
 
 //Importing the package file
 PhpBURN::import('webinsys.Users');
-
+/*
 //Instanciate the object
 $user = new Users();
 
@@ -24,7 +24,6 @@ print "<pre>";
 while($user->fetch()) {
 //	Get the ONE TO ONE Relationship
 	$user->_getLink('albums');
-	//$user->save();
 
 //	A little check if user has an album or not
 	if($user->albums->id_album == null) {
@@ -47,11 +46,9 @@ while($user->fetch()) {
 	print "<br/><br/>";
 }
 print "</pre>";
-
+*/
 $user2 = new Users();
-$user2->get(1);
-print $user2->name;
-$user2->delete();
+$user2->find();
 
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";

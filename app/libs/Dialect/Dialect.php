@@ -132,6 +132,17 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$whereConditions .= sprintf("%s %s '%s'",$value['start'],$value['operator'],($value['end']));
 				}
 			}
+		} else {
+			$conditions = 'WHERE ';
+			foreach ($this->getModel()->getMap()->fields as $field => $infos) {
+				if($this->getModel()->getMap()->getRelationShip($field) != true) {
+					$value = $this->getModel()->getMap()->getFieldValue($field);
+					if(isset($value) && !empty($value) && $value != null && $value != '') {
+						$whereConditions .= sprintf("%s %s '%s'",$field,'=',$value);
+					}
+					unset($value);
+				}
+			}
 		}
 		
 		if($pk != null) {
@@ -192,12 +203,12 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	}
 	
 	public function prepareInsert() {
-		foreach ($this->getMap()->fields as $field => $infos) {
-			if($this->getMap()->getRelationShip($field) != true) {
-				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
+		foreach ($this->getModel()->getMap()->fields as $field => $infos) {
+			if($this->getModel()->getMap()->getRelationShip($field) != true) {
+				$this->getModel()->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$insertFields .= $insertFields == null ? '' : ', ';
 				$insertFields .= $field;
-				$value = $this->getMap()->getFieldValue($field) == '' ? 'NULL' : $this->getMap()->getFieldValue($field);
+				$value = $this->getModel()->getMap()->getFieldValue($field) == '' ? 'NULL' : $this->getModel()->getMap()->getFieldValue($field);
 				$insertValues .= $insertValues == null ? '' : ', ';
 				$insertValues .= sprintf("'%s'", $value);
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {

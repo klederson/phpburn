@@ -5,7 +5,7 @@
 	<attribute type="column" name="name" column="name" datatype="varchar" lenght="(255)" notnull="true" />
 	<attribute type="column" name="login" column="login" datatype="varchar" lenght="(255)" notnull="true" />
 	<attribute type="column" name="pass" column="pass" datatype="varchar" lenght="(255)" notnull="true" />
-	<attribute type="column" name="status" column="status" datatype="enum" lenght="('waiting','active','suspense','blocked','deleted')" notnull="true" defaultvalue="waiting" />
+	<attribute type="column" name="status" column="status" datatype="enum" lenght="('waiting','active','suspense','blocked','deleted')" notnull="true" defaultvalue="active" />
 	<attribute type="column" name="id_album" column="id_album" datatype="int" lenght="10" notnull="true" defaultvalue="" />
 	
 	<!-- relationships -->
