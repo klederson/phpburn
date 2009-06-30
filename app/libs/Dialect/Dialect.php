@@ -82,8 +82,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			}
 		} else {
 			$model = get_class($this->modelObj);
-//			@TODO Insert here an exeption message: "[!$model is not an mapped or valid PhpBURN Model!]"			
-			print "[!$model is not an mapped or valid PhpBURN Model!]";
+			PhpBURN_Message::output("$model [!is not an mapped or valid PhpBURN Model!]",PhpBURN_Message::ERROR);
 			exit;
 		}
 		
@@ -219,8 +218,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		$modelName = get_class($this->getModel());
 		if($sql == null) {
-			//TODO Send an Warning Message: "[!Warning!] : [!There is nothing to save in $modelName model.!]"
-			print "[!Warning!] : [!There is nothing to save in <b>$modelName</b> model.!]<br/>";
+			PhpBURN_Message::output("[!There is nothing to save in model!]: <b>$modelName</b>",PhpBURN_Message::WARNING);
 		} else {
 			return $sql;
 		}

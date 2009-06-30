@@ -141,8 +141,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				return $this->getDialect()->_getMultiInsertQuery( $opt );
 		}
 		
-		//@TODO Insert here an exeption message: "[!Unsuported SQL type!]: $type"
-		print "[!Unsuported SQL type!]: $type";
+		$msg = "[!Unsuported SQL type!]: $type";
+		PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
 		exit();
 	}
 	
@@ -350,10 +350,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		if($fieldInfo == false) {
 			$modelName = get_class($this);
-//			TODO Send an Exeption Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
-			print "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
+			PhpBURN_Message::output("<b>$modelName</b> [!has no such relationship!]", PhpBURN_Message::EXCEPTION);
 			return false;
-			exit;
 		}
 		
 //		All good let's start rock'n'roll
@@ -402,8 +400,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$amount = $this->$fieldInfo['alias']->find();
 				if( $amount > 1 && $fieldInfo['type'] == self::ONE_TO_ONE) {
 					$modelName = get_class($this);
-//					TODO Send an Exeption Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
-					print "[!There is an inconsistence for <b>$modelName</b> model in <b>'$name' relationship because we found $amount in a ONE TO ONE relationship. Using the first match as oficial</b>?!]";
+					PhpBURN_Message::output("<b>$modelName</b> [!has an inconsistent relationship!] ONE_TO_ONE [!called!] <b>$name</b> [[!results!] ($amount)]", PhpBURN_Message::WARNING);
 					return false;
 					exit;
 				}

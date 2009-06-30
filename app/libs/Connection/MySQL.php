@@ -90,8 +90,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 			$this->state = self::CLOSED;
 			$msg = '[!Database connection error!]: ' . $this->getDatabase().' - '.$this->getErrorMsg();
 			
-			//TODO onConnectError actions should be called from here
-			
+			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);			
 			return false;
 		}
 		
@@ -341,10 +340,9 @@ class PhpBURN_Connection_MySQL implements IConnection
 		$this->connect();
 		$rs = @mysql_query($sql, $this->conn_id);
 		if( ! $rs )
-		{
-			$msg = $this->getErrorMsg();
-//			@TODO Insert here an exeption message: "[!Database error:!] $msg"			
-			print "[!Database error:!] $msg";
+		{	
+			$msg = "[!Database error:!] " . $this->getErrorMsg();
+			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
 			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
 		} 
 		//$this->close();

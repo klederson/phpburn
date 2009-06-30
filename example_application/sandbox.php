@@ -1,6 +1,9 @@
 <?php
-require_once('config.php');
 require_once('app/phpBurn.php');
+require_once('config.php');
+
+//Turn the Messages and Logs and Erros ON
+PhpBURN_Message::setMode(PhpBURN_Message::FIREBUG); //You can Choose FIREPHP, BROWSER OR FILE for now than more can came latter
 
 //Loading the configuration file
 $config = new PhpBURN_Configuration($thisConfig);
@@ -13,14 +16,15 @@ $user = new Users();
 
 //Define some limit
 $user->limit(5);
-//Do the search
 $user->find();
+//Do the search
 
 print "<pre>";
 //Start to navigate into the data
 while($user->fetch()) {
 //	Get the ONE TO ONE Relationship
 	$user->_getLink('albums');
+	//$user->save();
 
 //	A little check if user has an album or not
 	if($user->albums->id_album == null) {

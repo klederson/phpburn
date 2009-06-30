@@ -258,18 +258,13 @@ class PhpBURN_Map implements IMap {
 		}
 		
 		$modelName = get_class($this->modelObj);
-		//TODO Send an Exeption Message: "[!There is no Primary Key for <b>$modelName</b> model. How did you did it?!]";
-		print "[!There is no Primary Key for <b>$modelName</b> model. How did you did it?!]";
-		exit;
+		PhpBURN_Message::output("<b>$modelName</b> [!has no Primary Key. How did you did it?!]", PhpBURN_Message::EXCEPTION);
 	}
 	
 	public function getRelationShip($name, $returnData = false) {
 		if(!is_array($this->fields[$name]['isRelationship']) || count($this->fields[$name]['isRelationship']) <= 0) {
 			$modelName = get_class($this->getModel());
-			//TODO Send an Warning Message: "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
-			//print "[!There is no such relationship for <b>$modelName</b> model. Are you sure you're looking for <b>'$name'</b>?!]";
 			return false;
-			//exit;
 		}
 		
 		if($returnData == true) {
@@ -292,9 +287,7 @@ class PhpBURN_Map implements IMap {
 	 */
 	public function checkColumns($value,$index,$myCompare) {
 		if($index == 'column' && $value == $myCompare) {
-			//TODO Send an Exeption Message: [!Duplicated Column!]: $myCompare
-			print "[!Duplicated column!]: $myCompare";
-			exit;
+			PhpBURN_Message::output("[!Duplicated Column!]: $myCompare",PhpBURN_Message::EXCEPTION);
 		}
 	}
 	
@@ -339,8 +332,7 @@ class PhpBURN_Map implements IMap {
 		$fields = new ArrayObject($this->fields);
 		$test = $fields->offsetExists($field);
 		if($test === false) {
-			//TODO Send an Warning Message:"[!Warning!] : [!This field doesn't exist in the Mapping!]: <strong>". get_class($this->modelObj) ."->$field </strong>";
-			print "[!Warning!]: [!This field doesn't exist in the Mapping!]: <strong>". get_class($this->modelObj) ."->$field </strong>";
+			PhpBURN_Message::output("[!This field doesn't exist in the Mapping!]: <strong>". get_class($this->modelObj) ."->$field </strong>", PhpBURN_Message::WARNING);
 		}
 		
 		$this->fields[$field]['#value'] = $value;
@@ -359,8 +351,7 @@ class PhpBURN_Map implements IMap {
 		if($keyExist == true && $this->fields[$fieldName]['isRelationship'] == false) {
 			return $this->modelObj->_dialectObj->validateValue($this->fields[$fieldName]['#value'],$this->fields[$fieldName]['type'], $this->fields[$fieldName]['length']);
 		} else {
-			//TODO Send an Exception Message: "[!This field doesn't exist or is a Relationship!]: <strong>". get_class($this->modelObj) ."->$fieldName </strong>"
-			print "[!This field doesn't exist or is a Relationship!]: <strong>". get_class($this->modelObj) ."->$fieldName </strong>";
+			PhpBURN_Message::output("[!This field doesn't exist or is a Relationship!]: <strong>". get_class($this->modelObj) ."->$fieldName </strong>",PhpBURN_Message::WARNING);
 			return false;
 		}
 		
