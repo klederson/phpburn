@@ -86,7 +86,7 @@ class PhpBURN_Message {
 
   		//Setup the message
   		$message = sprintf("%s: [%s (%s MB)] ",$type, $time, $usage);
-  		$message .= $originalMessage;
+  		$message .= var_export($originalMessage, true);
   		$message .="\r\n\r\n"; //The breaklines
   		
   		//Sending the message
