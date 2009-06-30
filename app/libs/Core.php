@@ -324,7 +324,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 		
 	public function get($pk = null) {
-		$this->find();
+		$this->find($pk);
 		$this->fetch();
 	}
 	
