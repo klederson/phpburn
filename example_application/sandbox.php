@@ -48,6 +48,10 @@ while($user->fetch()) {
 }
 print "</pre>";
 
+$user2 = new Users();
+$user2->get(1);
+print $user2->name;
+
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";
 
