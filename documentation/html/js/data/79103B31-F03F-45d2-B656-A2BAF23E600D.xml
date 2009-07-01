@@ -1,8 +1,0 @@
-tocTab[tocTab.length] = new Array("1:1", "", "libs", "EARoot/EA1/EA5.html", "3.png", "4", "0", "", "Logical diagram");
-tocTab[tocTab.length] = new Array("1:2", "", "«interface» IPhpBurn", "EARoot/EA1/EA10.html", "8.png", "18", "0", "", "Interface");
-tocTab[tocTab.length] = new Array("1:3", "", "PhpBURN_Configuration", "EARoot/EA1/EA11.html", "5.png", "20", "0", "", "Class");
-tocTab[tocTab.length] = new Array("1:4", "", "PhpBURN_Connection", "EARoot/EA1/EA12.html", "5.png", "17", "0", "", "Class");
-tocTab[tocTab.length] = new Array("1:5", "", "PhpBurn_Core", "EARoot/EA1/EA13.html", "5.png", "19", "0", "", "Class");
-tocTab[tocTab.length] = new Array("1.1", "1", "Connection", "EARoot/EA1/EA7.html", "4.png", "", "", "{DEF92335-3221-4f28-A550-D01C42658A2E}", "Package");
-tocTab[tocTab.length] = new Array("1.2", "1", "Dialect", "EARoot/EA1/EA8.html", "4.png", "", "", "{156E89FE-7F9A-441e-B503-B95BFBB6ED79}", "Package");
-tocTab[tocTab.length] = new Array("1.3", "1", "Exception", "EARoot/EA1/EA9.html", "4.png", "", "", "{D2E0F6D8-7D04-42c5-A400-A2FB1443A7AA}", "Package");

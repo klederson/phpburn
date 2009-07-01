@@ -1,2 +1,0 @@
-tocTab[tocTab.length] = new Array("1.4:1", "", "Exception", "EARoot/EA1/EA4/EA25.html", "3.png", "12", "0", "", "Logical diagram");
-tocTab[tocTab.length] = new Array("1.4:2", "", "«interface» IException", "EARoot/EA1/EA4/EA27.html", "8.png", "30", "0", "", "Interface");

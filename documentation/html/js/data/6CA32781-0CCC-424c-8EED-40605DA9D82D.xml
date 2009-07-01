@@ -1,3 +1,0 @@
-tocTab[tocTab.length] = new Array("1.2:1", "", "Connection", "EARoot/EA1/EA2/EA18.html", "3.png", "11", "0", "", "Logical diagram");
-tocTab[tocTab.length] = new Array("1.2:2", "", "«interface» IConnection", "EARoot/EA1/EA2/EA20.html", "8.png", "28", "0", "", "Interface");
-tocTab[tocTab.length] = new Array("1.2:3", "", "PhpBURN_Connection_MySQL", "EARoot/EA1/EA2/EA21.html", "5.png", "27", "0", "", "Class");
