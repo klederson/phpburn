@@ -19,7 +19,7 @@ class Albums extends PhpBURN_Core {
 	public function _mapping() {
 		$this->getMap()->addField('id_album', 'id_album', 'int', '10',array('primary' => true, 'autoincrement' => true, 'notnull' => true));
 		$this->getMap()->addField('name', 'name', 'varchar', '255',array('notnull' => true));
-		$this->getMap()->addField('created_at', 'created_at', 'timestamp', null ,array('notnull' => true, 'default-value' => 'CURRENT_TIMESTAMP'));
+		$this->getMap()->addField('created_at', 'created_at', 'timestamp', null ,array('notnull' => true, 'defaultvalue' => 'CURRENT_TIMESTAMP'));
 		
 		// addRelationship($relName,$relType,$foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable, $lazy) ;
 		$this->_mapObj->addRelationship('pictures',parent::ONE_TO_MANY,'Pictures', 'id_album', 'id_album',null, null, null, false);

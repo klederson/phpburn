@@ -215,7 +215,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				$this->getModel()->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$insertFields .= $insertFields == null ? '' : ', ';
 				$insertFields .= $infos['field']['column'];;
-				$value = $this->getModel()->getMap()->getFieldValue($field) == '' ? 'NULL' : $this->getModel()->getMap()->getFieldValue($field);
+				$value = $this->getModel()->getMap()->getFieldValue($field);
 				$insertValues .= $insertValues == null ? '' : ', ';
 				$insertValues .= sprintf("'%s'", $value);
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {

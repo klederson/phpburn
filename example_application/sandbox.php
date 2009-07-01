@@ -46,6 +46,8 @@ while($user->fetch()) {
 			print "--";
 		}
 		
+		print_r($user->toArray());
+		
 	}
 	print "<br/><br/>";
 }
