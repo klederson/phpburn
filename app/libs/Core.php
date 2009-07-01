@@ -316,7 +316,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$result = $this->getDialect()->fetch();
 		if ($result) {
 //			Clean old data
-			//$this->_clearData();
+			$this->_clearData();
 			foreach ($result as $key => $value) {
 				$this->getMap()->setFieldValue($key,$value);
 			}
@@ -326,7 +326,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	private function _clearData() {
 		foreach($this->getMap()->fields as $index => $value) {
-			$this->getMap()->setFieldValue($index,'');
+			//if($this->getMap()->getRelationShip($index) != true) {
+				$this->getMap()->setFieldValue($index,'');
+			//} else {
+			//	unset($this->$index);
+			//}
 		}
 		
 //		Clear all existent data for the model
@@ -441,8 +445,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['thisKey'],$fieldInfo['relKey']);
 				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['outKey'],$fieldInfo['relOutKey']);
 				
-				return $this->$fieldInfo['alias']->find();
-				
+				$this->$fieldInfo['alias']->find();
+				return $this->$fieldInfo['alias']->fetch();	
 			break;
 		}
 	}
@@ -555,9 +559,21 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	public function toArray() {
+		$return = array();
 		foreach($this->getMap()->fields as $fieldName => $info) {
-			
+			if($this->getMap()->getRelationShip($fieldName) == true) {
+				if(get_parent_class($this->$fieldName) == 'PhpBURN_Core') {
+					if(count($this->$fieldName->getDialect()->dataSet) > 0)					
+					foreach($this->$fieldName->getDialect()->dataSet as $index => $value) {
+						$return[$fieldName][] = $this->$fieldName->toArray();
+					}
+				}
+			} else {
+				$return[$fieldName] = $this->getMap()->getFieldValue($fieldName);
+			}
 		}
+		
+		return $return;
 	}
 }
 ?>

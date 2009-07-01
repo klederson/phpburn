@@ -22,9 +22,12 @@ $user->find();
 print "<pre>";
 //Start to navigate into the data
 while($user->fetch()) {
+	
 //	Get the ONE TO ONE Relationship
 	$user->_getLink('albums');
-	$user->toArray();
+	
+	
+	
 //	A little check if user has an album or not
 	if($user->albums->id_album == null) {
 		print sprintf('The user <i>%s</i> has no album',$user->name);
@@ -42,6 +45,7 @@ while($user->fetch()) {
 			print "Picture Name: " . $user->albums->tags->name;
 			print "--";
 		}
+		
 	}
 	print "<br/><br/>";
 }

@@ -2,8 +2,8 @@
 abstract class PhpBURN_Dialect  implements IDialect  {
 	
 	protected $obj = null;
-	protected $resultSet;
-	protected $dataSet;
+	public $resultSet;
+	public $dataSet;
 	protected $pointer;
 		
 	function __construct(PhpBurn_Core $obj) {
