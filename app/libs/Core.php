@@ -138,22 +138,22 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		switch($type)
 		{
 			case self::QUERY_SELECT:
-				return $this->getDialect()->_getSelectQuery();
+				return $this->getDialect()->prepareSelect();
 			
 			case self::QUERY_SELECT_COUNT:
-				return $this->getDialect()->_getSelectQuery(true, $opt);
+				return null;
 				
 			case self::QUERY_UPDATE:
-				return $this->getDialect()->_getUpdateQuery( $opt );
+				return $this->getDialect()->prepareUpdate();
 				
 			case self::QUERY_DELETE:
-				return $this->getDialect()->_getDeleteQuery( $opt );
+				return $this->getDialect()->prepareDelete();
 			
 			case self::QUERY_INSERT:
-				return $this->getDialect()->_getInsertQuery( $opt );
+				return $this->getDialect()->prepareInsert();
 
 			case self::QUERY_MULTI_INSERT;
-				return $this->getDialect()->_getMultiInsertQuery( $opt );
+				return null;
 		}
 		
 		$msg = "[!Unsuported SQL type!]: $type";
@@ -316,32 +316,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$result = $this->getDialect()->fetch();
 		if ($result) {
 //			Clean old data
-			$this->_clearData();
+			$this->getMap()->reset();
 			foreach ($result as $key => $value) {
 				$this->getMap()->setFieldValue($key,$value);
 			}
 		}
 		return $result;
 	}
-	
-	private function _clearData() {
-		foreach($this->getMap()->fields as $index => $value) {
-			//if($this->getMap()->getRelationShip($index) != true) {
-				$this->getMap()->setFieldValue($index,'');
-			//} else {
-			//	unset($this->$index);
-			//}
-		}
-		
-//		Clear all existent data for the model
-		unset($this->_where,$this->_orderBy,$this->_limit,$this->_select,$this->_join);
-		
-		$this->_where								= array();
-		$this->_orderBy								= null;
-		$this->_limit									= null;
-		$this->_select								= array();
-		$this->_join									= array();
-	}
+
 		
 	public function get($pk = null) {
 		$this->find($pk);
@@ -445,8 +427,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['thisKey'],$fieldInfo['relKey']);
 				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['outKey'],$fieldInfo['relOutKey']);
 				
-				$this->$fieldInfo['alias']->find();
-				return $this->$fieldInfo['alias']->fetch();	
+				return $this->$fieldInfo['alias']->find();
 			break;
 		}
 	}

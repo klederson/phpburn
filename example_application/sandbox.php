@@ -33,7 +33,7 @@ while($user->fetch()) {
 		print sprintf('The user <i>%s</i> has no album',$user->name);
 	} else {
 //		Set some clauses to MANY_TO_MANY relationships
-		$user->albums->_linkWhere('tags','name LIKE("%test%")'); //@TODO change to %test% and see the magic
+		//$user->albums->_linkWhere('tags','name LIKE("%test%")'); //@TODO change to %test% and see the magic
 		
 //		Get MANY_TO_MANY relationship in Albums
 		$amountPictures = $user->albums->_getLink('tags');
