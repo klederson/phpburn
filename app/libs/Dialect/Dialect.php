@@ -69,7 +69,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		$pk = $pk == null ? $this->getModel()->getMap()->getFieldValue($pkField['field']['alias']) : $pk;
 		
 		if(isset($pk) && !empty($pk) && $pk != null) {
-			$whereConditions = sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk);
+			$whereConditions = sprintf("WHERE %s='%s'",$pkField['field']['column'],$pk);
 		}
 			
 		return $sql = $whereConditions == null ? null : sprintf("DELETE %s %s", $from, $whereConditions);
