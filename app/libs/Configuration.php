@@ -11,23 +11,19 @@ class PhpBURN_Configuration {
 		 */
 		if(empty($options['database']))
 		{
-			throw new PhpBURN_Exception(PhpBURN_Message::EMPTY_DATABASE);
-			return;
+			PhpBURN_Message::output('[!Empty database into configuration!]',PhpBURN_Message::EXCEPTION);
 		}
 		if(empty($options['user']))
 		{
-			throw new PhpBURN_Exception(PhpBURN_Message::EMPTY_DATABASE_USER);
-			return;
+			PhpBURN_Message::output('[!Empty database user into configuration!]',PhpBURN_Message::EXCEPTION);
 		}
 		if(empty($options['password']))
 		{
-			throw new PhpBURN_Exception(PhpBURN_Message::EMPTY_DATABASE_PASSWORD);
-			return;
+			PhpBURN_Message::output('[!Empty password into configuration!]',PhpBURN_Message::EXCEPTION);
 		}
 		if(empty($options['class_path']))
 		{
-			throw new PhpBURN_Exception(PhpBURN_Message::EMPTY_CLASSPATH);
-			return;
+			PhpBURN_Message::output('[!Empty class_path into configuration!]',PhpBURN_Message::EXCEPTION);
 		}
 		
 		/**
@@ -35,18 +31,18 @@ class PhpBURN_Configuration {
 		 */
 		if(empty($options['dialect']))
 		{
-			PhpBURN_Logs::debug(PhpBURN_Message::EMPTY_DIALECT);
+			PhpBURN_Message::output('[!Empty dialect into configuration!]',PhpBURN_Message::WARNING);
 			$options['dialect'] = 'MySQL';
 		}
 		
 		if(empty($options['port']))
 		{
-			PhpBURN_Logs::debug(PhpBURN_Message::EMPTY_DATABASE_PORT);
+			PhpBURN_Message::output('[!Empty database port into configuration!]',PhpBURN_Message::WARNING);
 			$options['port'] = '3306';
 		}
 		if(empty($options['host']))
 		{
-			PhpBURN_Logs::debug(PhpBURN_Message::EMPTY_DATABASE_HOST);
+			PhpBURN_Message::output('[!Empty database host into configuration!]',PhpBURN_Message::WARNING);
 			$options['host'] = 'localhost';
 		}
 		
@@ -64,6 +60,12 @@ class PhpBURN_Configuration {
 		}
 	}
 	
+	/**
+	 * Gets the config about a specific package
+	 * 
+	 * @param String $package
+	 * @return Array
+	 */
 	public function getConfig($package = null) {
 		if($package == null) {
 			return self::$options;

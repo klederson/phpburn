@@ -10,7 +10,7 @@ $config = new PhpBURN_Configuration($thisConfig);
 
 //Importing the package file
 PhpBURN::import('webinsys.Users');
-
+/*
 //Instanciate the object
 $user = new Users();
 
@@ -52,10 +52,11 @@ while($user->fetch()) {
 	print "<br/><br/>";
 }
 print "</pre>";
-
+*/
 $user2 = new Users();
-$user2->name = "Oi";
-$user2->find();
+$user2->get(2);
+
+print_r($user2->toArray());
 
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";

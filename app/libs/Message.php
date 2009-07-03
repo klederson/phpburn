@@ -1,13 +1,4 @@
 <?php
-/**
- * This class manages all internal messages into the system
- * from the LOG messages until EXCEPTIONS throught files, 
- * browser, database or even FirePHP
- * 
- * @author Kléderson Bueno <klederson@klederson.com>
- * @version 0.1a
- */
-
 //Loading needed libs
 PhpBURN::load('Extras.Views.Views');
 
@@ -16,6 +7,14 @@ if(SYS_USE_FIREPHP == true) {
 	PhpBURN::load('FirePHPCore.fb');
 }
 
+/**
+ * This class manages all internal messages into the system
+ * from the LOG messages until EXCEPTIONS throught files, 
+ * browser, database or even FirePHP
+ * 
+ * @author Kléderson Bueno <klederson@klederson.com>
+ * @version 0.1a
+ */
 class PhpBURN_Message {
 	
 	/* MODE */
@@ -44,6 +43,11 @@ class PhpBURN_Message {
   	 */
   	public $databaseModel;
   	
+  	/**
+  	 * Turn the Message system on and set the mode
+  	 * 
+  	 * @param Integer $mode
+  	 */
   	public function setMode($mode = self::BROWSER) {
   		self::$mode = $mode;
   	}
@@ -57,20 +61,27 @@ class PhpBURN_Message {
   		self::$databaseModel = $databaseModel;
   	}
   	
+  	/**
+  	 * Defines the name for the log file
+  	 * 
+  	 * @param String $name
+  	 */
   	public function setFileName($name) {
   		self::$fileName = $name;
   	}
+  	
   	
   	public function setMessageLevel($level = self::NOTICE) {
   		self::$messageLevel = $level;
   	}
   
   	/**
-  	 * Main function of Messaging System
-  	 * @param $originalMessage
-  	 * @param $mode
-  	 * @param $type
-  	 * @return unknown_type
+  	 * Main function of Messaging System. It outputs a message based on the mode defined.
+  	 * 
+  	 * @param String $originalMessage
+  	 * @param String $type
+  	 * @return String
+  	 * @return Boolean
   	 */
   	public function output($originalMessage, $type = self::NOTICE) {
   		if(self::$mode == null) {

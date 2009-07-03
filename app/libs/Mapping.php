@@ -1,8 +1,21 @@
 <?php
 PhpBURN::load('Mapping.Map');
 
+/**
+ * This class manage the map controller. 
+ * It is the main responsable for create and delegate the maps into the models.
+ * Can be used by many ways but by default its better if you simply do not mess around ;) let the application work for you.
+ * 
+ * @author Kléderson Bueno <klederson@klederson.com>
+ * @version 0.1a
+ */
 class PhpBURN_Mapping
 {
+	/**
+	 * This variable storage in runtime all maps for each kind of model. For more details 
+	 * @see getMapping()
+	 * @var Array
+	 */
 	private static $mapping = array();
 	
 	/**
@@ -10,7 +23,7 @@ class PhpBURN_Mapping
 	 * If the map already exists it just return it ( caching )
 	 *
 	 * @param PhpBURN_Core $modelObj
-	 * @return unknown
+	 * @return PhpBURN_Map
 	 */
 	public function create(PhpBURN_Core &$modelObj,$fromMulti = false) {		
 		$mapObj = self::getMapping(get_class($modelObj));
@@ -24,7 +37,6 @@ class PhpBURN_Mapping
 			$mapObj = new PhpBURN_Map($modelObj);
 			self::addMap($modelObj,$mapObj);
 			
-				
 			/*
 			if(count($parentMaps) > 0 && $fromMulti != false) {	
 				//Prepare multi-map item
@@ -58,6 +70,12 @@ class PhpBURN_Mapping
 		return $mapObj;
 	}
 	
+	/**
+	 * It verify if the model is a Child of other model
+	 * 
+	 * @param PhpBURN_Core $modelObj
+	 * @return Boolean
+	 */
 	private function isChild(PhpBURN_Core &$modelObj) {
 		if(get_parent_class($modelObj) != 'PhpBURN_Core') {
 			return true;

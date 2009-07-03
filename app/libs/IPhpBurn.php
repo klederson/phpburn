@@ -2,6 +2,10 @@
 interface IPhpBurn {
 	public function get();
 	
+	public function find();
+	
+	public function fetch();
+	
 	public function save();
 	
 	public function delete();

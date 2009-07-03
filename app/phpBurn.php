@@ -17,6 +17,9 @@ define('PHPBURN_INCLUDE_PATH', dirname(__FILE__), true);
 abstract class PhpBURN {
 	/**
 	 * This method loads internals classes as Configuration, Exceptions, Connection, etc.
+	 * 
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @access public
 	 */
 	public static function load() {
 		$args = func_get_args();
@@ -39,8 +42,17 @@ abstract class PhpBURN {
 	
 	/**
 	 * This method loads model(s) from packages
-	 * @example PhpBURN::import('package.Model');
-	 * @example PhpBURN::import('package.subpackage.SubModel');
+	 * 
+	 * @example 
+	 * <code>
+	 * PhpBURN::import('package.Model');
+	 * </code>
+	 * @example 
+	 * <code>
+	 * PhpBURN::import('package.subpackage.SubModel');
+	 * </code>
+	 * 
+	 * @access public
 	 */
 	public static function import() {
 		$args = func_get_args();
@@ -69,7 +81,8 @@ abstract class PhpBURN {
 	 * PhpBURN::loadXMLMapping('phpburn.super.model.Users');
 	 * Will look for phpburn directory / super / model / mapping / Users.xml
 	 *
-	 * @return unknown
+	 * @return String
+	 * @return Boolean
 	 */
 	public static function loadXMLMapping() {
 		$args = func_get_args();

@@ -1,9 +1,11 @@
 <?php
 /**
- * All phpBurn classes should extend thi
+ * All phpBurn models should extend this class
+ * It is the main responsable for the Magic.
  * 
  * @author Kléderson Bueno <klederson@klederson.com>
- * @version 0.37
+ * @version 0.4a
+ * @abstract
  */
 abstract class PhpBURN_Core implements IPhpBurn {
 	/* The structure of the constants follow the concept
@@ -65,6 +67,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 */
 	public $_multiMap							= false;
 	
+	/**
+	 * PHP magic method that automaticaly executes when a new instance of this class is been created
+	 * Also here we configure the basics for the well work of PhpBURN Models
+	 */
 	public function __construct() {
 		if(!isset($this->_tablename) || !isset($this->_package)) {
 			throw new PhpBURN_Exeption(PhpBURN_Message::EMPTY_PACKAGEORTABLE);
@@ -98,6 +104,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_initialize();
 	}
 	
+	/**
+	 * PHP Magic method that starts when you initialize a class/model
+	 * It also starts the conection between the model and the database
+	 */
 	final private function _initialize() {
 		//Opening the database connection for this object
 		$this->getConnection()->connect();
@@ -130,10 +140,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @version 0.1a
 	 * 
 	 * @param Integer $type
-	 * @param Mixed $opt
 	 * @return String
 	 */
-	public function _getQUERY( $type = self::QUERY_SELECT, $opt = null )
+	public function _getQUERY( $type = self::QUERY_SELECT)
 	{
 		switch($type)
 		{
@@ -154,11 +163,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 			case self::QUERY_MULTI_INSERT;
 				return null;
+				
+			default:
+				return $this->getDialect()->getCurrentQuery();
 		}
 		
+		//Outputs the error message
 		$msg = "[!Unsuported SQL type!]: $type";
 		PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
-		exit();
 	}
 	
 	/**
@@ -182,18 +194,50 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_join[$tableName]['type'] = $joinType;
 	}
 	
+	/**
+	 * Just a hook for join() method, it automaticaly creates a LEFT JOIN into the SELECT query of your model
+	 * 
+	 * @param String $tableName
+	 * @param String $fieldLeft
+	 * @param String $fieldRight
+	 * @param String $operator
+	 */
 	public function joinLeft($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
 		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'LEFT JOIN');
 	}
 	
+	/**
+	 * Just a hook for join() method, it automaticaly creates a RIGHT JOIN into the SELECT query of your model
+	 * 
+	 * @param String $tableName
+	 * @param String $fieldLeft
+	 * @param String $fieldRight
+	 * @param String $operator
+	 */
 	public function joinRight($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
 		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'RIGHT JOIN');
 	}
 	
+	/**
+	 * Just a hook for join() method, it automaticaly creates a INNER JOIN into the SELECT query of your model
+	 * 
+	 * @param String $tableName
+	 * @param String $fieldLeft
+	 * @param String $fieldRight
+	 * @param String $operator
+	 */
 	public function joinInner($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
 		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'INNER JOIN');
 	}
 	
+	/**
+	 * Just a hook for join() method, it automaticaly creates a OUTTER JOIN into the SELECT query of your model
+	 * 
+	 * @param String $tableName
+	 * @param String $fieldLeft
+	 * @param String $fieldRight
+	 * @param String $operator
+	 */
 	public function joinOutter($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
 		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'OUTTER JOIN');
 	}
@@ -221,14 +265,26 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return true;
 	}
 	
+	/**
+	 * This defines WHERE clauses to your model if override is true it cleanup all old wheres
+	 * 
+	 * @param String $conditions
+	 * @param Boolean $override
+	 */
 	public function where($conditions, $override = false) {
 		if($override == true) {
-			//unset($this->_where);
+			unset($this->_where);
 			$this->_where = array();
 		}
 		array_push($this->_where, $conditions);
 	}
 	
+	/**
+	 * This method create SELECT method for your call
+	 * 
+	 * @param String $field
+	 * @param String $alias
+	 */
 	public function select($field, $alias = null) {
 		$alias = $alias == null ? $field : $alias;
 		array_push($this->_select, array('value'=>$field, 'alias'=>$alias));
@@ -321,33 +377,75 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$this->getMap()->setFieldValue($key,$value);
 			}
 		}
+		
 		return $result;
 	}
 
-		
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/IPhpBurn#get()
+	 */
 	public function get($pk = null) {
 		$this->find($pk);
 		$this->fetch();
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/IPhpBurn#save()
+	 */
 	public function save() {
 		$this->getDialect()->save();
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/IPhpBurn#delete()
+	 */
 	public function delete($pk = null) {
 		$this->getDialect()->delete($pk);
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/IPhpBurn#order()
+	 */
 	public function order() {
 		
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/IPhpBurn#limit()
+	 */
 	public function limit($offset = null, $limit = null) {
 		$this->_limit = $limit == null ? $offset : $offset . ',' . $limit;
 	}
 	
 //	Relationships functions
+
+	/**
+	 * This method gets a relationship of the model based on mapping informations
+	 * 
+	 * @param String $name
+	 * @param String $linkWhere
+	 * @param Integer $offset
+	 * @param Integer $limit
+	 * @return PhpBURN_Core
+	 */
+	public function getRelationship($name, $linkWhere = null, $offset = null, $limit = null) {
+		return self::_getLink($name, $linkWhere, $offset, $limit);
+	}
 	
+	/**
+	 * This method gets a relationship of the model based on mapping informations
+	 * 
+	 * @param String $name
+	 * @param String $linkWhere
+	 * @param Integer $offset
+	 * @param Integer $limit
+	 * @return PhpBURN_Core
+	 */
 	public function _getLink($name, $linkWhere = null, $offset = null, $limit = null) {
 		//Cheking if the link existis
 		$fieldInfo = $this->getMap()->getRelationShip($name, true);
@@ -434,14 +532,23 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	
 	/**
-	 * It puts a WHERE clause when you want to get a link with specific caracteristics
+	 * It puts a WHERE clause when you want to get a relationship with specific caracteristics.
+	 * If override is true then cleanup old stuff.
+	 * 
+	 * FOR RELATIONSHIPS ONLY
+	 * 
+	 * @example
+	 * <code>
+	 * $model->_linkWhere('album_id','> 10');
+	 * $model->getRelationship('albums');
+	 * </code>
 	 * 
 	 * @author Kléderson Bueno <klederson@klederson.com>
 	 * @version 0.1b
 	 * 
-	 * @param $linkName
-	 * @param $conditions
-	 * @param $override
+	 * @param String $linkName
+	 * @param String $conditions
+	 * @param Boolean $override
 	 */
 	public function _linkWhere($linkName, $conditions, $override = false) {
 		if($override == true) {
@@ -539,6 +646,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
 	}
 	
+	/**
+	 * This method convert all mapped informationg (including cascating relatioinships) into a array to better manage it into views or anything you want to.
+	 * 
+	 * @return Array
+	 */
 	public function toArray() {
 		$return = array();
 		foreach($this->getMap()->fields as $fieldName => $info) {

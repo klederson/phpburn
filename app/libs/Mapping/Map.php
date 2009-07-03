@@ -323,10 +323,11 @@ class PhpBURN_Map implements IMap {
 	}
 	
 	/**
-	 * This sets the value in a field based in name, value and mappinginfo
+	 * This sets the value in a field based in name, value and Mapping Info
 	 *
 	 * @param String $field
 	 * @param unknown_type $value
+	 * @access public
 	 */
 	public function setFieldValue($field,$value) {
 		$fields = new ArrayObject($this->fields);
@@ -335,7 +336,7 @@ class PhpBURN_Map implements IMap {
 			PhpBURN_Message::output("[!This field doesn't exist in the Mapping!]: <strong>". get_class($this->modelObj) ."->$field </strong>", PhpBURN_Message::WARNING);
 		}
 		
-		$this->fields[$field]['#value'] = $value;
+		$this->fields[$field]['#value'] = $this->getModel()->$field = $value;
 		$this->getFieldValue($field);
 		
 	}
