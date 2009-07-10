@@ -22,7 +22,7 @@ class PhpBURN_Message {
   	const BROWSER 				= 300002;
   	const FIREBUG 					= 300003;
   	const FILE    						= 300004;
-  	const DATABASE    				= 300005;
+  	const DATABASE    			= 300005;
 
   	/* TYPE */
   	const NOTICE						= '[!Notice!]';
@@ -30,6 +30,12 @@ class PhpBURN_Message {
   	const WARNING					= '[!Warning!]';
   	const LOG							= '[!Log!]';
   	const ERROR						= '[!Error!]';
+  	
+  	/* PRIORITY */
+  	const LOW							= 300100;
+  	const NORMAL					= 300101;
+  	const HIGH						= 300102;
+  	const INSANE						= 300103; //this one will ALWAYS be show, even when the message type is not allowed (will not only when message system is turned off)
   
   	/* STAGE */
   	public static $mode;
@@ -83,9 +89,13 @@ class PhpBURN_Message {
   	 * @return String
   	 * @return Boolean
   	 */
-  	public function output($originalMessage, $type = self::NOTICE) {
+  	public function output($originalMessage, $type = self::NOTICE, $priority = self::NORMAL) {
   		if(self::$mode == null) {
   			return false;
+  		}
+  		
+  		if($type == null) {
+  			$type = self::NOTICE;
   		}
   		
   		//Now time
