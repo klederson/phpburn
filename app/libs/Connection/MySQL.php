@@ -411,6 +411,11 @@ class PhpBURN_Connection_MySQL implements IConnection
 		$this->executeSQL("ROLLBACK");
 	}
 	
+	//Utils
+	public function last_id() {
+		return mysql_insert_id($this->conn_id);
+	}
+	
 	public function __destruct() {
 		self::close();
 	}
