@@ -67,6 +67,7 @@ abstract class PhpBURN {
 			$newfile = $basedir . str_replace('.', DIRECTORY_SEPARATOR, $libname). '.php';
 		
 			if(file_exists($newfile)) {
+				PhpBURN_Message::output('[!Loading Model!]: '. $newfile, null, PhpBURN_Message::LOW);
 				require_once $newfile;
 			} else {
 				return "error";
