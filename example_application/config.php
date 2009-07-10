@@ -85,7 +85,9 @@ $thisConfig = array(
 		 * Or if you want to create some different config like another database
 		 * or another host,port,user,password or even another Dialect you can use like this.
 		 * 
-		 * @example 'package' => array(
+		 * @example 
+		 * <code>
+		 * 'package' => array(
 		 * 'packageone',
 		 * 'packagetwo',
 		 * 'packagethree' => array(
@@ -102,9 +104,9 @@ $thisConfig = array(
 		 *	 'class_path' => '/home/models/microsoftclass/',
 		 *	 'port' => '666'
 		 *  ),
-		 *  'packagefive',
-		 *  ...
+		 *  'packagefive'
 		 * )
+		 * </code>
 		 */
 			
 			'packages' => array(
