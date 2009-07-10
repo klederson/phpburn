@@ -129,7 +129,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				} else {
 					//SuperWhere
 					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
-					$whereConditions .= sprintf("%s %s '%s'",$value['start'],$value['operator'],($value['end']));
+					$whereConditions .= sprintf(" %s %s '%s' ",$value['start'],$value['operator'],($value['end']));
 				}
 			}
 			
@@ -141,7 +141,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				if($this->getModel()->getMap()->getRelationShip($field) != true) {
 					$value = $this->getModel()->getMap()->getFieldValue($field);
 					if(isset($value) && !empty($value) && $value != null && $value != '') {
-						$whereConditions .= sprintf("%s %s '%s'",$field,'=',$value);
+						$whereConditions .= $whereConditions == null ? sprintf(" %s %s '%s' ",$field,'=',$value) : sprintf(" AND %s %s '%s' ",$field,'=',$value);
 					}
 					unset($value);
 				}
@@ -154,7 +154,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		if($pk != null) {
 				$pkField = $this->getModel()->getMap()->getPrimaryKey();
-				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s'",$pkField['field']['alias'],$pk) : sprintf("AND %s='%s'",$pkField['field']['alias'],($pk));
+				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s' ",$pkField['field']['alias'],$pk) : sprintf(" AND %s='%s' ",$pkField['field']['alias'],($pk));
 		}
 		
 		if(count($this->getModel()->_orderBy) > 0) {
@@ -204,6 +204,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		if($sql != null) {
 			$this->execute($sql);
+			$this->getModel()->get($this->getModel()->getConnection()->last_id());
 		} else {
 			return false;
 		}
