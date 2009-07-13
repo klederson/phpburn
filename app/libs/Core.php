@@ -507,17 +507,15 @@ abstract class PhpBURN_Core implements IPhpBurn {
 					exit;
 				}
 				
-				//return $this->$fieldInfo['alias']->fetch();
+				return $amount;
 			break;
 			case self::ONE_TO_MANY:
 //				Looking for ONE TO MANY relationship
 				
 //				Define WHERE based on relationship fields
-				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
-				
-				$amount = $this->$fieldInfo['alias']->find();				
+				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);		
 								
-				//return $this->$fieldInfo['alias']->fetch();				
+				return $this->$fieldInfo['alias']->find();			
 			break;
 			case self::MANY_TO_MANY:
 //				Looking for MANY TO MANY relationship
@@ -525,7 +523,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['thisKey'],$fieldInfo['relKey']);
 				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['outKey'],$fieldInfo['relOutKey']);
 				
-				//return $this->$fieldInfo['alias']->find();
+				return $this->$fieldInfo['alias']->find();
 			break;
 		}
 	}
