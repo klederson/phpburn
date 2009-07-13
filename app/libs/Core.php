@@ -514,6 +514,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
+				
 				$amount = $this->$fieldInfo['alias']->find();				
 								
 				//return $this->$fieldInfo['alias']->fetch();				

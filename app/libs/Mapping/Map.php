@@ -296,8 +296,8 @@ class PhpBURN_Map implements IMap {
 	 *
 	 * @param String $fieldName
 	 */
-	public function getFieldInfo($fieldName){
-		
+	public function getField($fieldName){
+		return $this->fields[$fieldName];
 	}
 	
 	/**

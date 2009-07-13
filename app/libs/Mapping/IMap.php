@@ -11,7 +11,7 @@ interface IMap {
 	 *
 	 * @param String $fieldName
 	 */
-	public function getFieldInfo($fieldName);
+	public function getField($fieldName);
 	
 	/**
 	 * This method gets all mapinfo from a relationship
