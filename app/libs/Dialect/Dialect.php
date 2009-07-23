@@ -51,21 +51,14 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#fetch()
 	 */
 	public function fetch() {
-			
-			if($this->getPointer() == 0 && !$this->dataExists($this->getPointer())) {
-				
-			} else {
-				$this->moveNext();
-			}
-		
+					
 			if($this->getPointer() > $this->getLast() ) {
 				$this->setPointer($this->getLast());
 				return false;
-			} else {		
-						
+			} else {						
 				$data = $this->dataExists($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
 				
-				PhpBURN_Message::output("Pointer ".$this->getPointer());
+				//PhpBURN_Message::output("Pointer ".$this->getPointer());
 				
 				if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
 					$this->dataSet[$this->getPointer()] = $data;

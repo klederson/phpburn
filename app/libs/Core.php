@@ -132,7 +132,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	public function _moveNext() {
-		print $truePointer = $this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists(0) ? 0 : $this->getDialect()->getPointer()+1;//$this->getDialect()->moveNext();
+		$truePointer = $this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists(0) ? 0 : $this->getDialect()->getPointer()+1;//$this->getDialect()->moveNext();
 		
 		if($truePointer <= $this->getDialect()->getLast() && $truePointer !== false) {
 			$this->_moveTo($truePointer);
@@ -163,15 +163,20 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	public function _moveTo($pointer) {
-		$currentPosition = $this->getDialect()->getPointer();
+		$currentPosition = $pointer;//$this->getDialect()->getPointer();
 		$lastPosition = $this->getDialect()->getLast();
 		
 		if($pointer <= $lastPosition && $pointer >= 0) {
 			if(!$this->getDialect()->dataExists($pointer)) {
 				for($i = $currentPosition; $i <= $pointer; $i++) {
+					$this->getDialect()->setPointer($i);
 					PhpBURN_Message::output('[!Moving to register!]: #'. $i .  ' [!at!] '  . get_class($this));
-					$this->fetch();
+					$data = $this->getDialect()->fetch();
+					if($data !== false) {
+						$this->getMap()->fillModel($data);
+					}
 				}
+				
 			} else {
 				PhpBURN_Message::output('[!Moving to register!]: #'. $pointer .  ' [!at!] '  . get_class($this));
 				$this->getMap()->fillModel($this->getDialect()->dataSet[$pointer]);
@@ -422,6 +427,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return PhpBURN_Core
 	 */
 	public function fetch() {
+		
+		if($this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists($this->getDialect()->getPointer())) {
+				
+		} else {
+			$this->getDialect()->moveNext();
+		}
 		
 		$result = $this->getDialect()->fetch();
 		if ($result) {
