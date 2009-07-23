@@ -46,17 +46,44 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		return $this->getModel()->getConnection()->affected_rows($this->resultSet);
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see app/libs/Dialect/IDialect#fetch()
+	 */
 	public function fetch() {
-		$data = is_array($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
-		if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
-			$this->dataSet[$this->getPointer()] = $data;
-		}
+			
+			if($this->getPointer() == 0 && !$this->dataExists($this->getPointer())) {
 				
-		if($this->moveNext() === false) {
-			return false;
-		} else {
-			return $data;
-		}
+			} else {
+				$this->moveNext();
+			}
+		
+			if($this->getPointer() > $this->getLast() ) {
+				$this->setPointer($this->getLast());
+				return false;
+			} else {		
+						
+				$data = $this->dataExists($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
+				
+				PhpBURN_Message::output("Pointer ".$this->getPointer());
+				
+				if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
+					$this->dataSet[$this->getPointer()] = $data;
+				}
+				
+				return $data;
+			}
+			
+	}
+	
+	/**
+	 * Verify if the data is already stored into database cache application
+	 * 
+	 * @param Integer $pointer
+	 * @return Boolean
+	 */
+	public function dataExists($pointer) {
+		return is_array($this->dataSet[$pointer]) ? true : false;
 	}
 	
 	public function prepareDelete($pk) {
@@ -331,8 +358,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#moveNext()
 	 */
 	public function moveNext() {
-		if($this->pointer <= $this->getLast()) {
+		if($this->getPointer() <= $this->getLast()) {
 			$this->pointer++;
+			
+			return $this->pointer;
 		} else {
 			return false;
 		}
@@ -343,8 +372,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#movePrev()
 	 */
 	public function movePrev() {
-	if($this->pointer > 0) {
+		if($this->pointer > 0) {
 			$this->pointer--;
+			
+			return $this->pointer;
 		} else {
 			return false;
 		}
@@ -355,7 +386,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#moveFirst()
 	 */
 	public function moveFirst() {
-		$this->pointer = 0;
+		return $this->pointer = 0;
 	}
 	
 	/**
@@ -363,7 +394,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#moveLast()
 	 */
 	public function moveLast() {
-		$this->pointer = $this->getConnection()->num_rows($this->resultSet) - 1;
+		return $this->pointer = $this->getLast();
 	}
 	
 	/**
@@ -371,7 +402,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @see app/libs/Dialect/IDialect#getLast()
 	 */
 	public function getLast() {
-		return $this->getConnection()->num_rows($this->resultSet) - 1;
+		return $this->getAmount() - 1;
+	}
+	
+	public function getAmount() {
+		return $this->getConnection()->num_rows($this->resultSet);
 	}
 	
 	/**

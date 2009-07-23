@@ -54,9 +54,23 @@ while($user->fetch()) {
 print "</pre>";
 */
 $user2 = new Users();
-$user2->get(2);
+$user2->find();
 
-print_r($user2->toArray());
+$user2->_moveNext();
+PhpBURN_Message::output($user2->id);
+
+$user2->_moveNext();
+PhpBURN_Message::output($user2->id);
+
+$user2->_movePrev();
+PhpBURN_Message::output($user2->id);
+
+$user2->_moveLast();
+PhpBURN_Message::output($user2->id);
+
+$user2->_moveFirst();
+PhpBURN_Message::output($user2->id);
+
 
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";

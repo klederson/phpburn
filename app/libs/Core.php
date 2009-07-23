@@ -131,6 +131,59 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return $this->getDialect()->find($pk);
 	}
 	
+	public function _moveNext() {
+		print $truePointer = $this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists(0) ? 0 : $this->getDialect()->getPointer()+1;//$this->getDialect()->moveNext();
+		
+		if($truePointer <= $this->getDialect()->getLast() && $truePointer !== false) {
+			$this->_moveTo($truePointer);
+		} else {
+			PhpBURN_Message::output('[!Can not move to register!]: #'. $truePointer .  ' [!at!] '  . get_class($this) . ' | [!Current pointer!]: #' . $this->getDialect()->getPointer());
+			return false;
+		}
+	}
+	
+	public function _movePrev() {
+		$truePointer = $this->getDialect()->movePrev();
+		
+		if($truePointer >= 0 ) {
+			$this->_moveTo($truePointer);
+		} else {
+			PhpBURN_Message::output('[!Can not move to register!]: #'. $truePointer .  ' [!at!] '  . get_class($this) . ' | [!Current pointer!]: #' . $this->getDialect()->getPointer());
+			return false;
+		}
+	}
+	
+	public function _moveLast() {
+		$truePointer = $this->getDialect()->getLast();
+		$this->_moveTo($truePointer);
+	}
+	
+	public function _moveFirst() {
+		$this->_moveTo(0);
+	}
+	
+	public function _moveTo($pointer) {
+		$currentPosition = $this->getDialect()->getPointer();
+		$lastPosition = $this->getDialect()->getLast();
+		
+		if($pointer <= $lastPosition && $pointer >= 0) {
+			if(!$this->getDialect()->dataExists($pointer)) {
+				for($i = $currentPosition; $i <= $pointer; $i++) {
+					PhpBURN_Message::output('[!Moving to register!]: #'. $i .  ' [!at!] '  . get_class($this));
+					$this->fetch();
+				}
+			} else {
+				PhpBURN_Message::output('[!Moving to register!]: #'. $pointer .  ' [!at!] '  . get_class($this));
+				$this->getMap()->fillModel($this->getDialect()->dataSet[$pointer]);
+				
+				$this->getDialect()->setPointer($pointer);
+			}
+		} else {
+			PhpBURN_Message::output('[!You can not move to!]: #'. $pointer .  ' [!at!] '  . get_class($this) . ' | [!Current pointer!]: #' . $this->getDialect()->getPointer(), PhpBURN_Message::ERROR);
+			return false;
+		}
+	}
+	
 	/**
 	 * This function is going to retrive you the prepared QUERY for execution based on your dialect (MySQL, PostgreeSQL, Oracle, SQLite, etc )
 	 * 
@@ -316,6 +369,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		if($override == true) {
 			unset($this->_where);
+			$this->_where = array();
 		}
 		
 		array_push($this->_where, $conditions);
@@ -330,7 +384,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		">" => array('>', 'major', 'maior'),
 		"<" => array('<','minor', 'menor'),
 		"!=" => array('!=','diff', 'different', 'diferente'),
-		"=" => array('=','equal','eq','igual'),
+		"=" => array('=','==','===','equal','eq','igual'),
 		">=" => array('>=','major_equal', 'major_eq', 'maior_igual'),
 		"<=" => array('<=','minor_equal', 'minor_eq', 'menor_igual')
 	);
@@ -376,6 +430,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			foreach ($result as $key => $value) {
 				$this->getMap()->setFieldValue($key,$value);
 			}
+			//$this->getDialect()->moveNext();
 		}
 		
 		return $result;
@@ -386,9 +441,17 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @see app/libs/IPhpBurn#get()
 	 */
 	public function get($pk = null) {
-		$this->find($pk);
-		$this->fetch();
-	}
+		$amount = $this->find($pk);
+		if($amount >= 1) {
+			if($amount > 1 && $pk != null) {
+				PhpBURN_Message::output('[!There are more than one results for primary key!]: '. $pk, PhpBURN_Message::WARNING);
+			}
+			$this->fetch();
+			return true;
+		} else {
+			return false;
+		}
+    }
 	
 	/**
 	 * (non-PHPdoc)
@@ -646,10 +709,23 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	/**
 	 * This method convert all mapped informationg (including cascating relatioinships) into a array to better manage it into views or anything you want to.
+	 * By default recursive is true and full recursive is false.
 	 * 
+	 * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to array too.
+	 * <code>
+	 * Array('name'=>'Klederson', 'albums'=>Array('name' = 'My First Album')
+	 * </code>
+	 * 
+	 * Full means (PLEASE BE VERY CAREFUL WHEN USE IT OR YOU WILL PROBABLY CRASH YOUR APP) it will take ALL relationships (yes all dataset) and ALL sub-relationships ( infinite and alldataset ) and convert giving you for each relationship a array pretty much like:
+	 * <code>
+	 * Array('name'=>'Klederson', 'albums'=>Array(0 => 'name' = 'My First Album', 1 => 'name' => 'My Second Album')
+	 * </code>
+	 * 
+	 * @param Boolean $recursive
+	 * @param Boolean $full
 	 * @return Array
 	 */
-	public function toArray() {
+	public function toArray($recursive = true, $full = false) {
 		$return = array();
 		foreach($this->getMap()->fields as $fieldName => $info) {
 			if($this->getMap()->getRelationShip($fieldName) == true) {
@@ -665,6 +741,28 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		}
 		
 		return $return;
+	}
+	
+	/**
+	 * This method convert all mapped informationg (including cascating relatioinships) into a JSON format to better manage it into views or anything you want to.
+	 * By default recursive is true and full recursive is false.
+	 * 
+	 * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to array too.
+	 * <code>
+	 * @TODO PUT AN EXAMPLE HERE
+	 * </code>
+	 * 
+	 * Full means (PLEASE BE VERY CAREFUL WHEN USE IT OR YOU WILL PROBABLY CRASH YOUR APP) it will take ALL relationships (yes all dataset) and ALL sub-relationships ( infinite and alldataset ) and convert giving you for each relationship a array pretty much like:
+	 * <code>
+	 * @TODO PUT AN EXAMPLE HERE
+	 * </code>
+	 * 
+	 * @param Boolean $recursive
+	 * @param Boolean $full
+	 * @return String
+	 */
+	public function toJSON($recursive = true, $full = false) {		
+		return json_encode(self::toArray($recursive, $full));
 	}
 }
 ?>

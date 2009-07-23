@@ -146,6 +146,18 @@ class PhpBURN_Map implements IMap {
 		}
 	}
 	
+	public function fillModel(array $data) {
+		if ($data) {
+//			Clean old data
+			$this->reset();
+			foreach ($data as $key => $value) {
+				$this->setFieldValue($key,$value);
+			}
+		}
+		
+		return $data;
+	}
+	
 	/**
 	 * This maps the model based on its _objectMap() function
 	 * @TODO Discutir a redundância aqui e analisar os métodos mágicos que podem vir a ser aplicados
