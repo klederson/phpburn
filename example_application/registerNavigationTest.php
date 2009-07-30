@@ -45,29 +45,6 @@ print "_movePrev() => " . $user->id . " <br/>";
 
 PhpBURN_Message::output($user->getDialect()->dataSet);
 
-/*
-
-$user->_moveNext();
-print "_moveNext() => " . $user->id . " <br/>";
-PhpBURN_Message::output("_moveNext() => " . $user->id);
-
-$user->_movePrev();
-print "_movePrev() => " . $user->id . " <br/>";
-PhpBURN_Message::output("_movePrev() => " . $user->id);
-
-$user->_moveLast();
-print "_moveLast() => " . $user->id . " <br/>";
-PhpBURN_Message::output("_moveLast() => " . $user->id);
-
-$user->_moveFirst();
-print "_moveFirst() => " . $user->id . " <br/>";
-PhpBURN_Message::output("_moveFirst() => " . $user->id);
-
-$user->_moveTo(3);
-print "_moveTo() => " . $user->id . " <br/>";
-PhpBURN_Message::output("_moveTo() => " . $user->id);
-*/
-
 print "<hr>Memory Usage: ";
 print memory_get_usage()/1024 . " Kb";
 
