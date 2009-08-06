@@ -109,20 +109,21 @@ class Router {
 		return preg_match('#^'.$route.'$#', $uri);
 	}
 
-	public function parseRoutes($routes = null) {
+	public function parseRoute($routes = null) {
 		$routes = $routes == null ? self::$routes : $routes;
 		
 		self::parseDiff();
 		
 		foreach($routes as $index => $value) {
 			if(self::routeMatch($index)) {
-				self::executeRoute($index, $value);
+				$return['index'] = $index;
+				$return['action'] = $value;
+				
+				return $return;
 			}
 		}
-	}
-	
-	public function executeRoute($name, $action) {
-		print $action;
+		
+		return false;
 	}
 }
 ?>

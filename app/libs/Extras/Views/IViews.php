@@ -3,6 +3,9 @@ interface IViews {
 	/**
 	 * This function must translate the tolkens in the given string.
 	 * In case of translation a language must be setted
+	 * 
+	 * @package PhpBURN
+ 	 * @subpackage Views
 	 *
 	 * @param String $template
 	 * @param Array $tolkens

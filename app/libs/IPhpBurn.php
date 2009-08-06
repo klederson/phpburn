@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package PhpBURN Beta 1
+ * @author Klederson Bueno
+ *
+ */
 interface IPhpBurn {
 	public function get();
 	

@@ -3,6 +3,8 @@
  * All phpBurn models should extend this class
  * It is the main responsable for the Magic.
  * 
+ * @package PhpBURN
+ * 
  * @author Kléderson Bueno <klederson@klederson.com>
  * @version 0.4a
  * @abstract
@@ -47,7 +49,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	
 	//Persistent methods storage
 	public $_where								= array();
-	public $_orderBy							= null;
+	public $_orderBy							= array();
 	public $_limit									= null;
 	public $_select								= array();
 	public $_join									= array();
@@ -484,8 +486,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * (non-PHPdoc)
 	 * @see app/libs/IPhpBurn#order()
 	 */
-	public function order() {
-		
+	public function order($conditions, $override = false) {
+		if($override == true) {
+			unset($this->_orderBy);
+			$this->_orderBy = array();
+		}
+		array_push($this->_orderBy, $conditions);
 	}
 	
 	/**

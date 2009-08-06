@@ -5,6 +5,8 @@
  * This class manage the dialects for each package.
  * Can be used by many ways but by default its better if you simply do not mess around ;) let the application work for you.
  * 
+ * @package PhpBURN Dialects
+ * 
  * @author Kléderson Bueno <klederson@klederson.com>
  * @version 0.1a
  *

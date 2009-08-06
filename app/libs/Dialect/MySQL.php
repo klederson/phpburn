@@ -6,6 +6,9 @@ PhpBURN::load("Dialect.IDialect");
  * This class manages all content, queries and result stuff in a system level and for all database driver interaction level
  * it calls PhpBURN_Connection object that is the main responsable between the application data and database interaction
  * 
+ * @package PhpBURN
+ * @subpackage Dialect
+ * 
  * @author Klederson Bueno <klederson@klederson.com>
  *
  */

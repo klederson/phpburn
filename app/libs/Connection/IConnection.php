@@ -1,4 +1,11 @@
 <?php
+/**
+ * @package PhpBURN
+ * @subpackage Connection
+ * 
+ * @author klederson
+ *
+ */
 interface IConnection
 {
 	static public function getInstance();

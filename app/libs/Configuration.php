@@ -1,5 +1,10 @@
 <?php
 PhpBURN::load('Configuration.ConfigurationItem');
+
+/**
+ * @package PhpBURN Configuration
+ * @author Kléderson Bueno <klederson@klederson.com>
+ */
 class PhpBURN_Configuration {
 	
 	public static $options = array();

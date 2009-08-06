@@ -2,6 +2,8 @@
 /**
  * This is the main file and the only what needs to be included
  * in your code.
+ * @package PhpBURN Beta 1
+ * @version 0.1
  */
 
 //Defines absolute directory of PHPBURN

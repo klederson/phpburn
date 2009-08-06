@@ -23,6 +23,9 @@
  * 
  * Than you can have INFINITE Dimensions but BE CAREFUL don't go mess your code, use it with inteligence and good sense
  * 
+ * @package PhpBURN
+ * @subpackage Views
+ * 
  * @author Kléderson Bueno
  * @version 0.1-pre-alpha
  * @copyright Add4 Comunicação

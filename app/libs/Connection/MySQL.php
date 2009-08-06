@@ -6,8 +6,10 @@ PhpBURN::load('Connection.IConnection');
  * 
  * 
  * This class has been adapted from Lumine 1.0
- * The original idea is from:
- * @author Hugo Ferreira da Silva
+ * The original idea is from Hugo Ferreira da Silva in Lumine
+ * 
+ * @package PhpBURN
+ * @subpackage Connection
  * 
  * It has been modified and implemented into PhpBURN by:
  * 

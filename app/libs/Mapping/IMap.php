@@ -1,6 +1,11 @@
 <?php
 /**
  * This interface is responsable for the individual Mapping for each Model
+ * 
+ * @package PhpBURN
+ * @subpackage Mapping
+ * 
+ * @author Kléderson Bueno <klederson@klederson.com>
  */
 interface IMap {
 

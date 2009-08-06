@@ -1,4 +1,11 @@
 <?php
+/**
+ * @package PhpBURN
+ * @subpackage Dialect
+ * 
+ * @author klederson
+ *
+ */
 abstract class PhpBURN_Dialect  implements IDialect  {
 	
 	protected $obj = null;
@@ -182,8 +189,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			//Define OrderBY
 			$orderBy = 'ORDER BY ';
 			foreach($this->getModel()->_orderBy as $index => $value) {
-				$orderConditions .= $orderConditions == null ? "" : ", " . $value['type'];
-				$orderConditions .= $value['field'];
+				$orderConditions .= $orderConditions == null ? "" : ", ";
+                $orderConditions .= $value;
 			}
 		}
 		

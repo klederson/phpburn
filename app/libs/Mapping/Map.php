@@ -1,6 +1,12 @@
 <?php
 PhpBURN::load('Mapping.IMap');
 
+/**
+ * @package PhpBURN
+ * @subpackage Mapping
+ * 
+ * @author Kléderson Bueno <klederson@klederson.com>
+ */
 class PhpBURN_Map implements IMap {
 	
 	//Relationship types

@@ -3,6 +3,9 @@
  * This class controls the main functions of controllers and actions calls
  * 
  * @version 0.1
+ * @package PhpBURN
+ * @subpackage Controllers
+ * 
  * @author Klederson Bueno <klederson@klederson.com>
  */
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package PhpBURN
+ * @subpackage Dialect
+ * @author klederson
+ *
+ */
 interface IDialect
 {
 

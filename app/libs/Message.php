@@ -12,6 +12,9 @@ if(SYS_USE_FIREPHP == true) {
  * from the LOG messages until EXCEPTIONS throught files, 
  * browser, database or even FirePHP
  * 
+ * @package PhpBURN
+ * @subpackage Messages
+ * 
  * @author Kléderson Bueno <klederson@klederson.com>
  * @version 0.1a
  */

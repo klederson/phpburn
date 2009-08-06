@@ -1,6 +1,9 @@
 <?php
 /**
  * This carries all the configuration for each package
+ * 
+ * @package PhpBURN
+ * @subpackage Configuration
  */
 class phpBURN_ConfigurationItem {
 	public $package;
