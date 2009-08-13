@@ -12,8 +12,6 @@ print "<pre>";
 //Loading Modules
 PhpBURN::loadModule('Model','View','Controller');
 
-
-
 print "</pre>";
 
 ?>

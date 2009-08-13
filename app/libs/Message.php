@@ -1,6 +1,4 @@
 <?php
-//Loading needed libs
-PhpBURN::load('Tools.Views.Views');
 
 //Load firephp only when we need
 if(SYS_USE_FIREPHP == true) {
@@ -101,6 +99,13 @@ class PhpBURN_Message {
   			$type = self::NOTICE;
   		}
   		
+  		//Searching if Views is loaded
+		if(array_search('PhpBURN_Views',get_declared_classes()) == true) {
+			$messageClass = 'PhpBURN_Views';			
+		} else {
+			$messageClass = self;
+		}
+  		
   		//Now time
   		$time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'), date('Y'));
   		$time = strftime(SYS_USE_DATEFORMAT,$time);
@@ -116,10 +121,10 @@ class PhpBURN_Message {
   		//Sending the message
   		switch(self::$mode) {
   			case self::BROWSER:
-  				print PhpBURN_Views::lazyTranslate($message);
+  				print $message = call_user_func(array($messageClass,'lazyTranslate'),$message);
   			break;
   			case self::FIREBUG:
-  				$message = PhpBURN_Views::lazyTranslate($message);
+  				$message = call_user_func(array($messageClass,'lazyTranslate'),$message);
   				switch($type) {
   					case self::LOG:
   						FB::log($message);
@@ -143,13 +148,13 @@ class PhpBURN_Message {
   				$fileName = SYS_BASE_PATH . $fileName;
   				  				
   				$fp = fopen($fileName, 'a+');
-				fwrite($fp, PhpBURN_Views::lazyTranslate($message));
+				fwrite($fp, call_user_func(array($messageClass,'lazyTranslate'),$message));
 				fclose($fp);
 				
 				//@chmod($fileName, 0755);
   			break;
   			default:
-  				print PhpBURN_Views::lazyTranslate($message);
+  				print $message = call_user_func(array($messageClass,'lazyTranslate'),$message);
   			break;
   		}
   		
@@ -160,6 +165,15 @@ class PhpBURN_Message {
   		unset($time,$usage, $message,$translatedType);
   		
   	}
+  	
+	public static function lazyTranslate($content, $lang = null, $domain = null, $lazy = false) {
+		preg_match_all("|\[!(.*)!]|U",$content, $out, PREG_SET_ORDER);
+		foreach($out as $index => $arrContent) {
+			$content = str_replace("[!$arrContent[1]!]",$arrContent[1],$content);
+		}
+		
+		return $content;
+	}
 }
 
 ?>
