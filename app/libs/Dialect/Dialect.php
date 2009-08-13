@@ -190,7 +190,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			$orderBy = 'ORDER BY ';
 			foreach($this->getModel()->_orderBy as $index => $value) {
 				$orderConditions .= $orderConditions == null ? "" : ", ";
-                $orderConditions .= $value;
+				$orderConditions .= $value['field'] . ' ' . $value['type'];
 			}
 		}
 		

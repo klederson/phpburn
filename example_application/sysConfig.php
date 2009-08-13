@@ -6,25 +6,47 @@
  * to make the system work all right and plug'n'play.
  */
 
+
+##########################################
+# URL
+##########################################
 /**
  * Base URL variable (auto-detect)
  * @var String
  */
-$base_url = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "https" : "http");
-$base_url .= "://".$_SERVER['HTTP_HOST'];
-$base_url .= str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
+$baseUrl = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") ? "https" : "http");
+$baseUrl .= "://".$_SERVER['HTTP_HOST'];
+$baseUrl .= str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']);
 
 if (function_exists('realpath') AND @realpath(dirname(__FILE__)) !== FALSE)
 {
-	$system_folder = realpath(dirname(__FILE__)) . '/';
+	$basePath = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
 }
 
-define('SYS_BASE_URL',$base_url,true);
-define('SYS_BASE_PATH',$system_folder,true);
-define('SYS_CSS_PATH',$system_folder . '/public/css/',true);
-define('SYS_IMAGE_PATH',$system_folder . '/public/images/',true);
-define('SYS_JAVASCRIPT_PATH',$system_folder . '/public/js/',true);
-define('SYS_FILE_PATH',$system_folder . '/public/files/',true);
+define('SYS_BASE_URL',$baseUrl,true);
+
+##########################################
+# PATH
+##########################################
+define('DS',DIRECTORY_SEPARATOR,true);
+define('SYS_BASE_PATH',$basePath,true);
+define('SYS_APPLICATION_PATH', SYS_BASE_PATH . DS . 'system');
+define('SYS_MODEL_PATH',SYS_APPLICATION_PATH . DS . 'model' . DS,true);
+define('SYS_VIEW_PATH',SYS_APPLICATION_PATH . DS . 'views' . DS,true);
+define('SYS_CONTROLLER_PATH',SYS_APPLICATION_PATH . DS . 'controllers' . DS,true);
+
+define('SYS_CSS_PATH',SYS_BASE_PATH . DS . 'public' . DS . 'css' ,true);
+define('SYS_IMAGE_PATH',SYS_BASE_PATH . DS . 'public' . DS . 'images',true);
+define('SYS_JAVASCRIPT_PATH',SYS_BASE_PATH . DS . 'public' . DS . 'js',true);
+define('SYS_FILE_PATH',SYS_BASE_PATH . DS . 'public' . DS . 'files',true);
+
+
+##########################################
+# GENERAL
+##########################################
+define('SYS_MODEL_EXT', 'php',true);
+define('SYS_VIEW_EXT', 'php',true);
+define('SYS_CONTROLLER_EXT', 'php',true);
 
 /**
  * Extra Libs

@@ -3,24 +3,16 @@ class Users extends PhpBURN_Core {
 	public $_package = 'webinsys';
 	public $_tablename = 'users';
 	
-	public $id;
-	public $login;
-	public $pass;
-	public $status;
-	public $created;
-	public $checked;
+	public $id_user;
+	public $name;
+	public $password;
+	public $created_at;
 	
-	/**
-	 * Here we setup all mapping fields without user XML
-	 * 
-	 * IMPORTANT: This method will ONLY be called automaticaly if the model DOES NOT have a xml Map
-	 * 
-	 * @example $this->_mapObj->addField('name','column','sqlType','length',array('notnull' => true, 'autoincrement' => true);
-	 * @example $this->_mapObj->addField('name','column','sqlType','length',array();
-	 * @example $this->_mapObj->addField('id','user_id','int','10',array('notnull' => true, 'pk' => true, 'autoincrement' => true);
-	 */
 	public function _mapping() {
-		//Setup your mapping here if you DO NOT have a xml Map
+		$this->getMap()->addField('id_user','id_user','int',10,array('autoincrement' => true, 'primary' => true));
+		$this->getMap()->addField('name','name','varchar',255, array() );
+		$this->getMap()->addField('password','password','varchar',255, array() );
+		$this->getMap()->addField('created_at','created_at','timestamp', null, array('default_value' => 'CURRENT_TIMESTAMP') );
 	}
 }
 ?>

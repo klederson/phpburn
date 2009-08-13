@@ -15,7 +15,7 @@ interface IPhpBurn {
 	
 	public function delete();
 	
-	public function order();
+	public function order($field, $orderType = "ASC", $override = false);
 	
 	public function limit($offset = null, $limit = null);
 

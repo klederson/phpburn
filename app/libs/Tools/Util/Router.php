@@ -163,7 +163,7 @@ class Router {
 		}
 		
 		if(method_exists($controller,$action)) {
-				call_user_func_array(array($controller,$action),$parms);
+			$controller->callAction($action,$parms);
 		} else {
 			Controller::callErrorPage('404');
 		}

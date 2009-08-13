@@ -1,6 +1,6 @@
 <?php
 //Loading needed libs
-PhpBURN::load('Extras.Views.Views');
+PhpBURN::load('Tools.Views.Views');
 
 //Load firephp only when we need
 if(SYS_USE_FIREPHP == true) {

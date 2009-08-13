@@ -16,12 +16,26 @@ ob_start();
 error_reporting(E_ALL & ~E_NOTICE);
 //error_reporting(E_ALL);
 
-//Setup locale for lots of internal reasons ( it will be good for you just make sure you use internacionalization correctly )
-setlocale(LC_ALL, 'pt_BR');
-
 //Call the main system configurations
 require_once('sysConfig.php');
 
-//Call the main system configurations
-require_once('config/database.php');
+################################
+# Internacionalization Settings
+################################
+setlocale(LC_ALL, 'pt_BR');
+date_default_timezone_set('America/Sao_Paulo');
+
+################################
+# Views Settings
+################################
+
+################################
+# Controller Settings
+################################
+
+################################
+# Model Settings
+################################
+require_once(SYS_APPLICATION_PATH . DS . 'config/database.php');
+
 ?>

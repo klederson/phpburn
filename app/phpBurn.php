@@ -42,6 +42,13 @@ abstract class PhpBURN {
 		}
 	}
 	
+	public function loadModule() {
+		$args = func_get_args();
+		foreach($args as $module) {
+			PhpBURN::load($module);
+		}
+	}
+	
 	/**
 	 * This method loads model(s) from packages
 	 * 
@@ -135,5 +142,5 @@ abstract class PhpBURN {
 	}
 
 }
-PhpBURN::load('Configuration','ConnectionManager', 'IPhpBurn', 'Core', 'DialectManager', 'Mapping','Message');
+PhpBURN::load('Configuration','Message');
 ?>

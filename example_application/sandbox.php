@@ -54,6 +54,7 @@ while($user->fetch()) {
 print "</pre>";
 */
 $user2 = new Users();
+//$user2->order('id_user', 'DESC');
 $user2->find();
 
 $user2->_moveNext();
