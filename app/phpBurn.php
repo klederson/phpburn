@@ -140,6 +140,22 @@ abstract class PhpBURN {
 		}
 		return $content;
 	}
+	
+	public function startApplication() {
+		if(array_search('Controller',get_declared_classes()) == true) {
+			PhpBURN::load('Tools.Util.Router');
+			include_once(SYS_APPLICATION_PATH . DS . 'config' . DS . 'routes.php');
+			
+			//Define the main route functions
+			$router = new Router($routes);
+			$currentRoute = $router->parseRoute();
+			if($currentRoute != false) {
+				$router->executeRoute($currentRoute);
+			} else {
+				Controller::callErrorPage('404');
+			}
+		}
+	}
 
 }
 PhpBURN::load('Configuration','Message');

@@ -5,8 +5,6 @@ class main extends Controller {
 	}
 	
 	public function index() {
-		print 'this is my main controller';
-		
 		//Loading model
 		PhpBURN::import('webinsys.Users');
 
@@ -14,14 +12,10 @@ class main extends Controller {
 
 		$user->order('id_user','DESC');
 		$user->find();
-		
 		while($user->fetch()) {
-			print "<br/>";
-			print $user->name;
+			$this->_viewData['name'] = $user->name;
 		}
-		
-		$this->_viewData = "Oi";		
-		
+				
 	}
 }
 ?>

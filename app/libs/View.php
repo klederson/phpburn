@@ -39,6 +39,12 @@ abstract class PhpBURN_Views implements IView {
 	public static $domain = 'system';
 	public static $translationFolder = 'locale/';
 	
+	public static $autoLoad = true;
+	
+	public function autoLoad($status) {
+		self::$autoLoad = $status;
+	}
+	
 	
 	/**
 	 * This function must translate the tolkens in the given string.
@@ -127,23 +133,40 @@ abstract class PhpBURN_Views implements IView {
 		return $content;
 	}
 	
-	/**
-	 * This loads a file to a String and give you the content ( its the same of PhpBURN::loadFile however to keep it independent we choose to not call directly that )
-	 *
-	 * @param String $filename
-	 * @return String
-	 */
-	public static function loadFile($filename) {
-		$file = file($filename);
-		$content = '';
-		if(file_exists($filename)) {
-			foreach ($file as $key => $value) {
-			   $content .= $value;
-			}
+	public function loadView($viewName, $data, $toVar = false) {
+		//Getting the path view
+		$viewPath = SYS_VIEW_PATH . DS . $viewName . '.' . SYS_VIEW_EXT;
+		
+		if(file_exists($viewPath)) {
+			PhpBURN_Message::output('[!Loading view:!] ' . $viewPath);
+			$output = self::processViewData($viewPath, $data);
+			unset($viewFile, $viewName, $viewPath);
+			return $toVar == false ? print $output : $output;
 		} else {
-			$content = "error";
+			return false;
 		}
-		return $content;
+	}
+	
+	private function processViewData($___phpBurnFileContent, $__phpBurnData) {
+		//Flushing buffer
+		ob_end_flush();
+			//Starting a new buffer
+			ob_start();
+				
+				foreach($__phpBurnData as $__index => $__value) {
+					$$__index = $__value;
+				}
+				
+				include($___phpBurnFileContent);
+
+				//eval("\$___phpBurnOutput = \"$___phpBurnFileContent\";");
+				//Storing buffer result to a var
+				$___phpBurnBufferStored = ob_get_contents();
+			//Cleaning the buffer for new sessions
+			ob_clean();
+			
+		//unset($___phpBurnBufferStored);
+		return $___phpBurnBufferStored;
 	}
 	
 }

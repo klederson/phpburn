@@ -1,16 +1,5 @@
 <?php
-PhpBURN::load('Tools.Util.Router');
 PhpBURN::load('Tools.Controller.IController');
-include_once(SYS_APPLICATION_PATH . DS . 'config' . DS . 'routes.php');
-
-//Define the main route functions
-$router = new Router($routes);
-$currentRoute = $router->parseRoute();
-if($currentRoute != false) {
-	$router->executeRoute($currentRoute);
-} else {
-	Controller::callErrorPage('404');
-}
 
 /**
  * This class controls the main functions of controllers and actions calls
@@ -22,6 +11,9 @@ if($currentRoute != false) {
  * @author Klederson Bueno <klederson@klederson.com>
  */
 abstract class Controller {	
+	
+	public $_viewData = array();
+	
 	protected function begin() {
 		
 	}
@@ -36,20 +28,13 @@ abstract class Controller {
 		//Calling action
 		call_user_func_array(array($this,$action),$parms);
 		
-		$this->callView($action);
+		$this->loadView($action);
 	}
 	
-	public function callView($action) {
-		
-		
+	public function loadView($action) {
 		//Searching if Views is loaded
-		if(array_search('PhpBURN_Views',get_declared_classes()) == true) {
-			//Getting the path view
-			$viewPath = SYS_VIEW_PATH . get_class($this) . DS .$action . '.' . SYS_VIEW_EXT;
-			
-			PhpBURN_Message::output('[!Loading view:!] ' . $viewPath);
-			
-			
+		if(array_search('PhpBURN_Views',get_declared_classes()) == true && PhpBURN_Views::$autoLoad == true) {
+			PhpBURN_Views::loadView(get_class($this) . DS .$action, $this->_viewData, false);
 		}
 	}
 }
