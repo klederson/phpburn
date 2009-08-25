@@ -39,7 +39,7 @@ abstract class PhpBURN_Views implements IView {
 	public static $domain = 'system';
 	public static $translationFolder = 'locale/';
 	
-	public static $autoLoad = true;
+	public static $autoLoad = PHPBURN_VIEWS_AUTOLOAD;
 	
 	public function autoLoad($status) {
 		self::$autoLoad = $status;

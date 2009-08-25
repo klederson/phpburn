@@ -28,6 +28,7 @@ date_default_timezone_set('America/Sao_Paulo');
 ################################
 # Views Settings
 ################################
+define('PHPBURN_VIEWS_AUTOLOAD', true);
 
 ################################
 # Controller Settings
