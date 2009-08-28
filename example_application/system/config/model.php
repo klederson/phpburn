@@ -1,4 +1,7 @@
 <?php
+################################
+# Model Settings
+################################
 $thisConfig = array(
 		/**
 		 * Database configuration ( Default )
@@ -84,4 +87,7 @@ $thisConfig = array(
 				'newmodel',
 			)
 );
+
+//Loading the configuration file
+$config = new PhpBURN_Configuration($thisConfig);
 ?>
