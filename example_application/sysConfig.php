@@ -42,15 +42,15 @@ define('SYS_FILE_PATH',SYS_BASE_PATH . DS . 'public' . DS . 'files',true);
 
 
 ##########################################
-# GENERAL
+# EXTENSIONS
 ##########################################
 define('SYS_MODEL_EXT', 'php',true);
 define('SYS_VIEW_EXT', 'php',true);
 define('SYS_CONTROLLER_EXT', 'php',true);
 
-/**
- * Extra Libs
- */
+##########################################
+# EXTRAS
+##########################################
 define('SYS_USE_FIREPHP',true,true);
 define('SYS_USE_DATEFORMAT',"%a, %b : %H:%M:%S",true); //To see more read about srftime
 ?>

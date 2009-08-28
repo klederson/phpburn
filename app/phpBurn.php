@@ -45,8 +45,15 @@ abstract class PhpBURN {
 	public function loadModule() {
 		$args = func_get_args();
 		foreach($args as $module) {
+			PhpBURN::loadConfig($module);
 			PhpBURN::load($module);
 		}
+	}
+	
+	public function loadConfig($moduleName) {
+		$configFile = strtolower($moduleName) . '.php';
+		
+		require_once(SYS_APPLICATION_PATH . DS . 'config' . DS . $configFile);
 	}
 	
 	/**

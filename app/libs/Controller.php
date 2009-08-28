@@ -34,7 +34,7 @@ abstract class Controller {
 	public function loadRelativeView($action, $toVar = false) {
 		//Searching if Views is loaded
 		if(array_search('PhpBURN_Views',get_declared_classes()) == true && PhpBURN_Views::$autoLoad == true) {
-			PhpBURN_Views::loadView(get_class($this) . DS .$action, $this->_viewData, $toVar);
+			return PhpBURN_Views::loadView(get_class($this) . DS .$action, $this->_viewData, $toVar);
 		}
 	}
 	

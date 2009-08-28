@@ -147,7 +147,18 @@ abstract class PhpBURN_Views implements IView {
 		}
 	}
 	
-	private function processViewData($___phpBurnFileContent, $__phpBurnData) {
+	/**
+	 * This method is used to process the data into the view and than return it to the main method that will handle what to do.
+	 * It also uses buffer to handle that content.
+	 * 
+	 * @author Klederson Bueno <klederson@klederson.com>
+	 * @version 0.1a
+	 * 
+	 * @param String $___phpBurnFilePath
+	 * @param Array $__phpBurnData
+	 * @return String
+	 */
+	private function processViewData($___phpBurnFilePath, array $__phpBurnData) {
 		//Flushing buffer
 		ob_end_flush();
 			//Starting a new buffer
@@ -157,7 +168,7 @@ abstract class PhpBURN_Views implements IView {
 					$$__index = $__value;
 				}
 				
-				include($___phpBurnFileContent);
+				include($___phpBurnFilePath);
 
 				//eval("\$___phpBurnOutput = \"$___phpBurnFileContent\";");
 				//Storing buffer result to a var
@@ -169,5 +180,36 @@ abstract class PhpBURN_Views implements IView {
 		return $___phpBurnBufferStored;
 	}
 	
+	#####################################################
+	# Inteligent View Methods
+	#####################################################
+	
+	private function loadInteligentView($template, $tokens, $lang = null) {
+		if(is_array($tokens)) {
+			preg_match_all("|\[#(.*)#]|U",$template, $out, PREG_SET_ORDER);
+			foreach($out as $index => $arrContent) {
+				$pieces = explode(':',$arrContent[1]);
+				for($i = 0; $i < count($pieces); $i++) {
+					$stringArray .= "['$pieces[$i]']";
+				}
+
+				eval("\$_tmpValue = isset(\$tokens$stringArray)  ?  (string)\$tokens$stringArray : '__false__';");
+				//print $stringArray . ':::::' . $_tmpValue . "\r\n"; //For hardcore debug usage
+
+				if($_tmpValue != '__false__') {
+					
+					$contentValue = $lang == null ? $_tmpValue : self::translate($_tmpValue, $lang);
+					$template = str_replace("[#$arrContent[1]#]",$contentValue,$template);
+					
+				}
+
+				unset($stringArray,$_tmpValue,$contentValue);
+			}
+		} else {
+			$template = preg_replace("/\[#*[A-Za-z0-9.:\-_,]*#\]/","",$template);
+		}
+		
+		return $template;
+	}
 }
 ?>

@@ -12,12 +12,20 @@
  */
 ob_start();
 
-//Error Reporting
-error_reporting(E_ALL & ~E_NOTICE);
-//error_reporting(E_ALL);
-
-//Call the main system configurations
+################################
+# System Settings
+################################
 require_once('sysConfig.php');
+
+
+################################
+# Error and Message System
+################################
+error_reporting(E_ALL & ~E_NOTICE);
+
+//Turn the Messages and Logs and Erros ON
+PhpBURN_Message::setMode(PhpBURN_Message::FIREBUG); //You can Choose FIREPHP, BROWSER OR FILE for now than more can came latter
+
 
 ################################
 # Internacionalization Settings
@@ -25,18 +33,24 @@ require_once('sysConfig.php');
 setlocale(LC_ALL, 'pt_BR');
 date_default_timezone_set('America/Sao_Paulo');
 
-################################
-# Views Settings
-################################
-define('PHPBURN_VIEWS_AUTOLOAD', true);
 
 ################################
-# Controller Settings
+# Modules
 ################################
+# To load the module just remove the # comment from the line
+
+# Views
+# PhpBURN::loadModule('View');
+
+# Controller
+PhpBURN::loadModule('Controller');
+
+# To load the module just remove the # comment from the line
+PhpBURN::loadModule('Model');
+
 
 ################################
-# Model Settings
+# Starting application
 ################################
-require_once(SYS_APPLICATION_PATH . DS . 'config/database.php');
-
+PhpBURN::startApplication();
 ?>
