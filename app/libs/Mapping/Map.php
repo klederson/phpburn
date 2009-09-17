@@ -27,7 +27,7 @@ class PhpBURN_Map implements IMap {
 	 * 									*['retroRelationship'] => array( fieldHere:string, fieldThere:string, class:string, type:const ),
 	 * 									**['isRelationship'] => array( type:const, class:string, fieldThere:string, fieldHere:string, lazy:bool )
 	 * 									***['isExternal'] => false;
-	 * 									***['parentReferences'] => ( parentPackage, class, table, column )
+	 * 									***['classReference'] => ( parentPackage, class, table, column )
 	 * 
 	 * 								) 
 	 * 							)
@@ -38,6 +38,8 @@ class PhpBURN_Map implements IMap {
 	 * @var array
 	 */	
 	public $fields = array();
+	
+	public $parentFieldReferences = array();
 	
 	/**
 	 * Our reference to $modelObj
@@ -86,6 +88,19 @@ class PhpBURN_Map implements IMap {
 		} else {
 			$this->fields = $fields;
 		}
+	}
+	
+	public function cloneReferences() {
+		return $this->parentFieldsReferences;
+	}
+	
+	public function setReferences($fieldsArray) {
+		if(count($fieldsArray) > 0) {
+			foreach($fieldsArray as $index => $value) {
+				$this->parentFieldsReferences[$index] = $value;
+			}
+		}
+		
 	}
 	
 	/**
@@ -193,7 +208,7 @@ class PhpBURN_Map implements IMap {
 	 * @param String $relTable
 	 * @param Boolean $lazy
 	 */
-	public function addRelationship($relName,$relType,$foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable, $lazy) {
+	public function addRelationship($relName,$relType,$foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable, $lazy = false) {
 
 		//Setup a simple field as a relationship field, just for double check
 		$this->fields[$relName]['field']['type'] = false;
@@ -217,8 +232,8 @@ class PhpBURN_Map implements IMap {
 		$this->fields[$relName]['isExternal'] = false;
 		
 		//For multipMap ONLY
-		$this->fields[$relName]['parentReferences'] = get_class($this->modelObj);
-		
+		$this->fields[$relName]['classReference'] = !isset($this->fields[$relName]['classReference']) ? get_class($this->modelObj) : $this->fields[$relName]['classReference'];
+		//$this->fields[$relName]['parentLinkField'] = 'false'; 
 		//Setup defaultvalue for this field
 		$this->setFieldValue($relName,null);
 	}
@@ -227,8 +242,46 @@ class PhpBURN_Map implements IMap {
 		
 	}
 	
-	public function addParentField($name, $column, $type, $length, array $options, $parentClass) {
+	public function addParentField($name) {
+		$parentClass = get_parent_class($this->modelObj);
+		$relName = '__PhpBURN_Extended_'.$parentClass;
+				
+		$this->addRelationship($relName, PhpBURN_Map::ONE_TO_ONE, $parentClass, $name, $name, null, null, null);
 		
+		$parentVars = get_class_vars($parentClass);
+		$parentTable = $parentVars['_tablename'];
+		
+		$this->parentFieldsReferences[$parentTable] = $name;
+		
+		//NOT WOKING YET
+		$this->fields[$name]['classReference'] = get_class($this->getModel());
+		$this->fields[$name]['parentLinkField'] = true;
+		
+		
+	}
+	
+	public function getParentFields() {
+		if(count($this->parentFieldsReferences) > 0 ) {
+			foreach($this->parentFieldsReferences as $name) {
+				$fields[] = $this->getField($name);
+			}
+		} else {
+			$fields = array();
+		}
+		
+		return $fields;
+	}
+	
+	public function getTableParentField($tableName) {
+		if(array_key_exists($tableName, $this->parentFieldsReferences) == true) {
+			return $this->fields[$this->parentFieldsReferences[$tableName]];
+		} else {
+			return false;
+		}
+	}
+	
+	public function getTrueFields($className) {
+		return PhpBURN_Mapping::$mapping[$className];
 	}
 	
 	/**
@@ -242,29 +295,33 @@ class PhpBURN_Map implements IMap {
 	 * @param Array $options
 	 */
 	public function addField($name, $column, $type, $length, array $options) {
-		//Check for duplicated columns in this map
-		array_walk_recursive($this->fields,array($this, 'checkColumns'),$name);
+			$parentClass = get_parent_class($this->modelObj);
 		
-		//Setup a simple field		
-		$this->fields[$name]['field']['type'] = $type;
-		$this->fields[$name]['field']['alias'] = $name;
-		$this->fields[$name]['field']['column'] = $column;
-		$this->fields[$name]['field']['type'] = $type;
-		$this->fields[$name]['field']['length'] = $length;
-		$this->fields[$name]['field']['options'] = count($options) > 0 ? $options : array();
-		
-		//Just for double check it sets false to other kinds of field
-		$this->fields[$name]['isRelationship'] = false;
-		
-		//When it belongs to a child class
-		$this->fields[$name]['isExternal'] = false;
-		
-		//For multipMap use ONLY
-		$this->fields[$name]['parentReferences'] = get_class($this->modelObj);
-		
-		//Setup defaultvalue for this field
-		$options['defaultvalue'] = $options['defaultvalue'] != null ? $options['defaultvalue'] : null;
-		$this->setFieldValue($name,$options['defaultvalue']);
+			//Check for duplicated columns in this map
+			array_walk_recursive($this->fields,array($this, 'checkColumns'),$name);
+			
+			//Setup a simple field		
+			$this->fields[$name]['field']['type'] = $type;
+			$this->fields[$name]['field']['alias'] = $name;
+			$this->fields[$name]['field']['column'] = $column;
+			$this->fields[$name]['field']['type'] = $type;
+			$this->fields[$name]['field']['length'] = $length;
+			$this->fields[$name]['field']['options'] = count($options) > 0 ? $options : array();
+			$this->fields[$name]['field']['tableReference'] = $this->modelObj->_tablename;
+			
+			//Just for double check it sets false to other kinds of field
+			$this->fields[$name]['isRelationship'] = false;
+			
+			//When it belongs to a parent class
+			$this->fields[$name]['isExternal'] = false;
+			
+			//For multipMap use ONLY
+			$this->fields[$name]['classReference'] = get_class($this->modelObj);
+			//$this->fields[$name]['parentLinkField'] = 'false';
+			
+			//Setup defaultvalue for this field
+			$options['defaultvalue'] = $options['defaultvalue'] != null ? $options['defaultvalue'] : null;
+			$this->setFieldValue($name,$options['defaultvalue']);
 	}
 	
 	public function getPrimaryKey() {

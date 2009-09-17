@@ -38,6 +38,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		if($sql != null) {
 			$this->execute($sql);
+			$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
 		} else {
 			PhpBURN_Message::output("[!No query found!] - <b>$modelName</b>");
 			return false;
@@ -110,43 +111,57 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @return String $sql
 	 */
 	public function prepareSelect($pk = null) {		
+		//Globals
+		$pkField = $this->getModel()->getMap()->getPrimaryKey();
+		$parentFields = $this->getModel()->getMap()->getParentFields();
+		$parentClass = get_parent_class($this->getModel());
+		
+		
+		//Join the extended classes
+		foreach($parentFields as $index => $value) {
+			$classVars = get_class_vars($parentClass);
+			if($parentClass == $value['classReference']) {
+				$tableLeft = $this->getModel()->_tablename;
+			} else {
+				$tableLeft = $classVars['_tablename'];
+			}
+			
+			$this->getModel()->join($value['field']['tableReference'],$value['field']['column'],$value['field']['column'],'=', 'JOIN', $tableLeft);
+			unset($classVars);
+		}
+		
 		//Creating the selectable fields
 		if(count($this->getModel()->_select) <= 0) {
 			//Selecting from the map
 			foreach($this->getModel()->getMap()->fields as $index => $value) {
 				//Parsing non-relationship fields
-				if(!$value['isRelationship'] && $value['field']['column'] != null) {
+				if(!$value['isRelationship'] && $value['field']['column'] != null) { //&& $value['classReference'] == get_class($this->getModel())) {
 					$fields .= $fields == null ? "" : ", ";
-					$fields .= sprintf("%s.%s AS %s", $this->getModel()->_tablename,$value['field']['column'], $index);
+					$fields .= sprintf("%s.%s AS %s", $value['field']['tableReference'],$value['field']['column'], $index);
 				}
 			}
 		} elseif(count($this->getModel()->_select) > 0) {
 			//Select based ONLY in the $obj->select(); method
 			foreach($this->getModel()->_select as $index => $value) {
 				$fields .= $fields == null ? "" : ", ";
-				$fields .= sprintf("%s AS %s", $value['value'], $value['alias']);
+				$fields .= sprintf("%s.%s AS %s", $value['field']['tableReference'], $value['value'], $value['alias']);
 			}
 		} else {
 			$model = get_class($this->modelObj);
 			PhpBURN_Message::output("$model [!is not an mapped or valid PhpBURN Model!]",PhpBURN_Message::ERROR);
 			exit;
 		}
-		
-		//Defnine FROM tables
+
 		$from = 'FROM ' . $this->getModel()->_tablename;
 		
+		//Define Join SENTENCE
 		if(count($this->getModel()->_join) > 0) {
-			foreach($this->getModel()->_join as $index => $value) {
-				$joinString .= $joinString != null ? ' ' : null;
-				$joinString .= sprintf('%s %s', $value['type'], $index);
-				if($value['fieldLeft']  != null && $value['fieldRight']  != null) {
-					$joinString .= sprintf(" ON `%s`.`%s` %s `%s`.`%s`", $this->getModel()->_tablename, ($value['fieldLeft']), $value['operator'], $index,($value['fieldRight']));
-				}
-			}			
+			$joinString = $this->getJoinString();
 		}
 				
+		//Define Where SENTENCE
 		if(count($this->getModel()->_where) > 0) {
-			//Define conditions
+			
 			
 			foreach($this->getModel()->_where as $index => $value) {
 				//Checking swhere and where
@@ -155,8 +170,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$whereConditions .= ($value);
 				} else {
 					//SuperWhere
+					$fieldInfo = $this->getModel()->getMap()->getField($value['start']);
 					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
-					$whereConditions .= sprintf(" %s %s '%s' ",$value['start'],$value['operator'],($value['end']));
+					$whereConditions .= sprintf(" %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$value['start'],$value['operator'],($value['end']));
 				}
 			}
 			
@@ -169,7 +185,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$value = $this->getModel()->getMap()->getFieldValue($field);
 					if(isset($value) && !empty($value) && $value != null && $value != '') {
 						$fieldInfo = $this->getModel()->getMap()->getField($field);
-						$whereConditions .= $whereConditions == null ? sprintf(" %s %s '%s' ",$fieldInfo['field']['column'],'=',$value) : sprintf(" AND %s %s '%s' ",$fieldInfo['field']['column'],'=',$value);
+						$whereConditions .= $whereConditions == null ? sprintf(" %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',$value) : sprintf(" AND %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',$value);
 					}
 					unset($value);
 				}
@@ -181,31 +197,55 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		if($pk != null) {
-				$pkField = $this->getModel()->getMap()->getPrimaryKey();
-				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s='%s' ",$pkField['field']['column'],$pk) : sprintf(" AND %s='%s' ",$pkField['field']['column'],($pk));
+				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],($pk));
 		}
 		
+		//Define OrderBY SENTENCE
 		if(count($this->getModel()->_orderBy) > 0) {
-			//Define OrderBY
-			$orderBy = 'ORDER BY ';
-			foreach($this->getModel()->_orderBy as $index => $value) {
-				$orderConditions .= $orderConditions == null ? "" : ", ";
-				$orderConditions .= $value['field'] . ' ' . $value['type'];
-			}
+			$orderConditions = $this->getOrderByString();
 		}
 		
+		//Define Limit SENTENCE
 		if($this->getModel()->_limit != null) {
-			//Define Limit
 			$limits = explode(',',$this->getModel()->_limit);
 			$limit = $this->setLimit($limits[0],$limits[1]);
 		}
 		
 		//Construct SQL
-		$sql = ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $orderBy . ' ' . $orderConditions . ' ' . $limit);
+		$sql = ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $orderConditions . ' ' . $limit . ';');
+		
+		unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass);
 		
 		return $sql;
 	}
 	
+	public function getJoinString() {
+		
+		foreach($this->getModel()->_join as $index => $value) {
+			$value['tableLeft'] = $value['tableLeft'] == null ? $this->getModel()->_tablename : $value['tableLeft'];
+			$joinString .= $joinString != null ? ' ' : null;
+			$joinString .= sprintf('%s %s', $value['type'], $index);
+			if($value['fieldLeft']  != null && $value['fieldRight']  != null) {
+				$joinString .= sprintf(" ON `%s`.`%s` %s `%s`.`%s`", $value['tableLeft'], ($value['fieldLeft']), $value['operator'], $index,($value['fieldRight']));
+			}
+		}
+		
+		return $joinString;
+	}
+	
+	
+	public function getOrderByString() {
+		
+		$orderBy = 'ORDER BY ';
+		foreach($this->getModel()->_orderBy as $index => $value) {
+			$fieldInfo = $this->getModel()->getMap()->getField($value['field']);
+			$orderConditions .= $orderConditions == null ? "" : ", ";
+			$orderConditions .= $fieldInfo['field']['tableReference'] . '.' . $fieldInfo['field']['column'] . ' ' . $value['type'];
+		}
+	
+		
+		return $orderBy . $orderConditions;
+	}
 	/* Execution */
 	
 	/**
@@ -215,7 +255,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 */
 	public function execute($sql) {
 		PhpBURN_Message::output("[!Performing the query!]: $sql");
-		$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
+		return $this->getModel()->getConnection()->executeSQL($sql);
+		//$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
 	}
 	
 	public function save() {
@@ -227,32 +268,62 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			$isInsert = false;
 		}
 		
+		
 		//Preparing the SQL
 		$sql = $isInsert == true ? $this->prepareInsert() : $this->prepareUpdate();
 		
+		$sql = array_reverse($sql, true);
+		//$sql = implode(' ',$sql);
+		//print "<pre>";
+		//print($sql);
+		//exit;
+		
 		if($sql != null) {
-			$this->execute($sql);
-			$this->getModel()->get($this->getModel()->getConnection()->last_id());
+			foreach($sql as $index => $value) {
+				$this->execute($value);
+			}
+			//$this->getModel()->get($this->getModel()->getConnection()->last_id());
+			$field = $this->getMap()->getPrimaryKey();
+			$lastId = $this->getModel()->getConnection()->last_id();
+			$this->getMap()->setFieldValue($field['field']['alias'],$lastId);
 		} else {
 			return false;
 		}
 	}
 	
 	public function prepareInsert() {
+		//Globals
+		$pkField = $this->getModel()->getMap()->getPrimaryKey();
+		$parentFields = $this->getModel()->getMap()->getParentFields();
+		$parentClass = get_parent_class($this->getModel());
+		
+		
+		//Join the extended classes
+		foreach($parentFields as $index => $value) {
+			$classVars = get_class_vars($parentClass);
+			$this->getModel()->join($classVars['_tablename'],$pkField['field']['column'],$value['field']['column'],'=');
+			unset($classVars);
+		}
+		
 		foreach ($this->getModel()->getMap()->fields as $field => $infos) {
 			if($this->getModel()->getMap()->getRelationShip($field) != true) {
 				$this->getModel()->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$value = $this->getModel()->getMap()->getFieldValue($field);
 				if(isset($value) && $value != null) {
-					$insertFields .= $insertFields == null ? '' : ', ';
-					$insertFields .= $infos['field']['column'];
-					$insertValues .= $insertValues == null ? '' : ', ';
-					$insertValues .= sprintf("'%s'", $value);
+					$insertFields[$infos['field']['tableReference']] .= $insertFields[$infos['field']['tableReference']] == null ? '' : ', ';
+					$insertFields[$infos['field']['tableReference']] .= $infos['field']['tableReference'] . '.' . $infos['field']['column'];
+					$insertValues[$infos['field']['tableReference']] .= $insertValues[$infos['field']['tableReference']] == null ? '' : ', ';
+					$insertValues[$infos['field']['tableReference']] .= sprintf("'%s'", $value);
 				}
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 				//print $field . "<br/>";
 				$this->getModel()->$field->save();
 			}
+		}
+		
+		//Define sqls based on each table from the parent to the child
+		foreach($insertFields as $index => $insertFieldsUnique) {
+			$sql[$index] = sprintf("INSERT INTO %s ( %s ) VALUES ( %s ) ", $index, $insertFieldsUnique, $insertValues[$index]);
 		}
 		
 		//Pre-defined parms
@@ -268,8 +339,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		foreach ($this->getMap()->fields as $field => $infos) {
 			if($this->getModel()->getMap()->getRelationShip($field) != true && $this->getModel()->$infos['field']['alias'] != $infos['#value']) {
 				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
-				$updatedFields .= $updatedFields == null ? '' : ', ';
-				$updatedFields .= sprintf("%s='%s'", $infos['field']['column'], ($this->getModel()->$field));
+				$updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
+				$updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], ($this->getModel()->$field));
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 				//print $field . "<br/>";
 				$this->getModel()->$field->save();
@@ -277,13 +348,22 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		//Pre-defined parms
-		$tableName = &$this->getModel()->_tablename;
+		//$tableName = &$this->getModel()->_tablename;
 		
 		//To see more about pkField Structure see addField at MapObject
 		$pkField = &$this->getMap()->getPrimaryKey();
 		
+		//Define sqls based on each table from the parent to the child
+		foreach($updatedFields as $index => $updatedFieldsUnique) {
+			$pkField = $index == $this->getModel()->_tablename ? $this->getMap()->getPrimaryKey() : $this->getMap()->getTableParentField($index);
+			//print $index;
+			//print_r($pkField);
+			
+			$sql[$index] = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s';", $index, $updatedFieldsUnique, $pkField['field']['column'], $pkField['#value']) : null;
+		}
+		
 		//Constructing the SQL
-		$sql = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s'", $tableName, $updatedFields, $pkField['field']['column'], $pkField['#value']) : null;
+		//$sql = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s'", $tableName, $updatedFields, $pkField['field']['column'], $pkField['#value']) : null;
 		
 		$modelName = get_class($this->getModel());
 		if($sql == null) {

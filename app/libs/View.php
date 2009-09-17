@@ -160,7 +160,7 @@ abstract class PhpBURN_Views implements IView {
 	 */
 	private function processViewData($___phpBurnFilePath, array $__phpBurnData) {
 		//Flushing buffer
-		ob_end_flush();
+		//ob_end_flush();
 			//Starting a new buffer
 			ob_start();
 				
@@ -175,6 +175,7 @@ abstract class PhpBURN_Views implements IView {
 				$___phpBurnBufferStored = ob_get_contents();
 			//Cleaning the buffer for new sessions
 			ob_clean();
+			//ob_start();
 			
 		//unset($___phpBurnBufferStored);
 		return $___phpBurnBufferStored;

@@ -250,11 +250,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $operator
 	 * @param String $joinType
 	 */
-	public function join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN') {
-		$this->_join[$tableName]['fieldLeft'] = $fieldLeft;
-		$this->_join[$tableName]['fieldRight'] = $fieldRight;
-		$this->_join[$tableName]['operator'] = $operator;
-		$this->_join[$tableName]['type'] = $joinType;
+	public function join($tableRight, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableLeft = null) {
+		$this->_join[$tableRight]['fieldLeft'] = $fieldLeft;
+		$this->_join[$tableRight]['fieldRight'] = $fieldRight;
+		$this->_join[$tableRight]['operator'] = $operator;
+		$this->_join[$tableRight]['type'] = $joinType;
+		$this->_join[$tableRight]['tableLeft'] = $tableLeft;
 	}
 	
 	/**
@@ -447,6 +448,23 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$this->getMap()->setFieldValue($key,$value);
 			}
 			//$this->getDialect()->moveNext();
+			
+			/* Parent Referecences
+//			@TODO Klederson's note: I`m thinking about a way to generalize and use left join at same time with same cascading effect we have using relationShip
+			$parentClass = get_parent_class($this);
+			
+			if($parentClass != 'PhpBURN_Core') {
+				$linkName = '__PhpBURN_Extended_'.$parentClass;
+				$this->_getLink($linkName);
+				$this->$linkName->fetch();
+
+				$subResult = $this->$linkName->getMap()->fields;
+				
+				foreach ($subResult as $key => $value) {
+					$this->getMap()->setFieldValue($key,$value['#value']);
+				}
+			}
+			*/
 		}
 		
 		return $result;
@@ -474,7 +492,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @see app/libs/IPhpBurn#save()
 	 */
 	public function save() {
-		$this->getDialect()->save();
+		return $this->getDialect()->save();
 	}
 	
 	/**

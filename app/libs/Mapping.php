@@ -19,7 +19,7 @@ class PhpBURN_Mapping
 	 * @see getMapping()
 	 * @var Array
 	 */
-	private static $mapping = array();
+	public static $mapping = array();
 	
 	/**
 	 * Creates and return a PhpBURN_Map Object for the calling model
@@ -136,10 +136,12 @@ class PhpBURN_Mapping
 				$_tmpModelObj = new $class;
 				$_parentMap = $_tmpModelObj->_mapObj;
 			}
-			$cloned = $_parentMap->cloneAttributes();
+			$clonedFields = $_parentMap->cloneAttributes();
+			$clonedReferences = $_parentMap->cloneReferences();
 			
 			//Put the attributes into this current map as incremental mode
-			$modelObj->_mapObj->setAttributes($cloned);
+			$modelObj->_mapObj->setAttributes($clonedFields);
+			$modelObj->_mapObj->setReferences($clonedReferences);
 			
 			unset($class, $cloned, $_tmpModelObj, $_parentMap);
 		}

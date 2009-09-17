@@ -40,7 +40,7 @@ date_default_timezone_set('America/Sao_Paulo');
 # To load the module just remove the # comment from the line
 
 # Views
-# PhpBURN::loadModule('View');
+PhpBURN::loadModule('View');
 
 # Controller
 PhpBURN::loadModule('Controller');
