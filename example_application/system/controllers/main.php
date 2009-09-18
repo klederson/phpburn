@@ -68,6 +68,10 @@ class main extends Controller {
 		$user->name_user = 'Acid';
 		
 		$user->save();
+		
+		print "<pre>";
+		print_r($user->toArray());
+		print "</pre>";
 	}
 }
 ?>

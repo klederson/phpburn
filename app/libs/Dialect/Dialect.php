@@ -301,6 +301,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$parentClass = $this->getModel()->getMap()->getTableParentClass($index);
 					$lastId = $this->getModel()->getConnection()->last_id();
 					$parentField = $this->getModel()->getMap()->getClassParentField($parentClass);
+					if(count($parentField) > 0) {
+						$this->getMap()->setFieldValue($parentField['field']['alias'],$lastId);
+					}
 					$parentColumn = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(', %s', $parentField['field']['column']) : '';
 					$parentValue = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(", '%s'",$lastId) : '';
 					$value = str_replace('[#__fieldLink#]', $parentColumn, $value);
