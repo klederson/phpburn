@@ -273,13 +273,39 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		$sql = $isInsert == true ? $this->prepareInsert() : $this->prepareUpdate();
 		
 		$sql = array_reverse($sql, true);
-		//$sql = implode(' ',$sql);
-		//print "<pre>";
-		//print($sql);
-		//exit;
 		
-		if($sql != null) {
+//		print "<pre>";
+//		foreach($sql as $index => $value) {
+//				if($isInsert == true) {
+//					$parentClass = $this->getModel()->getMap()->getTableParentClass($index);
+//					$lastId = $this->getModel()->getConnection()->last_id();
+//					$parentField = $this->getModel()->getMap()->getClassParentField($parentClass);
+//					print_r($parentField);
+//					$parentColumn = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(', %s', $parentField['field']['column']) : '';
+//					$parentValue = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(", '%s'",$lastId) : '';
+//					$value = str_replace('[#__fieldLink#]', $parentColumn, $value);
+//					$value = str_replace('[#__fieldLinkValue#]',$parentValue, $value);
+//				}
+//				//$this->execute($value);
+//				print $value . '<hr/>';
+//			}
+//		
+//		
+//		print_r($sql);
+//		exit;
+		
+		//if($sql != null) {
+		if(count($sql) > 0) {
 			foreach($sql as $index => $value) {
+				if($isInsert == true) {
+					$parentClass = $this->getModel()->getMap()->getTableParentClass($index);
+					$lastId = $this->getModel()->getConnection()->last_id();
+					$parentField = $this->getModel()->getMap()->getClassParentField($parentClass);
+					$parentColumn = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(', %s', $parentField['field']['column']) : '';
+					$parentValue = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(", '%s'",$lastId) : '';
+					$value = str_replace('[#__fieldLink#]', $parentColumn, $value);
+					$value = str_replace('[#__fieldLinkValue#]',$parentValue, $value);
+				}
 				$this->execute($value);
 			}
 			//$this->getModel()->get($this->getModel()->getConnection()->last_id());
@@ -323,14 +349,15 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		//Define sqls based on each table from the parent to the child
 		foreach($insertFields as $index => $insertFieldsUnique) {
-			$sql[$index] = sprintf("INSERT INTO %s ( %s ) VALUES ( %s ) ", $index, $insertFieldsUnique, $insertValues[$index]);
+			$sql[$index] = sprintf("INSERT INTO %s ( %s [#__fieldLink#] ) VALUES ( %s [#__fieldLinkValue#] ) ", $index, $insertFieldsUnique, $insertValues[$index]);
 		}
 		
 		//Pre-defined parms
 		$tableName = &$this->getModel()->_tablename;
 		
 		//Constructing the SQL
-		return $sql = sprintf("INSERT INTO %s ( %s ) VALUES ( %s ) ", $tableName, $insertFields, $insertValues);
+		return $sql;
+		//return $sql = sprintf("INSERT INTO %s ( %s ) VALUES ( %s ) ", $tableName, $insertFields, $insertValues);
 	}
 	
 	public function prepareUpdate() {
@@ -354,12 +381,14 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		$pkField = &$this->getMap()->getPrimaryKey();
 		
 		//Define sqls based on each table from the parent to the child
-		foreach($updatedFields as $index => $updatedFieldsUnique) {
-			$pkField = $index == $this->getModel()->_tablename ? $this->getMap()->getPrimaryKey() : $this->getMap()->getTableParentField($index);
-			//print $index;
-			//print_r($pkField);
-			
-			$sql[$index] = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s';", $index, $updatedFieldsUnique, $pkField['field']['column'], $pkField['#value']) : null;
+		if(count($updatedFields) > 0) {
+			foreach($updatedFields as $index => $updatedFieldsUnique) {
+				$pkField = $index == $this->getModel()->_tablename ? $this->getMap()->getPrimaryKey() : $this->getMap()->getTableParentField($index);
+				//print $index;
+				//print_r($pkField);
+				
+				$sql[$index] = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s';", $index, $updatedFieldsUnique, $pkField['field']['column'], $pkField['#value']) : null;
+			}
 		}
 		
 		//Constructing the SQL
@@ -368,6 +397,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		$modelName = get_class($this->getModel());
 		if($sql == null) {
 			PhpBURN_Message::output("[!There is nothing to save in model!]: <b>$modelName</b>",PhpBURN_Message::WARNING);
+			return array();
 		} else {
 			return $sql;
 		}

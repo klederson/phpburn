@@ -280,6 +280,36 @@ class PhpBURN_Map implements IMap {
 		}
 	}
 	
+	public function getClassParentField($className) {
+		foreach($this->parentFieldsReferences as $index => $value) {
+			if($this->fields[$value]['classReference'] == $className) {
+				return $this->fields[$value];
+			}
+		}
+	}
+	
+	public function getTableChildClass($tableName) {
+		foreach($this->fields as $index => $field) {
+			if($field['field']['tableReference'] == $tableName) {
+				$classReference = $field['classReference'];
+				
+				foreach($this->fields as $index => $value) {
+					if(is_subclass_of($value['classReference'], $classReference) == true && get_parent_class($value['classReference']) == $classReference) {
+						return $value['classReference'];
+					}
+				}
+			}
+		}
+	}
+	
+	public function getTableParentClass($tableName) {
+		foreach($this->fields as $index => $field) {
+			if($field['field']['tableReference'] == $tableName) {
+				return get_parent_class($field['classReference']);
+			}
+		}
+	}
+	
 	public function getTrueFields($className) {
 		return PhpBURN_Mapping::$mapping[$className];
 	}

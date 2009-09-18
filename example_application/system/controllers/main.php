@@ -5,44 +5,69 @@ class main extends Controller {
 	}
 	
 	public function index() {
+		
+	}
+	
+	public function select() {
 		//Loading model
 		PhpBURN::import('webinsys.ExtendedUser');
 
-		$user = new Users();
+		$user = new ExtendedUser();
 
 		$user->order('id_user','DESC');
-		//$user->swhere('name','=','Lisa Simpson');
-		$user->getMap()->fields['id_user']['parentReferences'] = get_class($user);
-		$user->swhere('name','=','Megie Simpson');
 		$user->find();
+		print "<pre>";
 		while($user->fetch()) {
-			$this->_viewData['name'] = $user->name;
-			$user->name = 'Name Test';
-			//$user->last_name = 'Last Name Test';
-			//$user->name_user = 'Name User Test';
-			//$user->__PhpBURN_Extended_Users->name = 'Test';
-			$user->save();
+			print_r($user->toArray());
 		}
-
-		
-		
-		
-		//print $user->getMap()->fields['name']['#value'];
+		print "</pre>";
 	}
 	
-	public function teste() {
+	public function selectWithWhere() {
 		//Loading model
-		PhpBURN::import('webinsys.Users');
+		PhpBURN::import('webinsys.ExtendedUser');
 
-		$user = new Users();
+		$user = new ExtendedUser();
+
+		$user->order('id_user','DESC');
+		$user->swhere('name','=','Klederson');
+		$user->find();
+		print "<pre>";
+		while($user->fetch()) {
+			print_r($user->toArray());
+		}
+		print "</pre>";
+	}
+	
+	public function selectAndSave() {
+		//Loading model
+		PhpBURN::import('webinsys.ExtendedUser');
+
+		$user = new ExtendedUser();
 
 		$user->order('id_user','DESC');
 		$user->find();
+		print "<pre>";
 		while($user->fetch()) {
-			$this->_viewData['name'] = $user->name;
+			$user->name = 'Test Name';
+			$user->last_name = 'Test Last Name';
+			$user->name_user = 'Test Name User';
+			$user->save();
+			print_r($user->toArray());
 		}
+		print "</pre>";
+	}
+	
+	public function insert() {
+		PhpBURN::import('webinsys.ExtendedUser');
+
+		$user = new ExtendedUser();
 		
-		$this->loadView('main/index',$this->_viewData);
+		$user->name = 'Klederson';
+		$user->last_name = 'Bueno';
+		$user->name_user = 'Acid';
+		
+		$user->save();
 	}
 }
 ?>

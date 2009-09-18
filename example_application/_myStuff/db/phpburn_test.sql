@@ -5,75 +5,93 @@ DROP TABLE IF EXISTS `albums`;
 
 CREATE TABLE `albums` (
   `id_album` int(10) NOT NULL auto_increment,
-  `name` varchar(255) character set latin1 NOT NULL,
-  `created_at` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id_album`),
-  KEY `id_album` (`id_album`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id_album`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into `albums` values('2','album test','2009-06-23 23:44:38');
 
-DROP TABLE IF EXISTS `pictures`;
+DROP TABLE IF EXISTS `extended_album`;
 
-CREATE TABLE `pictures` (
-  `id_pictures` int(10) NOT NULL auto_increment,
-  `name` varchar(255) character set latin1 NOT NULL,
-  `physical_name` varchar(255) character set latin1 NOT NULL,
-  `created_at` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `id_album` int(10) NOT NULL,
-  PRIMARY KEY  (`id_pictures`),
-  KEY `id_album` (`id_album`),
-  CONSTRAINT `pictures_ibfk_1` FOREIGN KEY (`id_album`) REFERENCES `albums` (`id_album`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `extended_album` (
+  `id_extended_album` int(10) NOT NULL auto_increment,
+  `user` int(10) NOT NULL,
+  PRIMARY KEY  (`id_extended_album`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-insert into `pictures` values('2','picture one','myPic.jpg','2009-06-23 23:49:16','2'),
- ('3','picture two','myPic2.jpg','2009-06-23 23:49:29','2'),
- ('4','picture three','myPic3.jpg','2009-06-23 23:49:43','2');
 
-DROP TABLE IF EXISTS `tags`;
+DROP TABLE IF EXISTS `extended_user`;
 
-CREATE TABLE `tags` (
-  `id_tags` int(10) NOT NULL auto_increment,
-  `name` varchar(255) character set latin1 NOT NULL,
-  `enabled` enum('1','0') character set latin1 NOT NULL,
-  PRIMARY KEY  (`id_tags`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `extended_user` (
+  `id_extended_user` int(10) NOT NULL auto_increment,
+  `id_user2` int(10) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id_extended_user`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 
-insert into `tags` values('1','test','1'),
- ('2','teste 2','1');
+insert into `extended_user` values('1','0',''),
+ ('2','0',''),
+ ('3','0',''),
+ ('4','0',''),
+ ('5','0',''),
+ ('6','0',''),
+ ('7','4','Test Last Name'),
+ ('8','5','Test Last Name'),
+ ('9','6','Test Last Name'),
+ ('10','7','Test Last Name'),
+ ('11','8','Bueno'),
+ ('12','9','Bueno'),
+ ('13','10','Bueno'),
+ ('14','11','Bueno');
 
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-  `id` int(10) NOT NULL auto_increment,
+  `id_user` int(10) NOT NULL auto_increment,
   `name` varchar(255) NOT NULL,
-  `login` varchar(255) NOT NULL,
-  `pass` varchar(255) NOT NULL,
-  `status` enum('waiting','active','suspense','blocked','deleted') NOT NULL default 'waiting',
-  `id_album` int(10) NOT NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `id` (`id`),
-  KEY `album_id` (`id_album`),
-  KEY `album_id_2` (`id_album`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`id_user`)
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 
-insert into `users` values('1','Klederson Bueno','admin','password','active','2'),
- ('2','PhpBURN','phpburn','password','active','0');
+insert into `users` values('1','a','a','2009-09-17 22:24:38'),
+ ('2','b','b','2009-09-17 22:24:42'),
+ ('3','c','c','2009-09-17 22:24:45'),
+ ('4','Test Name','','2009-09-17 22:29:56'),
+ ('5','','','2009-09-17 22:25:47'),
+ ('6','','','2009-09-17 22:25:50'),
+ ('7','','','2009-09-17 22:25:51'),
+ ('8','','','2009-09-17 22:25:51'),
+ ('9','','','2009-09-17 22:25:52'),
+ ('10','','','2009-09-17 22:25:53'),
+ ('11','','','2009-09-17 22:25:53'),
+ ('12','','','2009-09-17 22:25:55'),
+ ('13','Test Name','','2009-09-17 22:29:56'),
+ ('14','Test Name','','2009-09-17 22:29:56'),
+ ('15','Test Name','','2009-09-17 22:29:56'),
+ ('16','Klederson','','2009-09-17 22:30:36'),
+ ('17','Klederson','','2009-09-17 22:30:48'),
+ ('18','Klederson','','2009-09-17 22:30:49'),
+ ('19','Klederson','','2009-09-17 22:30:50');
 
-DROP TABLE IF EXISTS `rel_album_tags`;
+DROP TABLE IF EXISTS `users2`;
 
-CREATE TABLE `rel_album_tags` (
-  `id_rel_album_tags` int(10) NOT NULL auto_increment,
-  `id_album` int(10) NOT NULL,
-  `id_tags` int(10) NOT NULL,
-  PRIMARY KEY  (`id_rel_album_tags`),
-  KEY `id_album` (`id_album`),
-  KEY `id_tags` (`id_tags`),
-  CONSTRAINT `rel_album_tags_ibfk_1` FOREIGN KEY (`id_tags`) REFERENCES `tags` (`id_tags`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `rel_album_tags_id_album` FOREIGN KEY (`id_album`) REFERENCES `albums` (`id_album`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+CREATE TABLE `users2` (
+  `id_user2` int(10) NOT NULL auto_increment,
+  `id_user` int(10) NOT NULL,
+  `name_user` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id_user2`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
-insert into `rel_album_tags` values('1','2','2'),
- ('2','2','1');
+insert into `users2` values('1','0',''),
+ ('2','0',''),
+ ('3','0',''),
+ ('4','4','Test Name User'),
+ ('5','13','Test Name User'),
+ ('6','14','Test Name User'),
+ ('7','15','Test Name User'),
+ ('8','16','Acid'),
+ ('9','17','Acid'),
+ ('10','18','Acid'),
+ ('11','19','Acid');
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1,3 +1,5 @@
+<h1>PhpBURN Example Application</h1>
+<h2>Select a test to perform</h2>
 <p>
-Hi, my name is <b>'<?=$name?>'</b> and i'm `at` "my main controller"
+[#testList#]
 </p>
