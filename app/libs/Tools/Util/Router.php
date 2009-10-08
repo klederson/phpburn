@@ -155,13 +155,13 @@ class Router {
 		
 		
 		$controller = new $route[0];
-		
-		if(count($this->uri) > 1) {
-			$action = $this->uri[1];
+						
+		if(count($this->uri) >= 1 ) {
+			$action = count($this->uri) == 1 ? $this->uri[0] : $this->uri[1];
 		} else {
 			$action = self::$routes['__defaultAction'];
 		}
-		
+				
 		if(method_exists($controller,$action)) {
 			$controller->callAction($action,$parms);
 		} else {

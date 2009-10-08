@@ -8,7 +8,7 @@ class main extends Controller {
 		
 	}
 	
-	public function select() {
+	public function find() {
 		//Loading model
 		PhpBURN::import('webinsys.ExtendedUser');
 
@@ -23,7 +23,7 @@ class main extends Controller {
 		print "</pre>";
 	}
 	
-	public function selectWithWhere() {
+	public function findWithWhere() {
 		//Loading model
 		PhpBURN::import('webinsys.ExtendedUser');
 
@@ -39,7 +39,7 @@ class main extends Controller {
 		print "</pre>";
 	}
 	
-	public function selectAndSave() {
+	public function findtAndSave() {
 		//Loading model
 		PhpBURN::import('webinsys.ExtendedUser');
 
@@ -55,6 +55,18 @@ class main extends Controller {
 			$user->save();
 			print_r($user->toArray());
 		}
+		print "</pre>";
+	}
+	
+	public function get() {
+		//Loading model
+		PhpBURN::import('webinsys.ExtendedUser');
+
+		$user = new ExtendedUser();
+
+		$user->get();
+		print "<pre>";
+			print_r($user->toArray());
 		print "</pre>";
 	}
 	

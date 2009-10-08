@@ -281,6 +281,7 @@ class PhpBURN_Map implements IMap {
 	}
 	
 	public function getClassParentField($className) {
+		if (count($this->parentFieldsReferences) > 0)
 		foreach($this->parentFieldsReferences as $index => $value) {
 			if($this->fields[$value]['classReference'] == $className) {
 				return $this->fields[$value];

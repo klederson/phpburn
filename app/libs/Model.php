@@ -561,7 +561,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		if($fieldInfo == false) {
 			$modelName = get_class($this);
-			PhpBURN_Message::output("<b>$modelName</b> [!has no such relationship!]", PhpBURN_Message::EXCEPTION);
+			PhpBURN_Message::output("<b>$modelName</b> [!has no such relationship!]", PhpBURN_Message::ERROR);
 			return false;
 		}
 		
