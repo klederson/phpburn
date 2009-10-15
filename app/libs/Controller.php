@@ -27,13 +27,14 @@ abstract class Controller {
 	public function callAction($action, $parms) {
 		//Calling action
 		call_user_func_array(array($this,$action),$parms);
-		
-		$this->loadRelativeView($action,false,true);
+		if(PhpBURN_Views::$autoLoad == true) {
+			$this->loadRelativeView($action,false,true);
+		}
 	}
 	
 	public function loadRelativeView($action, $toVar = false) {
 		//Searching if Views is loaded
-		if(array_search('PhpBURN_Views',get_declared_classes()) == true && PhpBURN_Views::$autoLoad == true) {
+		if(array_search('PhpBURN_Views',get_declared_classes()) == true) {
 			return PhpBURN_Views::loadView(get_class($this) . DS .$action, $this->_viewData, $toVar);
 		}
 	}
