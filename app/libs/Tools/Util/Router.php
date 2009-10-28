@@ -119,7 +119,7 @@ class Router {
 				$return['index'] = $index;
 				
 				
-				$parms = explode('/',$value);
+				$parms = explode('/',$index);
 				$parms = array_slice($parms,1,count($parms)-1);
 				
 				$finalValue = null;
@@ -138,6 +138,7 @@ class Router {
 				return $return;
 			}
 		}
+		
 		
 		//Searching for file
 		if(file_exists(SYS_CONTROLLER_PATH . $this->uri[0] . '.' . SYS_CONTROLLER_EXT) === true) {
