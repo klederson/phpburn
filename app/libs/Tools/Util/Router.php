@@ -117,7 +117,23 @@ class Router {
 		foreach($routes as $index => $value) {
 			if(self::routeMatch($index)) {
 				$return['index'] = $index;
-				$return['action'] = $value;
+				
+				
+				$parms = explode('/',$value);
+				$parms = array_slice($parms,1,count($parms)-1);
+				
+				$finalValue = null;
+				if(count($parms) >= 1) {
+					foreach($parms as $parmIndex => $parmValue) {
+						$finalValue = $finalValue == null ? '' : $finalValue. '/';
+						$finalValue .= $this->uri[$parmIndex+1];
+					}
+					
+					$parms = explode('/',$value);
+					$finalValue = $parms[0] . '/' . $finalValue;
+				}
+				
+				$return['action'] = $finalValue== null ? $value : $finalValue;
 				
 				return $return;
 			}
@@ -126,8 +142,8 @@ class Router {
 		//Searching for file
 		if(file_exists(SYS_CONTROLLER_PATH . $this->uri[0] . '.' . SYS_CONTROLLER_EXT) === true) {
 			$return['index'] = $this->uri[0];
-			$return['action'] = implode('/',$this->uri);
-			
+			$return['action'] = count($this->uri) > 1 ? implode('/',$this->uri) : $this->uri[0] . '/' .self::$routes['__defaultAction'];
+
 			return $return;
 		}
 		
@@ -148,16 +164,17 @@ class Router {
 	}
 	
 	public function executeRoute(array $route) {
+		
 		$route = explode('/', $route['action']);
+		
 		include_once(SYS_CONTROLLER_PATH . $route[0] . '.' . SYS_CONTROLLER_EXT);
 		
-		$parms = array_slice($this->uri,2,count($this->uri)-2);
-		
-		
+		$parms = array_slice($route,2,count($route)-2);
+				
 		$controller = new $route[0];
 						
-		if(count($this->uri) >= 1 ) {
-			$action = count($this->uri) == 1 ? $this->uri[0] : $this->uri[1];
+		if(count($route) > 1 ) {
+			$action = count($route) == 1 ? $route[0] : $route[1];
 		} else {
 			$action = self::$routes['__defaultAction'];
 		}

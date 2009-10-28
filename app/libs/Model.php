@@ -136,6 +136,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return $this->getDialect()->find($pk);
 	}
 	
+	/**
+	 * This method resets the fields at the model ( CLEAR ALL FIELDS )
+	 */
+	public function reset() {
+		$this->getMap()->reset();
+	}
+	
 	public function _moveNext() {
 		$truePointer = $this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists(0) ? 0 : $this->getDialect()->getPointer()+1;//$this->getDialect()->moveNext();
 		

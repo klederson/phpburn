@@ -12,8 +12,8 @@ class albumController extends Controller {
 		print "rá";
 	}
 	
-	public function home() {
-		print "ome";
+	public function home($a) {
+		print "ome-$a";
 	}
 	
 }
