@@ -182,7 +182,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		} else {
 			foreach ($this->getModel()->getMap()->fields as $field => $infos) {
 				if($this->getModel()->getMap()->getRelationShip($field) != true) {
-					$value = $this->getModel()->getMap()->getFieldValue($field);
+					$value = $this->getModel()->$field;
 					if(isset($value) && !empty($value) && $value != null && $value != '') {
 						$fieldInfo = $this->getModel()->getMap()->getField($field);
 						$whereConditions .= $whereConditions == null ? sprintf(" %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',$value) : sprintf(" AND %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',$value);
