@@ -163,6 +163,10 @@ abstract class PhpBURN {
 			}
 		}
 	}
+	
+	public function redirect($direction) {
+		echo "<script> document.location='".SYS_BASE_URL."$direction'; </script>";
+	}
 
 }
 PhpBURN::load('Configuration','Message');

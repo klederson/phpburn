@@ -315,6 +315,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			$field = $this->getMap()->getPrimaryKey();
 			$lastId = $this->getModel()->getConnection()->last_id();
 			$this->getMap()->setFieldValue($field['field']['alias'],$lastId);
+			
+			return true;
 		} else {
 			return false;
 		}

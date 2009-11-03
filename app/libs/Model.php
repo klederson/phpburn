@@ -395,6 +395,25 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 	
 	/**
+	 * Like method
+	 * 
+	 * Add a LIKE condition to your select query
+	 * 
+	 * @param String $field
+	 * @param String $condition
+	 */
+	public function like($field, $content, $condition = null) {
+		if(count($this->_where) > 0) {
+			$condition = $condition == null ? 'AND' : $condition;
+			$field = sprintf(' %s %s', $condition, $field);
+		}
+		
+		$strLike = sprintf("%s LIKE (%s)", $field, $condition);
+		$this->where($strLike);
+	}
+	
+	
+	/**
 	 * Here we setup the operators table, that translate the spoken language into a programatic operator. It will be used in database queries.
 	 * @var Array
 	 */

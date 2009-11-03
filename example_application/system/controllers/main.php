@@ -25,6 +25,8 @@ class main extends Controller {
 			print_r($user->toArray());
 		}
 		print "</pre>";
+		
+		
 	}
 	
 	public function findWithWhere() {
