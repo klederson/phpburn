@@ -10,7 +10,8 @@
  * @author Kléderson Bueno <klederson@klederson.com>
  * @version 1.0
  */
-ob_start();
+@ob_start();
+@session_start();
 
 ################################
 # System Settings

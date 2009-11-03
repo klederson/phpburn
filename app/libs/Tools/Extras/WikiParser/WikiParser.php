@@ -268,8 +268,10 @@ class WikiParser {
 	
 	function emphasize_off() {
 		$output = "";
-		foreach ($this->emphasis as $amount=>$state) {
-			if ($state) $output .= $this->emphasize($amount);
+		if(count($this->emphasis) > 0) {
+			foreach ($this->emphasis as $amount=>$state) {
+				if ($state) $output .= $this->emphasize($amount);
+			}
 		}
 		
 		return $output;
