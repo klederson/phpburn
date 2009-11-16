@@ -172,7 +172,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					//SuperWhere
 					$fieldInfo = $this->getModel()->getMap()->getField($value['start']);
 					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
-					$whereConditions .= sprintf(" %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$value['start'],$value['operator'],($value['end']));
+					$whereConditions .= sprintf(' %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$value['start'],$value['operator'],addslashes($value['end']));
 				}
 			}
 			
@@ -185,7 +185,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$value = $this->getModel()->$field;
 					if(isset($value) && !empty($value) && $value != null && $value != '') {
 						$fieldInfo = $this->getModel()->getMap()->getField($field);
-						$whereConditions .= $whereConditions == null ? sprintf(" %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',$value) : sprintf(" AND %s.%s %s '%s' ",$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',$value);
+						$whereConditions .= $whereConditions == null ? sprintf(' %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value)) : sprintf(' AND %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value));
 					}
 					unset($value);
 				}
@@ -197,7 +197,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		if($pk != null) {
-				$whereConditions .= $whereConditions == null ? sprintf("WHERE %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],($pk));
+				$whereConditions .= $whereConditions == null ? sprintf('WHERE %s.%s="%s" ',$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],addslashes($pk));
 		}
 		
 		//Define OrderBY SENTENCE
