@@ -344,7 +344,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$insertFields[$infos['field']['tableReference']] .= $insertFields[$infos['field']['tableReference']] == null ? '' : ', ';
 					$insertFields[$infos['field']['tableReference']] .= $infos['field']['tableReference'] . '.' . $infos['field']['column'];
 					$insertValues[$infos['field']['tableReference']] .= $insertValues[$infos['field']['tableReference']] == null ? '' : ', ';
-					$insertValues[$infos['field']['tableReference']] .= sprintf("'%s'", $value);
+					$insertValues[$infos['field']['tableReference']] .= sprintf('"%s"', addslashes($value));
 				}
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 				//print $field . "<br/>";
