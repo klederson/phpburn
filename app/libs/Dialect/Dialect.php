@@ -372,7 +372,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			if($this->getModel()->getMap()->getRelationShip($field) != true && $this->getModel()->$infos['field']['alias'] != $infos['#value']) {
 				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
-				$updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], ($this->getModel()->$field));
+				$updatedFields[$infos['field']['tableReference']] .= sprintf('%s="%s"', $infos['field']['column'], addslashes($this->getModel()->$field));
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 				//print $field . "<br/>";
 				$this->getModel()->$field->save();
