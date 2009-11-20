@@ -607,13 +607,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 //		All good let's start rock'n'roll
 
-//		Prepare the Where and LIMIT
-		$parms = func_get_args();
 		
 //		Instance object
-//		PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']); //@TODO possible problem because the package name not urgent but maybe critical FIX IT
-//		$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
-		
 		if( !($this->$fieldInfo['alias'] instanceof $fieldInfo['foreignClass']) && $this->modelExist($fieldInfo['foreignClass'])) {
 			$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
 		}		
@@ -638,6 +633,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				
 				return $amount;
 			break;
+			
 			case self::ONE_TO_MANY:
 //				Looking for ONE TO MANY relationship
 				
@@ -646,6 +642,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 								
 				return $this->$fieldInfo['alias']->find();			
 			break;
+			
 			case self::MANY_TO_MANY:
 //				Looking for MANY TO MANY relationship
 
@@ -661,6 +658,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$this->$fieldInfo['alias']->where($whereString);
 				
 				return $this->$fieldInfo['alias']->find();
+				
 			break;
 		}
 	}
@@ -674,7 +672,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * 
 	 * @example
 	 * <code>
-	 * $model->_linkWhere('album_id','> 10');
+	 * $model->_linkWhere('pictures','date','>', '10/10/2010','AND',true);
 	 * $model->getRelationship('albums');
 	 * </code>
 	 * 
@@ -682,8 +680,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @version 0.1b
 	 * 
 	 * @param String $linkName
-	 * @param String $conditions
+	 * @param String $condition_start
+	 * @param String $stringOperator
+	 * @param String $conditon_end
+	 * @param String $condition
 	 * @param Boolean $override
+	 * 
+	 * @return Boolean
 	 */
 	public function _linkWhere($linkName, $condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
 		if( $this->getMap()->getRelationShip($linkName) == true ) {
@@ -695,11 +698,21 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 			$this->$linkName->swhere($condition_start, $stringOperator, $conditon_end, $condition, $override);
 			
+			return true;
+			
 		} else {
 			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
+			
+			return false;
 		}
 	}
 	
+	/**
+	 * Just checks if a model exists based on the configured packages you just have to know the name
+	 * 
+	 * @param String $modelName
+	 * @return Boolean
+	 */
 	private function modelExist($modelName) {
 		foreach(PhpBURN_Configuration::$options as $index => $confItem) {
 			if ( PhpBURN::import($index . '.' . $modelName) != 'error' ) {
@@ -708,15 +721,6 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		}
 		
 		return false;
-	}
-	
-	
-	public function getWhereLink($linkName) {
-		return $this->_whereLink;
-	}
-	
-	public function getLimitLink($linkName) {
-		return $this->_linkLimit[$linkName];
 	}
 	
 	/**
@@ -730,7 +734,22 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Integer $end
 	 */
 	public function _linkLimit($linkName, $offset = null, $limit = null) {
-		$this->_linkLimit[$linkName] = $limit == null ? $offset : $offset . ',' . $limit;
+		if( $this->getMap()->getRelationShip($linkName) == true ) {
+			$infos = $this->getMap()->fields[$linkName];
+			
+			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+					$this->$linkName = new $infos['isRelationship']['foreignClass'];
+			}
+
+			$this->$linkName->limit($offset, $limit);
+			
+			return true;
+			
+		} else {
+			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
+			
+			return false;
+		}	
 	}
 	
 	/**
@@ -744,19 +763,22 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $orderType
 	 */
 	public function _linkOrder($linkName, $field, $orderType = "ASC", $override = false) {
-		if($override == true) {
-			unset($this->_orderLink[$linkName]);
-		}
-		
-		if(!is_array($this->_orderLink[$linkName])) {
-			$this->_orderLink[$linkName] = array();
-		}
-		
-		array_push($this->_orderLink[$linkName], $conditions);
-	}
-	
-	public function getOrderLink($linkName) {
-		return $this->_orderLink[$linkName];
+		if( $this->getMap()->getRelationShip($linkName) == true ) {
+			$infos = $this->getMap()->fields[$linkName];
+			
+			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+					$this->$linkName = new $infos['isRelationship']['foreignClass'];
+			}
+
+			$this->$linkName->order($field, $orderType, $override);
+			
+			return true;
+			
+		} else {
+			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
+			
+			return false;
+		}	
 	}
 	
 	/**

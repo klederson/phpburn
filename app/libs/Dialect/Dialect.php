@@ -314,9 +314,6 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			foreach ($this->getMap()->fields as $fieldCheck => $infos) {
 				if($this->getModel()->getMap()->getRelationShip($fieldCheck) == true && $this->getModel()->$fieldCheck instanceof $infos['isRelationship']['foreignClass']) {
 					
-//					print "<pre>";
-//					print_r($infos);
-					
 //					Just to short name
 					$relModel = &$this->getModel()->$fieldCheck;
 					
@@ -335,8 +332,6 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 						
 						case PhpBURN_Core::MANY_TO_MANY:
 							$this->getModel()->$fieldCheck->save();
-							print "<pre>";
-							print_r($this->getModel()->toArray());
 							
 //							SEARCH IF THE RELATIONSHIP ALREADY EXISTS
 							unset($sqlWHERE, $relationshipSQL, $rs);
@@ -391,9 +386,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$insertValues[$infos['field']['tableReference']] .= sprintf('"%s"', addslashes($value));
 				}
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
-//				print "<pre>";
-//				print_r($this->getModel()->getMap()->fields[$field]);
-//				$this->getModel()->$field->save();
+
 			}
 		}
 		
@@ -418,12 +411,6 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				$updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
 				$updatedFields[$infos['field']['tableReference']] .= sprintf('%s="%s"', $infos['field']['column'], addslashes($this->getModel()->$field));
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
-//				$relField = &$this->getModel()->getMap()->fields[$field];
-				
-//				print "<pre>";
-				//print_r($relField);
-				
-//				$this->getModel()->$field->save();
 
 			}
 		}
@@ -435,8 +422,6 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		if(count($updatedFields) > 0) {
 			foreach($updatedFields as $index => $updatedFieldsUnique) {
 				$pkField = $index == $this->getModel()->_tablename ? $this->getMap()->getPrimaryKey() : $this->getMap()->getTableParentField($index);
-				//print $index;
-				//print_r($pkField);
 				
 				$sql[$index] = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s';", $index, $updatedFieldsUnique, $pkField['field']['column'], $pkField['#value']) : null;
 			}
