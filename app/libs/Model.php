@@ -352,6 +352,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			unset($this->_where);
 			$this->_where = array();
 		}
+		
 		array_push($this->_where, $conditions);
 	}
 	
@@ -391,13 +392,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public function swhere($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
 		
 		//$this->_exceptionObj->log('teste');
-		
+				
 		$conditions = array();
 		$conditions['start'] = $condition_start;
 		$conditions['end'] = $conditon_end;
 		$conditions['operator'] = $this->convertWhereOperators($stringOperator);
 		$conditions['condition'] = $condition;
-		
+				
 		if($override == true) {
 			unset($this->_where);
 			$this->_where = array();
@@ -610,41 +611,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$parms = func_get_args();
 		
 //		Instance object
-		PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']); //@TODO possible problem because the package name not urgent but maybe critical FIX IT
-		$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
+//		PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']); //@TODO possible problem because the package name not urgent but maybe critical FIX IT
+//		$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
 		
-		$linkWhere = $this->getWhereLink($name);
-		$linkLimit = $this->getLimitLink($name);
-		$linkOrder = $this->getOrderLink($name);
-		
-//		Setup Where Clause
-		if($linkWhere != null && is_array($linkWhere)) {
-			foreach($linkWhere as $index => $value) {
-				foreach($value as $whereCondition) {
-					$this->$fieldInfo['alias']->where($whereCondition);
-				}
-			}
-		}
-		
-//		Setup Order by Clause
-		if($linkOrder != null && is_array($linkOrder)) {
-			foreach($linkOrder as $index => $value) {
-				foreach($value as $orderCondition) {
-					$this->$fieldInfo['alias']->order($orderCondition['field'],$orderCondition['type']);
-				}
-			}
-		}
-		
-//		Setup Limit Clause
-		if($linkLimit != null && !empty($linkLimit) ) {
-			$this->$fieldInfo['alias']->limit($linkLimit);
-		}
-		
-//		Setup Limit Clause
-		if(isset($offset)) {		
-			$this->_linkLimit($name,$offset,$limit);	
-		}
-		
+		if( !($this->$fieldInfo['alias'] instanceof $fieldInfo['foreignClass']) && $this->modelExist($fieldInfo['foreignClass'])) {
+			$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
+		}		
 		
 //		Define rules to get it
 		switch($fieldInfo['type']) {
@@ -677,14 +649,15 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			case self::MANY_TO_MANY:
 //				Looking for MANY TO MANY relationship
 
-//				TableReference
+//				Table Reference
 				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['outKey'],$fieldInfo['relOutKey'],'=','JOIN',$this->$fieldInfo['alias']->_tablename);
 				
 //				Current Model table
 				$this->$fieldInfo['alias']->join($this->_tablename,$fieldInfo['thisKey'],$fieldInfo['relKey'],'=', 'JOIN',$fieldInfo['relTable']);
 				
-//				Define WHAT TO FIND
-				$whereString = sprintf('`%s`.`%s` = "%s"',$this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
+//				Define HOW TO FIND
+				$conditionString = count($this->$fieldInfo['alias']->_where) > 0 ? ' AND ' : '';
+				$whereString = sprintf('%s `%s`.`%s` = "%s"',$conditionString, $this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
 				$this->$fieldInfo['alias']->where($whereString);
 				
 				return $this->$fieldInfo['alias']->find();
@@ -712,17 +685,31 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $conditions
 	 * @param Boolean $override
 	 */
-	public function _linkWhere($linkName, $conditions, $override = false) {
-		if($override == true) {
-			unset($this->_whereLink[$linkName]);
+	public function _linkWhere($linkName, $condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
+		if( $this->getMap()->getRelationShip($linkName) == true ) {
+			$infos = $this->getMap()->fields[$linkName];
+			
+			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+					$this->$linkName = new $infos['isRelationship']['foreignClass'];
+			}
+
+			$this->$linkName->swhere($condition_start, $stringOperator, $conditon_end, $condition, $override);
+			
+		} else {
+			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
 		}
-		
-		if(!is_array($this->_whereLink[$linkName])) {
-			$this->_whereLink[$linkName] = array();
-		}
-		
-		array_push($this->_whereLink[$linkName], $conditions);
 	}
+	
+	private function modelExist($modelName) {
+		foreach(PhpBURN_Configuration::$options as $index => $confItem) {
+			if ( PhpBURN::import($index . '.' . $modelName) != 'error' ) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	
 	public function getWhereLink($linkName) {
 		return $this->_whereLink;
