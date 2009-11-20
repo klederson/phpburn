@@ -257,12 +257,17 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $operator
 	 * @param String $joinType
 	 */
-	public function join($tableRight, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableLeft = null) {
-		$this->_join[$tableRight]['fieldLeft'] = $fieldLeft;
-		$this->_join[$tableRight]['fieldRight'] = $fieldRight;
-		$this->_join[$tableRight]['operator'] = $operator;
-		$this->_join[$tableRight]['type'] = $joinType;
-		$this->_join[$tableRight]['tableLeft'] = $tableLeft;
+	public function join($tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null) {
+//		$this->_join[$tableLeft][] 										= array();
+		
+//		$index = count($this->_join[$tableLeft])-1;
+		
+		$this->_join[$tableLeft]['tableLeft'] 				= $tableLeft;
+		$this->_join[$tableLeft]['fieldLeft'] 				= $fieldLeft;
+		$this->_join[$tableLeft]['fieldRight'] 			= $fieldRight;
+		$this->_join[$tableLeft]['operator'] 				= $operator;
+		$this->_join[$tableLeft]['type']						= $joinType;
+		$this->_join[$tableLeft]['tableRight'] 			= $tableRight;
 	}
 	
 	/**
@@ -348,6 +353,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			$this->_where = array();
 		}
 		array_push($this->_where, $conditions);
+	}
+	
+	public function from($conditions, $override = false) {
+		if($override == true) {
+			unset($this->_from);
+			$this->_from = array();
+		}
+		array_push($this->_from, $conditions);
 	}
 	
 	/**
@@ -597,7 +610,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$parms = func_get_args();
 		
 //		Instance object
-		PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']);
+		PhpBURN::import($this->_package . '.' . $fieldInfo['foreignClass']); //@TODO possible problem because the package name not urgent but maybe critical FIX IT
 		$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
 		
 		$linkWhere = $this->getWhereLink($name);
@@ -664,8 +677,15 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			case self::MANY_TO_MANY:
 //				Looking for MANY TO MANY relationship
 
-				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['thisKey'],$fieldInfo['relKey']);
-				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['outKey'],$fieldInfo['relOutKey']);
+//				TableReference
+				$this->$fieldInfo['alias']->join($fieldInfo['relTable'],$fieldInfo['outKey'],$fieldInfo['relOutKey'],'=','JOIN',$this->$fieldInfo['alias']->_tablename);
+				
+//				Current Model table
+				$this->$fieldInfo['alias']->join($this->_tablename,$fieldInfo['thisKey'],$fieldInfo['relKey'],'=', 'JOIN',$fieldInfo['relTable']);
+				
+//				Define WHAT TO FIND
+				$whereString = sprintf('`%s`.`%s` = "%s"',$this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
+				$this->$fieldInfo['alias']->where($whereString);
 				
 				return $this->$fieldInfo['alias']->find();
 			break;

@@ -68,6 +68,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				
 				//PhpBURN_Message::output("Pointer ".$this->getPointer());
 				
+//				Remove slashes
+				foreach($data as $index => $value) {
+					$data[$index] = stripslashes($value); 
+				}
+				
 				if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
 					$this->dataSet[$this->getPointer()] = $data;
 				}
@@ -221,12 +226,19 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	
 	public function getJoinString() {
 		
+//		print_r($this->getModel()->_join);
+//		exit;
+//		$tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null
+		
 		foreach($this->getModel()->_join as $index => $value) {
-			$value['tableLeft'] = $value['tableLeft'] == null ? $this->getModel()->_tablename : $value['tableLeft'];
+//			$value['tableRight'] = $value['tableRight'] == null ? $this->getModel()->_tablename : $value['tableRight'];
 			$joinString .= $joinString != null ? ' ' : null;
 			$joinString .= sprintf('%s %s', $value['type'], $index);
 			if($value['fieldLeft']  != null && $value['fieldRight']  != null) {
-				$joinString .= sprintf(" ON `%s`.`%s` %s `%s`.`%s`", $value['tableLeft'], ($value['fieldLeft']), $value['operator'], $index,($value['fieldRight']));
+				
+				$rightSide = $value['tableRight'] == null ? sprintf('"%s"', $value['fieldRight']) : sprintf('`%s`.`%s`', $value['tableRight'], $value['fieldRight']);
+				
+				$joinString .= sprintf(" ON `%s`.`%s` %s %s", $value['tableLeft'], ($value['fieldLeft']), $value['operator'], $rightSide);
 			}
 		}
 		
@@ -274,27 +286,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		$sql = array_reverse($sql, true);
 		
-//		print "<pre>";
-//		foreach($sql as $index => $value) {
-//				if($isInsert == true) {
-//					$parentClass = $this->getModel()->getMap()->getTableParentClass($index);
-//					$lastId = $this->getModel()->getConnection()->last_id();
-//					$parentField = $this->getModel()->getMap()->getClassParentField($parentClass);
-//					print_r($parentField);
-//					$parentColumn = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(', %s', $parentField['field']['column']) : '';
-//					$parentValue = $parentField['field']['column'] != null && !empty($parentField['field']['column']) ? sprintf(", '%s'",$lastId) : '';
-//					$value = str_replace('[#__fieldLink#]', $parentColumn, $value);
-//					$value = str_replace('[#__fieldLinkValue#]',$parentValue, $value);
-//				}
-//				//$this->execute($value);
-//				print $value . '<hr/>';
-//			}
-//		
-//		
-//		print_r($sql);
-//		exit;
-		
-		//if($sql != null) {
+//		Checks how many sqls have been generated ( based on extended classes )
 		if(count($sql) > 0) {
 			foreach($sql as $index => $value) {
 				if($isInsert == true) {
@@ -309,12 +301,64 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$value = str_replace('[#__fieldLink#]', $parentColumn, $value);
 					$value = str_replace('[#__fieldLinkValue#]',$parentValue, $value);
 				}
+				if($value != null)
 				$this->execute($value);
 			}
 			//$this->getModel()->get($this->getModel()->getConnection()->last_id());
 			$field = $this->getMap()->getPrimaryKey();
 			$lastId = $this->getModel()->getConnection()->last_id();
-			$this->getMap()->setFieldValue($field['field']['alias'],$lastId);
+			if($isInsert == true) {
+				$this->getMap()->setFieldValue($field['field']['alias'],$lastId);
+			}
+			
+			foreach ($this->getMap()->fields as $fieldCheck => $infos) {
+				if($this->getModel()->getMap()->getRelationShip($fieldCheck) == true && $this->getModel()->$fieldCheck instanceof $infos['isRelationship']['foreignClass']) {
+					
+//					print "<pre>";
+//					print_r($infos);
+					
+//					Just to short name
+					$relModel = &$this->getModel()->$fieldCheck;
+					
+//					Checking the kind of relationship
+					switch($infos['isRelationship']['type']) {
+						case PhpBURN_Core::ONE_TO_ONE:
+							$this->getModel()->$fieldCheck->save();
+							$this->getModel()->getMap()->setFieldValue($infos['isRelationship']['thisKey'], $relModel->getMap()->getFieldValue($infos['isRelationship']['thisKey']));
+							$this->getModel()->save();
+						break;
+						
+						case PhpBURN_Core::ONE_TO_MANY:
+							$relModel->getMap()->setFieldValue($infos['isRelationship']['relKey'], $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']));
+							$this->getModel()->$fieldCheck->save();
+						break;
+						
+						case PhpBURN_Core::MANY_TO_MANY:
+							$this->getModel()->$fieldCheck->save();
+							print "<pre>";
+							print_r($this->getModel()->toArray());
+							
+//							SEARCH IF THE RELATIONSHIP ALREADY EXISTS
+							unset($sqlWHERE, $relationshipSQL, $rs);
+							$relKeyVal = $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']);
+							$relOutKeyVal = $relModel->getMap()->getFieldValue($infos['isRelationship']['relOutKey']);
+							
+							$sqlWHERE = sprintf('%s.%s = "%s"',$infos['isRelationship']['relTable'],$infos['isRelationship']['relKey'],addslashes($relKeyVal));
+							$sqlWHERE .= " AND ";
+							$sqlWHERE .= sprintf('%s.%s = "%s"',$infos['isRelationship']['relTable'],$infos['isRelationship']['outKey'],addslashes($relOutKeyVal));
+							
+							$relationshipSQL = sprintf('SELECT * FROM %s WHERE %s',$infos['isRelationship']['relTable'], $sqlWHERE);
+							
+							$rs = $this->execute($relationshipSQL);
+							if($this->getModel()->getConnection()->affected_rows() == 0) {
+								unset($sqlWHERE, $relationshipSQL, $rs);
+								$relationshipSQL = sprintf('INSERT INTO %s ( %s, %s ) VALUES ( "%s" , "%s" ) ', $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'],$infos['isRelationship']['relOutKey'],$relKeyVal, $relOutKeyVal);
+								$rs = $this->execute($relationshipSQL);
+							}
+						break;
+					}
+				}
+			}
 			
 			return true;
 		} else {
@@ -347,8 +391,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$insertValues[$infos['field']['tableReference']] .= sprintf('"%s"', addslashes($value));
 				}
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
-				//print $field . "<br/>";
-				$this->getModel()->$field->save();
+//				print "<pre>";
+//				print_r($this->getModel()->getMap()->fields[$field]);
+//				$this->getModel()->$field->save();
 			}
 		}
 		
@@ -362,7 +407,6 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		//Constructing the SQL
 		return $sql;
-		//return $sql = sprintf("INSERT INTO %s ( %s ) VALUES ( %s ) ", $tableName, $insertFields, $insertValues);
 	}
 	
 	public function prepareUpdate() {
@@ -374,13 +418,15 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				$updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
 				$updatedFields[$infos['field']['tableReference']] .= sprintf('%s="%s"', $infos['field']['column'], addslashes($this->getModel()->$field));
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
-				//print $field . "<br/>";
-				$this->getModel()->$field->save();
+//				$relField = &$this->getModel()->getMap()->fields[$field];
+				
+//				print "<pre>";
+				//print_r($relField);
+				
+//				$this->getModel()->$field->save();
+
 			}
 		}
-		
-		//Pre-defined parms
-		//$tableName = &$this->getModel()->_tablename;
 		
 		//To see more about pkField Structure see addField at MapObject
 		$pkField = &$this->getMap()->getPrimaryKey();
@@ -402,7 +448,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		$modelName = get_class($this->getModel());
 		if($sql == null) {
 			PhpBURN_Message::output("[!There is nothing to save in model!]: <b>$modelName</b>",PhpBURN_Message::WARNING);
-			return array();
+			return array(null);
 		} else {
 			return $sql;
 		}
