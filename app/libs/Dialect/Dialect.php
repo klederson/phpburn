@@ -271,6 +271,14 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		//$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
 	}
 	
+	public function hasInherit($class) {
+		if($class instanceof PhpBURN_Core) {
+			return false;
+		} else {
+			return get_parent_class($class);
+		}
+	}
+	
 	public function save() {
 		$isInsert = true;
 		
@@ -279,6 +287,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		if(isset($this->getModel()->$pkField['field']['alias']) && !empty($this->getModel()->$pkField['field']['alias']) ) {
 			$isInsert = false;
 		}
+		
+//		Verify if exists and update trought inhirit
+//		if($this->hasInherit($this) != false && ) {
+//			
+//		}
 		
 		
 		//Preparing the SQL
