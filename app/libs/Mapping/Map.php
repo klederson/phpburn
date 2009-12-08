@@ -208,7 +208,7 @@ class PhpBURN_Map implements IMap {
 	 * @param String $relTable
 	 * @param Boolean $lazy
 	 */
-	public function addRelationship($relName,$relType,$foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable, $lazy = false) {
+	public function addRelationship($relName,$relType,$foreignClass, $thisKey, $relKey = null, $outKey = null, $relOutKey = null, $relTable = null, $lazy = false) {
 
 		//Setup a simple field as a relationship field, just for double check
 		$this->fields[$relName]['field']['type'] = false;
@@ -237,6 +237,22 @@ class PhpBURN_Map implements IMap {
 		//$this->fields[$relName]['parentLinkField'] = 'false'; 
 		//Setup defaultvalue for this field
 		$this->setFieldValue($relName,null);
+	}
+	
+	public function isRelationship($index) {
+		if($this->fields[$index]['isRelationship'] == false) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	public function isParent($index) {
+		if($this->fields[$index]['classReference'] != get_class($this->getModel())) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public function addParentRelationShip() {
