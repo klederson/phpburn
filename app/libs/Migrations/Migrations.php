@@ -34,13 +34,21 @@ class PhpBURN_Migrations {
 				$model = new $filename;
 				
 				if($model instanceof PhpBURN_Core) {
-					$sql .= $model->getDialect()->migrate($model, false);
+					if($_SERVER['HTTP_HOST'])
+						print "<pre>";
+						
+					print sprintf("Creating %s table for %s model from %s package into %s database: ", $model->_tablename, get_class($model), $packageConfig->package, $packageConfig->database);
+					if( $model->getDialect()->migrate($model) ) {
+						print "OK \r\n";
+					} else {
+						print "FAIL \r\n";
+					}				
 				}
 				unset($model);
+				if($_SERVER['HTTP_HOST'])
+						print "</pre>";
 			}
 		}
-		
-		print $sql;
 	}
 }
 ?>

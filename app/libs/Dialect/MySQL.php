@@ -103,7 +103,6 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 	}
 	
 	public function migrate(PhpBURN_Core $model, $execute = true) {
-		print "<pre>";
 		foreach($model->getMap()->fields as $fieldIndex => $fieldContent) {			
 			
 			
