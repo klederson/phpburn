@@ -102,14 +102,11 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 		
 	}
 	
-	public function migrate(PhpBURN_Core $model, $execute = true) {
-		foreach($model->getMap()->fields as $fieldIndex => $fieldContent) {			
+	public function migrate($execute = true) {
+		foreach($this->getModel()->getMap()->fields as $fieldIndex => $fieldContent) {			
 			
-			
-			if(!$model->getMap()->isRelationship($fieldIndex) && !$model->getMap()->isParent($fieldIndex)) {
-	//			Checking and fixing by patterns the length FIELDTYPE(LENGTH)
-//				$fieldContent['field']['length'] = $fieldContent['field']['length'] == null || empty($fieldContent['field']['length']) ? 0 : $fieldContent['field']['length']; //determine if is not set
-				
+			if($this->getModel()->getMap()->isField($fieldIndex,true) ) {				
+//				Determine field options
 				unset($options);
 				foreach($fieldContent['field']['options'] as $optionIndex => $optionContent) {
 					$options .= !empty($options) && $options != null ? ' ' : '';
@@ -117,56 +114,66 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 				}
 				$fieldString .= $fieldString == null ?  '' : ", \r\n";
 				
-				
-				switch(strtolower($fieldContent['field']['type'])) {
-					case 'tinyblob':
-					case 'blob':
-					case 'mediumblob':
-					case 'longblob':
-					case 'tinytext':
-					case 'text':
-					case 'mediumtext':
-					case 'longtext':
-					case 'date':
-					case 'timestamp':
-						$length = '';
-					break;
-					case 'enum':
-						$fieldContent['field']['length'] = explode(',',$fieldContent['field']['length']);
-						unset($length);
-						foreach($fieldContent['field']['length'] as $value) {
-							$length .= $length != null ? ', ' : '';
-							$length .= sprintf("'%s'",$value);
-						}
-						$length = sprintf("(%s)", $length);
-					break;
-					default:
-						$fieldContent['field']['length'] = is_numeric(str_replace(',','.',$fieldContent['field']['length'])) ? $fieldContent['field']['length'] : sprintf("'%s'",$fieldContent['field']['length']); //determine if is int, float or string
-						$length = sprintf("(%s)", $fieldContent['field']['length']);
-					break;
-				}
-				
+				$length = $this->lengthToString($fieldContent['field']['type'], $fieldContent['field']['length']);				
 				
 				$fieldString .= sprintf("\t`%s` %s%s %s",$fieldContent['field']['column'],strtoupper($fieldContent['field']['type']), $length, $options);
-			} else if($model->getMap()->isParent($fieldIndex)) {
+			} else if($this->getModel()->getMap()->isParent($fieldIndex)) {
 				
 			}
 		}
 		
-		$sql = sprintf("CREATE TABLE `%s`.`%s` ( \r\n $fieldString \r\n); \r\n\r\n", $model->getConnection()->getDatabase(), $model->_tablename);
+		$sql = sprintf("CREATE TABLE `%s`.`%s` ( \r\n $fieldString \r\n); \r\n\r\n", $this->getModel()->getConnection()->getDatabase(), $this->getModel()->_tablename);
 		
 		if($execute == true) {
-			return $model->getDialect()->execute($sql);
+			return $this->getModel()->getDialect()->execute($sql);
+//			print "<pre>$sql</pre>";
 		} else {
 			return $sql;
 		}
 	}
 	
+	private function lengthToString($fieldType, $fieldLength) {
+		switch(strtolower($fieldType)) {
+			case 'tinyblob':
+			case 'blob':
+			case 'mediumblob':
+			case 'longblob':
+			case 'tinytext':
+			case 'text':
+			case 'mediumtext':
+			case 'longtext':
+			case 'date':
+			case 'timestamp':
+				$length = '';
+			break;
+			case 'enum':
+				$fieldLength = explode(',',$fieldLength);
+				unset($length);
+				foreach($fieldLength as $value) {
+					$length .= $length != null ? ', ' : '';
+					$length .= sprintf("'%s'",$value);
+				}
+				$length = sprintf("(%s)", $length);
+			break;
+			default:
+				$fieldLength = is_numeric(str_replace(',','.',$fieldLength)) ? $fieldLength : sprintf("'%s'",$fieldLength); //determine if is int, float or string
+				$length = sprintf("(%s)", $fieldLength);
+			break;
+		}
+		
+		return $length;
+	}
+	
 	private function fieldOptionToString($option, $value, $fieldContent) {
+//					print_r($fieldContent);
+//			print "<hr/>";
 		switch($option) {
 			case 'autoincrement':
 			case 'auto_increment':
-				return "AUTO_INCREMENT";
+				if(!$this->getModel()->getMap()->isParentKey($fieldContent['field']['name']))
+					return "AUTO_INCREMENT";
+				else
+					return null;
 			break;
 			case 'notnull':
 			case 'not_null':
@@ -176,7 +183,10 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 					return 'NULL';
 			break;
 			case 'primary':
-				return "PRIMARY KEY";
+					if(!$this->getModel()->getMap()->isParentKey($fieldContent['field']['name']))
+						return "PRIMARY KEY";
+					else 
+						return null;
 			break;
 			case 'defaultvalue':
 			case 'default_value':

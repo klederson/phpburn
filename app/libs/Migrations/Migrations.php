@@ -33,17 +33,19 @@ class PhpBURN_Migrations {
 				PhpBURN::import($packageConfig->package . '.' . $filename );
 				$model = new $filename;
 				
-				if($model instanceof PhpBURN_Core) {
+				if($model instanceof PhpBURN_Core && !empty($model->_tablename)) {
 					if($_SERVER['HTTP_HOST'])
 						print "<pre>";
 						
 					print sprintf("Creating %s table for %s model from %s package into %s database: ", $model->_tablename, get_class($model), $packageConfig->package, $packageConfig->database);
-					if( $model->getDialect()->migrate($model) ) {
+					if( $model->getDialect()->migrate() ) {
 						print "OK \r\n";
 					} else {
 						print "FAIL \r\n";
-					}				
+					}			
+					$model->__destruct();	
 				}
+				
 				unset($model);
 				if($_SERVER['HTTP_HOST'])
 						print "</pre>";

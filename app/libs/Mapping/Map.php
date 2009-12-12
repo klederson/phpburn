@@ -247,12 +247,42 @@ class PhpBURN_Map implements IMap {
 		}
 	}
 	
+	public function isField($index, $onlyTableFields = false) {
+//		Check for relationship
+		if($this->isRelationship($index)) {
+			return false;
+		} else if($this->isParent($index)) {
+//			Check for parent fields that have to be in the current model table
+			if(is_array($this->parentFieldsReferences))
+				foreach($this->parentFieldsReferences as $refIndex => $refContent) {
+					if($refContent == $index) {
+						return true;
+					}
+				}
+		} else if($this->fields[$index]['field']['name'] = $index) {
+			return true;
+		} else {
+			return false;
+		}
+	} 
+	
 	public function isParent($index) {
 		if($this->fields[$index]['classReference'] != get_class($this->getModel())) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	public function isParentKey($index) {
+		if(is_array($this->parentFieldsReferences))
+			foreach($this->parentFieldsReferences as $fieldIndex => $fieldName) {
+				if($fieldName == $index) {
+					return true;
+				}
+			}
+		
+		return false;
 	}
 	
 	public function addParentRelationShip() {
