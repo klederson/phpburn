@@ -42,5 +42,15 @@ abstract class Controller {
 	public function loadView($view, $data, $toVar = false) {
 		return PhpBURN_Views::loadView($view, $data, $toVar);
 	}
+	
+	public function callControllerMethod($controllerName, $method) {
+		$parms = func_get_args();
+		$parms = array_slice($parms,2);
+		
+		$filename = sprintf("%s.%s", SYS_CONTROLLER_PATH . DS . $controllerName, SYS_CONTROLLER_EXT);
+		require_once($filename);
+		
+		return call_user_func_array(array($controllerName,$method),$parms);
+	}
 }
 ?>

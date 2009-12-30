@@ -31,7 +31,7 @@ class Router {
 	 * </example>
 	 * @var String
 	 */
-	const MATCH_ALL = '([a-zA-Z0-9 _&%+]+)';
+	const MATCH_ALL = '([a-zA-Z0-9 _&%+.-]+)';
 	
 	/**
 	 * This constant is just a help to users find their better REGEX expression for eatch part into the url
