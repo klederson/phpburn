@@ -18,6 +18,25 @@ abstract class Controller {
 		
 	}
 	
+	public function getFilesFromFolder($folder, $extension = "*", $amount = null, $rand = true) {
+		$files = glob($folder . DS . $extension);
+		
+		if($rand == true) {
+			shuffle($files);
+		}
+		
+		foreach($files as $index => $value) {
+			$files[$index] = str_replace($folder,"",$files[$index]);
+		}
+		
+		$returnArray = $amount == null || !is_numeric($amount) ? $files : array_slice($files,0,$amount);
+		unset($files);
+		
+//		print_r($returnArray);
+		
+		return $returnArray;
+	}
+	
 	public function callErrorPage($page = '404') {
 		PhpBURN_Message::output('[!Calling error page:!] '.$page,PhpBURN_Message::ERROR);
 		require_once(SYS_VIEW_PATH . DS . '_errorPages' . DS . $page . '.php');
