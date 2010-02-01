@@ -165,44 +165,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 				
 		//Define Where SENTENCE
-		if(count($this->getModel()->_where) > 0) {
-			
-			
-			foreach($this->getModel()->_where as $index => $value) {
-				//Checking swhere and where
-				if(!is_array($value)) {
-					//Normal where
-					$whereConditions .= ($value);
-				} else {
-					//SuperWhere
-					$fieldInfo = $this->getModel()->getMap()->getField($value['start']);
-					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
-					$whereConditions .= sprintf(' %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$value['start'],$value['operator'],addslashes($value['end']));
-				}
-			}
-			
-			if($whereConditions != null && isset($whereConditions) && !empty($whereConditions)) {
-        		$conditions = 'WHERE ';
-			}
-		} else {
-			foreach ($this->getModel()->getMap()->fields as $field => $infos) {
-				if($this->getModel()->getMap()->getRelationShip($field) != true) {
-					$value = $this->getModel()->$field;
-					if(isset($value) && !empty($value) && $value != null && $value != '') {
-						$fieldInfo = $this->getModel()->getMap()->getField($field);
-						$whereConditions .= $whereConditions == null ? sprintf(' %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value)) : sprintf(' AND %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value));
-					}
-					unset($value);
-				}
-			}
-			
-			if($whereConditions != null && isset($whereConditions) && !empty($whereConditions)) {
-        		$conditions = 'WHERE ';
-			}
-		}
+		$whereConditions = $this->getWhereString($pk, $pkField);
 		
-		if($pk != null) {
-				$whereConditions .= $whereConditions == null ? sprintf('WHERE %s.%s="%s" ',$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],addslashes($pk));
+		if($whereConditions != null && isset($whereConditions) && !empty($whereConditions)) {
+        	$conditions = 'WHERE ';
 		}
 		
 		//Define OrderBY SENTENCE
@@ -217,11 +183,47 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		//Construct SQL
-		$sql = ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $orderConditions . ' ' . $limit . ';');
-		
+		$sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit);
 		unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass);
 		
 		return $sql;
+	}
+	
+	public function getWhereString($pk, $pkField) {
+		if(count($this->getModel()->_where) > 0) {
+			
+			foreach($this->getModel()->_where as $index => $value) {
+				//Checking swhere and where
+				if(!is_array($value)) {
+					//Normal where
+					$whereConditions .= ($value);
+				} else {
+					//SuperWhere
+					$fieldInfo = $this->getModel()->getMap()->getField($value['start']);
+					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
+					$whereConditions .= sprintf(' %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$value['start'],$value['operator'],addslashes($value['end']));
+				}
+			}
+			
+			
+		} else {
+			foreach ($this->getModel()->getMap()->fields as $field => $infos) {
+				if($this->getModel()->getMap()->getRelationShip($field) != true) {
+					$value = $this->getModel()->$field;
+					if(isset($value) && !empty($value) && $value != null && $value != '') {
+						$fieldInfo = $this->getModel()->getMap()->getField($field);
+						$whereConditions .= $whereConditions == null ? sprintf(' %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value)) : sprintf(' AND %s.%s %s "%s" ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value));
+					}
+					unset($value);
+				}
+			}
+		}
+		
+		if($pk != null) {
+				$whereConditions .= $whereConditions == null ? sprintf('%s.%s="%s" ',$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],addslashes($pk));
+		}
+		
+		return $whereConditions;
 	}
 	
 	public function getJoinString() {

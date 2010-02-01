@@ -16,7 +16,7 @@ PhpBURN::load('Connection.IConnection');
  * @author Klederson Bueno Bezerra da Silva
  *
  */
-class PhpBURN_Connection_MSSQL implements IConnection
+class PhpBURN_Connection_PDO_MSSQL implements IConnection
 {
 
 	const CLOSED							= 100201;
@@ -44,7 +44,7 @@ class PhpBURN_Connection_MSSQL implements IConnection
 	private $options;
 	private $state;
 	
-	public $mode = MSSQL_ASSOC;
+	public $mode = PDO::FETCH_ASSOC;
 	
 	private static $instance = null;
 	
@@ -52,7 +52,7 @@ class PhpBURN_Connection_MSSQL implements IConnection
 	{
 		if(self::$instance == null)
 		{
-			self::$instance = new PhpBURN_Connection_MSSQL();
+			self::$instance = new PhpBURN_Connection_PDO_MSSQL();
 		}
 		
 		return self::$instance;
@@ -72,11 +72,11 @@ class PhpBURN_Connection_MSSQL implements IConnection
 		$hostString = $this->getHost();
 		if($this->getPort() != '') 
 		{
-			$hostString .=  ',' . $this->getPort();
+			$hostString .=  ':' . $this->getPort();
 		}
 		if(isset($this->options['socket']) && $this->options['socket'] != '')
 		{
-			$hostString .= ',' . $this->options['socket'];
+			$hostString .= ':' . $this->options['socket'];
 		}
 		$flags = isset($this->options['flags']) ? $this->options['flags'] : null;
 					
@@ -196,11 +196,9 @@ class PhpBURN_Connection_MSSQL implements IConnection
 		$msg = '';
 		if($this->conn_id) 
 		{
-//			$msg = mssql_error($this->conn_id);
-			$msg = mssql_get_last_message();
+			$msg = mssql_error($this->conn_id);
 		} else {
-//			$msg = mssql_error();
-			$msg = mssql_get_last_message();
+			$msg = mssql_error();
 		}
 		return $msg;
 	}
@@ -264,7 +262,6 @@ class PhpBURN_Connection_MSSQL implements IConnection
 	{
 		//$this->dispatchEvent('preExecute', $this, $sql);
 		$this->connect();
-//		$sql = sprintf("USE [%s]; %s", $this->getDatabase(), $sql);		
 		$rs = @mssql_query($sql, $this->conn_id);
 		if( ! $rs )
 		{	

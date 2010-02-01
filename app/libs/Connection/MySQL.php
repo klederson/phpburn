@@ -52,7 +52,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		if(self::$instance == null)
 		{
-			self::$instance = new Lumine_Connection();
+			self::$instance = new PhpBURN_Connection_MySQL();
 		}
 		
 		return self::$instance;

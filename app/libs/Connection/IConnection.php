@@ -47,6 +47,7 @@ interface IConnection
 	public function escape($str);
 	public function escapeBlob($blob);
 	public function affected_rows();
+	public function last_id();
 	public function num_rows($rs);
 	public function random();
 	

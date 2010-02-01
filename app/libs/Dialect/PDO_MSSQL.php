@@ -12,7 +12,7 @@ PhpBURN::load("Dialect.IDialect");
  * @author Klederson Bueno <klederson@klederson.com>
  *
  */
-class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
+class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 		
 	/* Common Persistent Methods */
 	
@@ -103,7 +103,7 @@ class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
 		$this->getConnection()->mode = $mode;
 		
 		if (empty($mode))
-			$this->getConnection()>mode(MSSQL_ASSOC);
+			$this->getConnection()>mode(PDO::FETCH_ASSOC);
 	}
 	
 	

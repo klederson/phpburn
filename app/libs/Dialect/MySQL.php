@@ -77,6 +77,10 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 		}
 	}
 	
+	public function buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit, $extras = null) {		
+		return ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $orderConditions . ' ' . $limit . ';');
+	}
+	
 	/* Auxiliar Methods */
 	
 	protected function handleSelect() {
@@ -87,7 +91,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 		$alias = $alias = null ? $name : $alias;
 	}
 
-	public function setMysqlMode($mode = "") {
+	public function setMode($mode = "") {
 		$this->getConnection()->mode = $mode;
 		
 		if (empty($mode))
