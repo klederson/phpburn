@@ -264,7 +264,8 @@ class PhpBURN_Connection_MSSQL implements IConnection
 	{
 		//$this->dispatchEvent('preExecute', $this, $sql);
 		$this->connect();
-//		$sql = sprintf("USE [%s]; %s", $this->getDatabase(), $sql);		
+		$sql = stripslashes(sprintf("USE [%s]; %s", $this->getDatabase(), $sql));		
+//		PhpBURN_Message::output($sql);
 		$rs = @mssql_query($sql, $this->conn_id);
 		if( ! $rs )
 		{	

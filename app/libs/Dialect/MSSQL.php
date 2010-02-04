@@ -58,6 +58,11 @@ class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
 		return $this->dataSet[$rowNumber];
 	}
 	
+	public function execute($sql) {
+		$sql = stripslashes($sql);
+		return parent::execute($sql);
+	}
+	
 	/* Functional Methods */
 		
 	public function resultToObject(array $resultSet) {
