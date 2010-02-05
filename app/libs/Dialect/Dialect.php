@@ -183,7 +183,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		//Construct SQL
-		$sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit);
+		$sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit,$limits);
 		unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass);
 		
 		return $sql;

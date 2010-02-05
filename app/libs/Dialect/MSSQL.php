@@ -70,17 +70,26 @@ class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
 	}
 	
 	public function setLimit($offset = null, $limit = null) {
-		$innerSQL = sprintf("%s %s %s %s %s %s ",$fields, $from, $joinString, $conditions, $whereConditions, $orderConditions);
+		$parms = func_get_args();
+				
+		$fields = $parms[2];
+		$from = $parms[3];
+		$joinString = $parms[4];
+		$whereConditions = $parms[5];
+		$conditions = $parms[6];
+		$orderConditions = $parms[7];
+		
+		$innerSQL = sprintf("%s %s %s %s %s",$fields, $from, $joinString, $conditions, $whereConditions);
 		
 		if($offset == null && $limit == null)
 		{
 			return;
 		} else if($offset == null && $limit != null) {
-			$sql = sprintf("SELECT TOP %s * FROM ( SELECT ROW_NUMBER() OVER (%s) AS RowNumber, %s ) AS  _MyResults", $limit, $orderConditions, $innerSQL);
+			$sql = sprintf("SELECT TOP %s * FROM ( SELECT ROW_NUMBER() OVER (%s) AS _rowNumber_, %s ) AS  _results_", $limit, $orderConditions, $innerSQL);
 		} else if($offset != null && $limit == null) {
-			$sql = sprintf("SELECT TOP %s * FROM ( SELECT ROW_NUMBER() OVER (%s) AS RowNumber, %s ) AS  _MyResults", $offset, $orderConditions, $innerSQL);
+			$sql = sprintf("SELECT TOP %s * FROM ( SELECT ROW_NUMBER() OVER (%s) AS _rowNumber_, %s ) AS  _results_", $offset, $orderConditions, $innerSQL);
 		} else {
-			$sql = sprintf("SELECT TOP %s * FROM ( SELECT ROW_NUMBER() OVER (%s) AS RowNumber, %s ) AS  _MyResults WHERE  RowNumber > %s", $limit, $orderConditions, $innerSQL, $offset);
+			$sql = sprintf("SELECT TOP %s * FROM ( SELECT ROW_NUMBER() OVER (%s) AS _rowNumber_, %s ) AS  _results_ WHERE  _rowNumber_ > %s", $limit, $orderConditions, $innerSQL, $offset);
 		}
 		
 		return $sql;
@@ -88,7 +97,8 @@ class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
 	
 	public function buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit, $extras = null) {
 		if($limit != null) {
-			return $limit;
+//			return $limit;
+			return $this->setLimit($extras[0], $extras[1],$fields, $from, $joinString, $conditions, $whereConditions, $orderConditions);
 		} else {
 			return ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $orderConditions . ';');
 		}
