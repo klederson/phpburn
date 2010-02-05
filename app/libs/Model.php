@@ -654,7 +654,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				
 //				Define HOW TO FIND
 				$conditionString = count($this->$fieldInfo['alias']->_where) > 0 ? ' AND ' : '';
-				$whereString = sprintf('%s `%s`.`%s` = "%s"',$conditionString, $this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
+				$this->$fieldInfo['thisKey'] = !is_numeric($this->$fieldInfo['thisKey']) ? sprintf("'%s'",$this->$fieldInfo['thisKey']) : $this->$fieldInfo['thisKey'];
+				
+				$whereString = sprintf('%s %s.%s = %s',$conditionString, $this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
 				$this->$fieldInfo['alias']->where($whereString);
 				
 				return $this->$fieldInfo['alias']->find();

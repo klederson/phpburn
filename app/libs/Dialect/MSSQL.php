@@ -133,13 +133,13 @@ class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
 				
 				$length = $this->lengthToString($fieldContent['field']['type'], $fieldContent['field']['length']);				
 				
-				$fieldString .= sprintf("\t`%s` %s%s %s",$fieldContent['field']['column'],strtoupper($fieldContent['field']['type']), $length, $options);
+				$fieldString .= sprintf("\t%s %s%s %s",$fieldContent['field']['column'],strtoupper($fieldContent['field']['type']), $length, $options);
 			} else if($this->getModel()->getMap()->isParent($fieldIndex)) {
 				
 			}
 		}
 		
-		$sql = sprintf("CREATE TABLE `%s`.`%s` ( \r\n $fieldString \r\n); \r\n\r\n", $this->getModel()->getConnection()->getDatabase(), $this->getModel()->_tablename);
+		$sql = sprintf("CREATE TABLE %s.%s ( \r\n $fieldString \r\n); \r\n\r\n", $this->getModel()->getConnection()->getDatabase(), $this->getModel()->_tablename);
 		
 		if($execute == true) {
 			return $this->getModel()->getDialect()->execute($sql);

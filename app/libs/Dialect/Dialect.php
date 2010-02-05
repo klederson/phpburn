@@ -201,7 +201,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					//SuperWhere
 					$fieldInfo = $this->getModel()->getMap()->getField($value['start']);
 					
-					$value['end'] = !(string)$value['end'] ? $value['end'] : sprintf("'%s'",$value['end']);
+					$value['end'] = is_numeric($value['end']) ? $value['end'] : sprintf("'%s'",$value['end']);
 					
 					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
 					$whereConditions .= sprintf(' %s.%s %s %s ',$fieldInfo['field']['tableReference'],$value['start'],$value['operator'],addslashes($value['end']));
@@ -216,7 +216,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					if(isset($value) && !empty($value) && $value != null && $value != '') {
 						$fieldInfo = $this->getModel()->getMap()->getField($field);
 						
-						$value = !(string)$value ? $value : "'$value'";
+						$value = is_numeric($value) ? $value : "'$value'";
 						
 						$whereConditions .= $whereConditions == null ? sprintf(' %s.%s %s %s ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value)) : sprintf(' AND %s.%s %s %s ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',addslashes($value));
 					}
@@ -226,9 +226,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		if($pk != null) {
-				$pk = !(string)$pk ? $pk: sprintf("'%s'",$pk);
+				$pk = is_numeric($pk) ? $pk : sprintf("'%s'",$pk);
 				
-				$whereConditions .= $whereConditions == null ? sprintf('%s.%s= %s ',$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s='%s' ",$this->getModel()->_tablename,$pkField['field']['column'],addslashes($pk));
+				$whereConditions .= $whereConditions == null ? sprintf('%s.%s= %s ',$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s= %s ",$this->getModel()->_tablename,$pkField['field']['column'],addslashes($pk));
 		}
 		
 		return $whereConditions;
@@ -246,9 +246,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			$joinString .= sprintf('%s %s', $value['type'], $index);
 			if($value['fieldLeft']  != null && $value['fieldRight']  != null) {
 				
-				$rightSide = $value['tableRight'] == null ? sprintf('"%s"', $value['fieldRight']) : sprintf('`%s`.`%s`', $value['tableRight'], $value['fieldRight']);
+				$rightSide = $value['tableRight'] == null ? sprintf('"%s"', $value['fieldRight']) : sprintf('%s.%s', $value['tableRight'], $value['fieldRight']);
 				
-				$joinString .= sprintf(" ON `%s`.`%s` %s %s", $value['tableLeft'], ($value['fieldLeft']), $value['operator'], $rightSide);
+				$joinString .= sprintf(" ON %s.%s %s %s", $value['tableLeft'], ($value['fieldLeft']), $value['operator'], $rightSide);
 			}
 		}
 		
