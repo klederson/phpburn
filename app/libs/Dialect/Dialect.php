@@ -201,7 +201,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					//SuperWhere
 					$fieldInfo = $this->getModel()->getMap()->getField($value['start']);
 					
-					$value['end'] = is_numeric($value['end']) ? $value['end'] : sprintf("'%s'",$value['end']);
+					$value['end'] = is_numeric($value['end']) || strpos($value['end'],'LIKE (') !== false ? $value['end'] : sprintf("'%s'",$value['end']);
 					
 					$whereConditions .= $whereConditions == null ? "" : sprintf(" %s ",$value['condition']);
 					$whereConditions .= sprintf(' %s.%s %s %s ',$fieldInfo['field']['tableReference'],$value['start'],$value['operator'],addslashes($value['end']));

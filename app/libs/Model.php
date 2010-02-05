@@ -416,14 +416,18 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $field
 	 * @param String $condition
 	 */
-	public function like($field, $content, $condition = null) {
-		if(count($this->_where) > 0) {
-			$condition = $condition == null ? 'AND' : $condition;
-			$field = sprintf(' %s %s', $condition, $field);
-		}
+	public function like($field, $content, $condition = 'AND') {
 		
-		$strLike = sprintf("%s LIKE (%s)", $field, $condition);
-		$this->where($strLike);
+		
+		$conditions = array();
+		$conditions['start'] = $field;
+		$conditions['end'] = sprintf("LIKE ('%s')", $content);
+		$conditions['operator'] = null; //$this->convertWhereOperators($stringOperator);
+		$conditions['condition'] = $condition;
+		
+//		print $strLike = sprintf("%s LIKE ('%s')", $field, $content);
+		
+		array_push($this->_where, $conditions);
 	}
 	
 	

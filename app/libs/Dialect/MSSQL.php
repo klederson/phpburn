@@ -79,7 +79,7 @@ class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
 		$conditions = $parms[6];
 		$orderConditions = $parms[7];
 		
-		$innerSQL = sprintf("%s %s %s %s %s",$fields, $from, $joinString, $conditions, $whereConditions);
+		$innerSQL = sprintf("%s %s %s %s %s",$fields, $from, $joinString, $whereConditions, $conditions);
 		
 		if($offset == null && $limit == null)
 		{
