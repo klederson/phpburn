@@ -655,6 +655,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				
 //				Current Model table
 				$this->$fieldInfo['alias']->join($this->_tablename,$fieldInfo['thisKey'],$fieldInfo['relKey'],'=', 'JOIN',$fieldInfo['relTable']);
+
 				
 //				Define HOW TO FIND
 				$conditionString = count($this->$fieldInfo['alias']->_where) > 0 ? ' AND ' : '';
@@ -748,6 +749,25 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			}
 
 			$this->$linkName->limit($offset, $limit);
+			
+			return true;
+			
+		} else {
+			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
+			
+			return false;
+		}	
+	}
+	
+	public function _linkLike($linkName, $field, $content, $condition = 'AND') {
+		if( $this->getMap()->getRelationShip($linkName) == true ) {
+			$infos = $this->getMap()->fields[$linkName];
+			
+			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+					$this->$linkName = new $infos['isRelationship']['foreignClass'];
+			}
+
+			$this->$linkName->like($field, $content, $condition);
 			
 			return true;
 			
