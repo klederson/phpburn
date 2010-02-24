@@ -370,8 +370,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $field
 	 * @param String $alias
 	 */
-	public function select($field, $alias = null) {
+	public function select($field, $alias = null, $override = false) {
 		$alias = $alias == null ? $field : $alias;
+                if($override == true) {
+			unset($this->_select);
+			$this->_select = array();
+		}
 		array_push($this->_select, array('value'=>$field, 'alias'=>$alias));
 	}
 		
@@ -695,23 +699,26 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * 
 	 * @return Boolean
 	 */
-	public function _linkWhere($linkName, $condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
-		if( $this->getMap()->getRelationShip($linkName) == true ) {
-			$infos = $this->getMap()->fields[$linkName];
-			
-			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
-					$this->$linkName = new $infos['isRelationship']['foreignClass'];
-			}
+	public function _linkWhere($linkName, $condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
+            $existis = $this->getMap()->getRelationShip($linkName);
+            
+            if($existis) {
+                $infos = $this->getMap()->fields[$linkName];
 
-			$this->$linkName->swhere($condition_start, $stringOperator, $conditon_end, $condition, $override);
-			
-			return true;
-			
-		} else {
-			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
-			
-			return false;
-		}
+                if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+                    $this->$linkName = new $infos['isRelationship']['foreignClass'];
+                }
+            }
+
+            if($existis == true && $stringOperator == null && $condition_start != null) {
+                $this->$linkName->where($condition_start);
+            } else if( $existis == true && $stringOperator != null ) {
+                $this->$linkName->swhere($condition_start, $stringOperator, $conditon_end, $condition, $override);
+                return true;
+            } else {
+                PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]');
+                return false;
+            }
 	}
 	
 	/**
