@@ -132,8 +132,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $sql
 	 * @return Integer
 	 */
-	public function find($pk = null) {		
-		return $this->getDialect()->find($pk);
+	public function find($pk = null, $fluid = false) {
+		return $fluid == false ? $this->getDialect()->find($pk) : $this;
 	}
 	
 	/**
@@ -603,8 +603,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Integer $limit
 	 * @return PhpBURN_Core
 	 */
-	public function getRelationship($name, $linkWhere = null, $offset = null, $limit = null) {
-		return self::_getLink($name, $linkWhere, $offset, $limit);
+	public function getRelationship($name, $fluid = false, array $options = array()) {
+		return self::_getLink($name, $fluid, $options);
 	}
 	
 	/**
@@ -616,8 +616,16 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Integer $limit
 	 * @return PhpBURN_Core
 	 */
-	public function _getLink($name, $linkWhere = null, $offset = null, $limit = null) {
+	public function _getLink($name, $fluid = false, array $options = array()) {
 		//Cheking if the link existis
+
+                $defaultOptions = array(
+                    "offset"    => null,
+                    "limit"     => null
+                );
+
+                $options = array_merge($defaultOptions, $options);
+
 		$fieldInfo = $this->getMap()->getRelationShip($name, true);
 		
 		if($fieldInfo == false) {
