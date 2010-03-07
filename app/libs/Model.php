@@ -660,7 +660,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 					exit;
 				}
 				
-				return $amount;
+				return $fluid == false ? $amount : $this;
 			break;
 			
 			case self::ONE_TO_MANY:
@@ -669,7 +669,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);		
 								
-				return $this->$fieldInfo['alias']->find();			
+				return $fluid == false ? $this->$fieldInfo['alias']->find() : $this;
 			break;
 			
 			case self::MANY_TO_MANY:
@@ -689,7 +689,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$whereString = sprintf('%s %s.%s = %s',$conditionString, $this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
 				$this->$fieldInfo['alias']->where($whereString);
 				
-				return $this->$fieldInfo['alias']->find();
+				return $fluid == false ? $this->$fieldInfo['alias']->find() : $this;
 				
 			break;
 		}
