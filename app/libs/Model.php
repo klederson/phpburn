@@ -133,7 +133,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return Integer
 	 */
 	public function find($pk = null, $fluid = false) {
-		return $fluid == false ? $this->getDialect()->find($pk) : $this;
+            $amount = $this->getDialect()->find($pk);
+            return $fluid == false ? $amount : $this;
 	}
 	
 	/**
@@ -669,7 +670,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);		
 								
-				return $fluid == false ? $this->$fieldInfo['alias']->find() : $this;
+				return $this->$fieldInfo['alias']->find(null, $fluid);
 			break;
 			
 			case self::MANY_TO_MANY:
@@ -689,7 +690,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$whereString = sprintf('%s %s.%s = %s',$conditionString, $this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
 				$this->$fieldInfo['alias']->where($whereString);
 				
-				return $fluid == false ? $this->$fieldInfo['alias']->find() : $this;
+				return $this->$fieldInfo['alias']->find(null, $fluid);
 				
 			break;
 		}
