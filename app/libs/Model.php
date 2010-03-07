@@ -661,7 +661,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 					exit;
 				}
 				
-				return $fluid == false ? $amount : $this;
+				return $fluid == false ? $amount : $this->$fieldInfo['alias'];
 			break;
 			
 			case self::ONE_TO_MANY:
