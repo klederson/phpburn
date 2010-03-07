@@ -58,6 +58,8 @@ class PhpBURN_Map implements IMap {
 		foreach($this->fields as $index => $value) {
 			$this->setFieldValue($index,'');
 		}
+
+                return $this;
 	}
 	
 	/**
@@ -74,6 +76,8 @@ class PhpBURN_Map implements IMap {
 		} else {
 			$this->mapFromCode();
 		}
+
+                return $this;
 	}
 	
 	public function cloneAttributes() {
@@ -100,7 +104,8 @@ class PhpBURN_Map implements IMap {
 				$this->parentFieldsReferences[$index] = $value;
 			}
 		}
-		
+
+                return $this;
 	}
 	
 	/**
@@ -237,6 +242,8 @@ class PhpBURN_Map implements IMap {
 		//$this->fields[$relName]['parentLinkField'] = 'false'; 
 		//Setup defaultvalue for this field
 		$this->setFieldValue($relName,null);
+
+                return $this;
 	}
 	
 	public function isRelationship($index) {
@@ -304,7 +311,7 @@ class PhpBURN_Map implements IMap {
 		$this->fields[$name]['classReference'] = get_class($this->getModel());
 		$this->fields[$name]['parentLinkField'] = true;
 		
-		
+		return $this;
 	}
 	
 	public function getParentFields() {
@@ -400,6 +407,8 @@ class PhpBURN_Map implements IMap {
 			//Setup defaultvalue for this field
 			$options['defaultvalue'] = $options['defaultvalue'] != null ? $options['defaultvalue'] : null;
 			$this->setFieldValue($name,$options['defaultvalue']);
+
+                        return $this;
 	}
 	
 	public function getPrimaryKey() {
@@ -442,6 +451,8 @@ class PhpBURN_Map implements IMap {
 		if($index == 'column' && $value == $myCompare) {
 			PhpBURN_Message::output("[!Duplicated Column!]: $myCompare",PhpBURN_Message::EXCEPTION);
 		}
+
+                return $this;
 	}
 	
 	/**
@@ -491,7 +502,7 @@ class PhpBURN_Map implements IMap {
 		
 		$this->fields[$field]['#value'] = $this->getModel()->$field = $value;
 		$this->getFieldValue($field);
-		
+		return $this;
 	}
 	
 	/**

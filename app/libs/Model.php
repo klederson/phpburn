@@ -31,31 +31,31 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	const ONE_TO_ONE 						= 100101;
 	const ONE_TO_MANY 						= 100102;
 	const MANY_TO_ONE 						= 100103;
-	const MANY_TO_MANY 					= 100104;
+	const MANY_TO_MANY                                              = 100104;
 	
 	//Query types
 	//@TODO We do not use the term SQL because in the future we want to expand phpBURN to NON-SQL databases and/or even possibles new kinds of database such as CouchDB
 	const QUERY_SELECT						= 100001;
-	const QUERY_SELECT_COUNT			= 100002;
+	const QUERY_SELECT_COUNT                                        = 100002;
 	const QUERY_UPDATE						= 100003;
 	const QUERY_INSERT						= 100004;
 	const QUERY_DELETE						= 100005;
-	const QUERY_MULTI_INSERT			= 100006;
+	const QUERY_MULTI_INSERT                                        = 100006;
 	
 	//Internal objects
-	public $_connObj							= null;
+	public $_connObj                                                = null;
 	public $_mapObj							= null;
-	public $_dialectObj							= null;
+	public $_dialectObj						= null;
 	
 	//Fields mapping
-	public $_fields								= array();
+	public $_fields							= array();
 	
 	//Persistent methods storage
-	public $_where								= array();
-	public $_orderBy							= array();
-	public $_limit									= null;
-	public $_select								= array();
-	public $_join									= array();
+	public $_where							= array();
+	public $_orderBy						= array();
+	public $_limit							= null;
+	public $_select							= array();
+	public $_join							= array();
 	
 	/**
 	 * This is an automatic configuration when a model inherit another PhpBURN Model
@@ -268,6 +268,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_join[$tableLeft]['operator'] 				= $operator;
 		$this->_join[$tableLeft]['type']						= $joinType;
 		$this->_join[$tableLeft]['tableRight'] 			= $tableRight;
+
+                return $this;
 	}
 	
 	/**
@@ -279,7 +281,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $operator
 	 */
 	public function joinLeft($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'LEFT JOIN');
+		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'LEFT JOIN');
 	}
 	
 	/**
@@ -291,7 +293,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $operator
 	 */
 	public function joinRight($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'RIGHT JOIN');
+		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'RIGHT JOIN');
 	}
 	
 	/**
@@ -303,7 +305,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $operator
 	 */
 	public function joinInner($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'INNER JOIN');
+		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'INNER JOIN');
 	}
 	
 	/**
@@ -315,7 +317,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $operator
 	 */
 	public function joinOutter($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		$this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'OUTTER JOIN');
+		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'OUTTER JOIN');
 	}
 	
 	/**
@@ -354,6 +356,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		}
 		
 		array_push($this->_where, $conditions);
+
+                return $this;
 	}
 	
 	public function from($conditions, $override = false) {
@@ -362,6 +366,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			$this->_from = array();
 		}
 		array_push($this->_from, $conditions);
+
+                return $this;
 	}
 	
 	/**
@@ -377,6 +383,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			$this->_select = array();
 		}
 		array_push($this->_select, array('value'=>$field, 'alias'=>$alias));
+
+                return $this;
 	}
 		
 	/**
@@ -409,7 +417,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		}
 		
 		array_push($this->_where, $conditions);
-
+                return $this;
 	}
 	
 	/**
@@ -432,6 +440,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 //		print $strLike = sprintf("%s LIKE ('%s')", $field, $content);
 		
 		array_push($this->_where, $conditions);
+                return $this;
 	}
 	
 	
@@ -548,7 +557,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @see app/libs/IPhpBurn#delete()
 	 */
 	public function delete($pk = null) {
-		$this->getDialect()->delete($pk);
+		return $this->getDialect()->delete($pk);
 	}
 	
 	/**
@@ -569,6 +578,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$_tmpOrder['type'] = $orderType;
 		
 		array_push($this->_orderBy, $_tmpOrder);
+
+                return $this;
 	}
 	
 	/**
@@ -577,6 +588,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 */
 	public function limit($offset = null, $limit = null) {
 		$this->_limit = $limit == null ? $offset : $offset . ',' . $limit;
+
+                return $this;
 	}
 	
 //	Relationships functions
@@ -880,16 +893,32 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Boolean $full
 	 * @return Array
 	 */
-	public function toArray($recursive = true, $full = false) {
+	public function toArray($recursive = true, $full = false, $insane = false) {
 		$return = array();
 		foreach($this->getMap()->fields as $fieldName => $info) {
-			if($this->getMap()->getRelationShip($fieldName) == true) {
-				if(get_parent_class($this->$fieldName) == 'PhpBURN_Core') {
-					if(count($this->$fieldName->getDialect()->dataSet) > 0)					
-					foreach($this->$fieldName->getDialect()->dataSet as $index => $value) {
-						$return[$fieldName][] = $this->$fieldName->toArray();
-					}
-				}
+			if($this->getMap()->getRelationShip($fieldName) == true && $recursive == true) {
+//				if(get_parent_class($this->$fieldName) == 'PhpBURN_Core') {
+//					if(count($this->$fieldName->getDialect()->dataSet) > 0)
+//					foreach($this->$fieldName->getDialect()->dataSet as $index => $value) {
+//						$return[$fieldName][] = $this->$fieldName->toArray();
+//					}
+//				}
+//
+                            if($full == true) {
+                                if( ($this->$fieldName instanceof PhpBURN_Core) && $insane == false) {
+                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full);
+                                } else if($insane==true){
+                                    if($this->$fieldName instanceof PhpBURN_Core) {
+                                        $this->$fieldName->find();
+                                        $this->$fieldName->getDialect()->moveFirst();
+                                    } else {
+                                        $this->getRelationship($fieldName);
+                                    }
+
+                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full, $insane);
+                                }
+                            }
+
 			} else {
 				$return[$fieldName] = $this->getMap()->getFieldValue($fieldName);
 			}
