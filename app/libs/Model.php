@@ -525,7 +525,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			*/
 		}
 		
-		return $result;
+		return $this;
 	}
 
 	/**
