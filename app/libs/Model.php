@@ -523,9 +523,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				}
 			}
 			*/
+
+                        return $this;
 		}
 		
-		return $this;
+		return $result;
 	}
 
 	/**
@@ -538,8 +540,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			if($amount > 1 && $pk != null) {
 				PhpBURN_Message::output('[!There are more than one results for primary key!]: '. $pk, PhpBURN_Message::WARNING);
 			}
-			$this->fetch();
-			return true;
+			return $this->fetch();
 		} else {
 			return false;
 		}
