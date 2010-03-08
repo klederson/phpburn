@@ -735,11 +735,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
             if($existis == true && $stringOperator == null && $condition_start != null) {
                 $this->$linkName->where($condition_start);
+                return $this;
             } else if( $existis == true && $stringOperator != null ) {
                 $this->$linkName->swhere($condition_start, $stringOperator, $conditon_end, $condition, $override);
-                return true;
+            
+                return $this;
             } else {
-                PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]');
+                PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]',PhpBURN_Message::ERROR);
                 return false;
             }
 	}
@@ -779,11 +781,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			}
 
 			$this->$linkName->limit($offset, $limit);
-			
-			return true;
-			
+			return $this;
 		} else {
-			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
+			PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
 			
 			return false;
 		}	
@@ -798,11 +798,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			}
 
 			$this->$linkName->like($field, $content, $condition);
-			
-			return true;
-			
+			return $this;
 		} else {
-			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
+			PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
 			
 			return false;
 		}	
@@ -827,11 +825,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			}
 
 			$this->$linkName->order($field, $orderType, $override);
-			
-			return true;
-			
+                        return $this;
 		} else {
-			PhpBURN_Message::output($linkName . ' [!is not a valid relationship!]');
+			PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
 			
 			return false;
 		}	
