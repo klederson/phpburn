@@ -377,13 +377,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $field
 	 * @param String $alias
 	 */
-	public function select($field, $alias = null, $override = false) {
+	public function select($field, $alias = null, $only = true, $override = false) {
 		$alias = $alias == null ? $field : $alias;
                 if($override == true) {
 			unset($this->_select);
 			$this->_select = array();
 		}
-		array_push($this->_select, array('value'=>$field, 'alias'=>$alias));
+		array_push($this->_select, array('value'=>$field, 'alias'=>$alias, 'only' => $only));
 
                 return $this;
 	}

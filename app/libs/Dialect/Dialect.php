@@ -149,7 +149,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			//Select based ONLY in the $obj->select(); method
 			foreach($this->getModel()->_select as $index => $value) {
 				$fields .= $fields == null ? "" : ", ";
-				$fields .= sprintf("%s.%s AS %s", $value['field']['tableReference'], $value['value'], $value['alias']);
+				$fields .= sprintf("%s AS %s", $value['value'], $value['alias']);
 			}
 		} else {
 			$model = get_class($this->modelObj);
