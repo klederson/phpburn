@@ -117,10 +117,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
         public function __cloneSubObjects() {
             foreach($this->getMap()->fields as $index => $field) {
-                if($this->$index instanceof PhpBURN_Core) {
+                if($this->$index instanceof PhpBURN_Core && $this->getMap()->isRelationship($index)) {
                     $this->$index = clone ($this->$index);
 //                  I Still don't know why, but it works!
-//                  @TODO this works to work arround a PHP issue
                     $this->$index = null;
                 }
             }
