@@ -781,6 +781,26 @@ abstract class PhpBURN_Core implements IPhpBurn {
                 return false;
             }
 	}
+
+        public function _linkJoin($linkName, $tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null) {
+            $existis = $this->getMap()->getRelationShip($linkName);
+
+            if($existis) {
+                $infos = $this->getMap()->fields[$linkName];
+
+                if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+                    $this->$linkName = new $infos['isRelationship']['foreignClass'];
+                }
+            }
+
+            if($existis == true && $tableLeft != null) {
+                $this->$linkName->join($tableLeft, $fieldLeft, $fieldRight, $operator, $joinType, $tableRight);
+                return $this;
+            } else {
+                PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]',PhpBURN_Message::ERROR);
+                return false;
+            }
+        }
 	
 	/**
 	 * Just checks if a model exists based on the configured packages you just have to know the name
