@@ -107,7 +107,24 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		//Then now we have all set... let's rock!
 		$this->_initialize();
+
+                
 	}
+
+        public function __clone() {
+            $this->__cloneSubObjects();
+        }
+
+        public function __cloneSubObjects() {
+            foreach($this->getMap()->fields as $index => $field) {
+                if($this->$index instanceof PhpBURN_Core) {
+                    $this->$index = clone ($this->$index);
+//                  I Still don't know why, but it works!
+//                  @TODO this works to work arround a PHP issue
+                    $this->$index = null;
+                }
+            }
+        }
 	
 	/**
 	 * PHP Magic method that starts when you initialize a class/model
@@ -758,7 +775,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
             }
 
             if($existis == true && $field != null && $alias != null) {
-                $this->$linkName->select($field, $alias, $only, $overrride);
+                $this->$linkName->select($field, $alias, $only, $override);
                 return $this;
             } else {
                 PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]',PhpBURN_Message::ERROR);
