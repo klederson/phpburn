@@ -37,12 +37,11 @@ abstract class PhpBURN {
 			} else {
 				return "error";
 			}
-			
-			
+	
 		}
 	}
 	
-	public function loadModule() {
+	public static function loadModule() {
 		$args = func_get_args();
 		foreach($args as $module) {
 			PhpBURN::loadConfig($module);
@@ -50,7 +49,7 @@ abstract class PhpBURN {
 		}
 	}
 	
-	public function loadConfig($moduleName) {
+	public static function loadConfig($moduleName) {
 		$configFile = strtolower($moduleName) . '.php';
 		
 		require_once(SYS_APPLICATION_PATH . DS . 'config' . DS . $configFile);
@@ -73,21 +72,24 @@ abstract class PhpBURN {
 	public static function import() {
 		$args = func_get_args();
 		
-		foreach($args as $libname)
+		foreach($args as $libName)
 		{
-			$lines = explode('.',$libname);
+//                      @TODO DEPRECATED WAY, WILL BE REMOVED AT Version 2
+			$lines = explode('.',$libName);
 			$config = PhpBURN_Configuration::getConfig($lines[0]);
-			
-			$basedir = $config->class_path;
-			$libname = preg_replace('@^PhpBURN_@', '', $libname);
-			$newfile = $basedir . str_replace('.', DIRECTORY_SEPARATOR, $libname). '.php';
+			$baseDir = $config->class_path;
+			$libName = preg_replace('@^PhpBURN_@', '', $libName);
+
+//                      GENERIC FOR SPL_AUTOLOAD USAGE
+                        $libName = preg_replace('([^.]*\.)', $replacement, $libName);
+			$newFile = count($lines) > 1 ? $baseDir . $config->package . DS . $libName . SYS_MODEL_EXT : $libName . SYS_MODEL_EXT;
 		
-			if(file_exists($newfile)) {
-				PhpBURN_Message::output('[!Loading Model!]: '. $newfile, null, PhpBURN_Message::LOW);
-				require_once $newfile;
+			if(require_once($newFile)) {
+				PhpBURN_Message::output('[!Loading Model!]: '. $newFile, null, PhpBURN_Message::LOW);
+//				require_once($newFile);
 			} else {
-				return "error";
-			}			
+				return false;
+			}
 		}
 	}
 	
@@ -147,8 +149,26 @@ abstract class PhpBURN {
 		}
 		return $content;
 	}
-	
-	public function startApplication() {
+
+        /**
+         * Starts the PhpBURN Application - Should be called at the index of the application
+         * <code>
+         * PhpBURN::StartApplication();
+         * </code>
+         */
+	public static function startApplication() {
+//              Setting up Model
+                if(array_search('PhpBURN_Core', get_declared_classes()) == true) {
+//                  Adds Models Paths to include Path
+                    $packages = PhpBURN_Configuration::getConfig();
+                    foreach($packages as $package => $configItem) {
+                        $includePath = get_include_path();
+                        $separator = strpos($includePath, ':') !== false ? ':' : ';';
+                        set_include_path($includePath . $separator . $configItem->class_path . DS . $package);
+                    }
+                }
+
+//              Setting up Controller
 		if(array_search('Controller',get_declared_classes()) == true) {
 			PhpBURN::load('Tools.Util.Router');
 			include_once(SYS_APPLICATION_PATH . DS . 'config' . DS . 'routes.php');
@@ -163,12 +183,24 @@ abstract class PhpBURN {
 			}
 		}
 	}
-	
-	public function redirect($direction) {
+
+        /**
+         * Redirects the page to a location based on Controller names
+         * @example PhpBURN::redirect('main/my_profile');
+         * <code>
+         * PhpBURN::redirect('main/my_profile');
+         * </code>
+         * @param String $direction
+         */
+	public static function redirect($direction) {
 		echo "<script> document.location='".SYS_BASE_URL."$direction'; </script>";
 	}
-	
-	public function go($index) {
+
+        /**
+         * Moves trought the Browser History
+         * @param Number $index
+         */
+	public static function go($index) {
 		echo "<script> document.history($index) </script>";
 	}
 }

@@ -71,7 +71,7 @@ class PhpBURN_Configuration {
 	 * @param String $package
 	 * @return Array
 	 */
-	public function getConfig($package = null) {
+	public static function getConfig($package = null) {
 		if($package == null) {
 			return self::$options;
 		} else {

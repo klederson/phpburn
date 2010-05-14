@@ -5,6 +5,7 @@
  *
  */
 interface IPhpBurn {
+        
 	public function get();
 	
 	public function find();

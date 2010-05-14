@@ -23,7 +23,7 @@ class phpBURN_ConfigurationItem {
 		 */
 		$class_attr = (get_class_vars(get_class($this)));
 		foreach($class_attr as $key => $value) {
-			$this->$key = $config[$key];
+                    $this->$key = $config[$key];
 		}
 		
 		/**

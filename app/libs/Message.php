@@ -55,7 +55,7 @@ class PhpBURN_Message {
   	 * 
   	 * @param Integer $mode
   	 */
-  	public function setMode($mode = self::BROWSER) {
+  	public static function setMode($mode = self::BROWSER) {
   		self::$mode = $mode;
   	}
   	
@@ -64,7 +64,7 @@ class PhpBURN_Message {
   	 * 
   	 * @param PhpBURN_Model $databaseModel
   	 */
-  	public function setDatabaseModel(PhpBURN_Model $databaseModel) {
+  	public static function setDatabaseModel(PhpBURN_Model $databaseModel) {
   		self::$databaseModel = $databaseModel;
   	}
   	
@@ -90,7 +90,7 @@ class PhpBURN_Message {
   	 * @return String
   	 * @return Boolean
   	 */
-  	public function output($originalMessage, $type = self::NOTICE, $priority = self::NORMAL) {
+  	public static function output($originalMessage, $type = self::NOTICE, $priority = self::NORMAL) {
   		if(self::$mode == null) {
   			return false;
   		}

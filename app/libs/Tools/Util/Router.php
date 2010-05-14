@@ -82,7 +82,7 @@ class Router {
 	 * 
 	 * @return Array
 	 */
-	public function parseDiff() {	
+	public function parseDiff() {
 		unset($this->uri);
 		$this->uri = array();
 		
@@ -141,6 +141,7 @@ class Router {
 		
 		
 		//Searching for file
+                if(!empty($this->uri[0]))
 		if(file_exists(SYS_CONTROLLER_PATH . $this->uri[0] . '.' . SYS_CONTROLLER_EXT) === true) {
 			$return['index'] = $this->uri[0];
 			$return['action'] = count($this->uri) > 1 ? implode('/',$this->uri) : $this->uri[0] . '/' .self::$routes['__defaultAction'];
