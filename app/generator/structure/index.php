@@ -14,4 +14,9 @@ require_once('config.php');
 # Starting application
 ################################
 PhpBURN::startApplication();
+
+################################
+# Sending a End of File
+################################
+PhpBURN_Message::output('[!EOF!]');
 ?>

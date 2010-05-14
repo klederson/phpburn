@@ -45,4 +45,15 @@ $thisConfig = array(
 
 //Loading the configuration file
 $config = new PhpBURN_Configuration($thisConfig);
+
+$configItems = $config->getConfig();
+
+foreach($configItems as $package => $infos) {
+    $path = $infos->class_path . $package . DS;
+    set_include_path(get_include_path() . ': '.$path);
+}
+
+spl_autoload_register(null, false);
+spl_autoload_extensions(SYS_MODEL_EXT);
+spl_autoload_register('PhpBURN::import');
 ?>
