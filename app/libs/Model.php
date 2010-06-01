@@ -654,7 +654,6 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 //		All good let's start rock'n'roll
 
-		
 //		Instance object
 		if( !($this->$fieldInfo['alias'] instanceof $fieldInfo['foreignClass']) && $this->modelExist($fieldInfo['foreignClass'])) {
 			$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
@@ -809,13 +808,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return Boolean
 	 */
 	private function modelExist($modelName) {
-		foreach(PhpBURN_Configuration::$options as $index => $confItem) {
-			if ( PhpBURN::import($index . '.' . $modelName) != 'error' ) {
-				return true;
-			}
-		}
-		
-		return false;
+            if ( PhpBURN::import($modelName) != 'error' ) {
+                return true;
+            } else {
+                return false;
+            }
 	}
 	
 	/**
