@@ -43,7 +43,7 @@ class PhpBURN_Configuration {
 		if(empty($options['port']))
 		{
 			PhpBURN_Message::output('[!Empty database port into configuration!]',PhpBURN_Message::WARNING);
-			$options['port'] = '3306';
+//			$options['port'] = '3306';
 		}
 		if(empty($options['host']))
 		{
