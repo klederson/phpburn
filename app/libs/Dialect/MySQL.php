@@ -77,8 +77,8 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 		}
 	}
 	
-	public function buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit, $extras = null) {		
-		return ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $orderConditions . ' ' . $limit . ';');
+	public function buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $groupConditions, $limit, $extras = null) {
+		return ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $groupConditions . ' ' . $orderConditions  . ' ' . $limit . ';');
 	}
 	
 	/* Auxiliar Methods */

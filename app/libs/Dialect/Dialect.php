@@ -175,6 +175,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		if(count($this->getModel()->_orderBy) > 0) {
 			$orderConditions = $this->getOrderByString();
 		}
+
+                //Define GroupBy SENTENCE
+		if(count($this->getModel()->_groupBy) > 0) {
+			$groupConditions = $this->getGroupByString();
+		}
 		
 		//Define Limit SENTENCE
 		if($this->getModel()->_limit != null) {
@@ -183,8 +188,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		//Construct SQL
-		$sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit,$limits);
-		unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass);
+		$sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $groupConditions, $limit,$limits);
+		unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass, $groupConditions);
 		
 		return $sql;
 	}
@@ -257,17 +262,31 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	
 	
 	public function getOrderByString() {
-		
+
 		$orderBy = 'ORDER BY ';
 		foreach($this->getModel()->_orderBy as $index => $value) {
 			$fieldInfo = $this->getModel()->getMap()->getField($value['field']);
 			$orderConditions .= $orderConditions == null ? "" : ", ";
 			$orderConditions .= $fieldInfo['field']['tableReference'] . '.' . $fieldInfo['field']['column'] . ' ' . $value['type'];
 		}
-	
-		
+
+
 		return $orderBy . $orderConditions;
 	}
+
+        public function getGroupByString() {
+
+		$clause = 'GROUP BY ';
+		foreach($this->getModel()->_groupBy as $index => $value) {
+			$fieldInfo = $this->getModel()->getMap()->getField($value['field']);
+			$conditions .= $conditions == null ? "" : ", ";
+			$conditions .= $fieldInfo['field']['tableReference'] . '.' . $fieldInfo['field']['column'];
+		}
+
+
+		return $clause . $conditions;
+	}
+
 	/* Execution */
 	
 	/**

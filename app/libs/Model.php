@@ -599,6 +599,23 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
                 return $this;
 	}
+
+        public function groupBy($field, $override = false) {
+                if($override == true) {
+			unset($this->_groupBy);
+			$this->_groupBy = array();
+		}
+                
+                if(!is_array($this->_groupBy)) {
+			$this->_groupBy = array();
+		}
+
+		$_tmpGroup['field'] = $field;
+
+		array_push($this->_groupBy, $_tmpGroup);
+
+                return $this;
+        }
 	
 	/**
 	 * (non-PHPdoc)

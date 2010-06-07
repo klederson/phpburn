@@ -95,12 +95,12 @@ class PhpBURN_Dialect_MSSQL extends PhpBURN_Dialect  implements IDialect {
 		return $sql;
 	}
 	
-	public function buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $limit, $extras = null) {
+	public function buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $groupConditions, $limit, $extras = null) {
 		if($limit != null) {
 //			return $limit;
 			return $this->setLimit($extras[0], $extras[1],$fields, $from, $joinString, $conditions, $whereConditions, $orderConditions);
 		} else {
-			return ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $orderConditions . ';');
+			return ('SELECT ' . $fields . ' ' . $from . ' ' . $joinString . ' ' . $conditions . ' ' . $whereConditions . ' ' . $groupConditions . ' ' . $orderConditions  . ';');
 		}
 	}
 	
