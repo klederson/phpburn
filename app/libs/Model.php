@@ -53,6 +53,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	//Persistent methods storage
 	public $_where							= array();
 	public $_orderBy						= array();
+        public $_groupBy                                                = array();
 	public $_limit							= null;
 	public $_select							= array();
 	public $_join							= array();
@@ -158,6 +159,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 */
 	public function reset() {
 		$this->getMap()->reset();
+                unset($this->_orderBy, $this->_select, $this->_where, $this->_groupBy);
+                unset($this->getDialect()->dataSet, $this->getDialect()->resultSet);
 	}
 	
 	public function _moveNext() {
