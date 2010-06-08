@@ -159,7 +159,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 */
 	public function reset() {
 		$this->getMap()->reset();
-                unset($this->_orderBy, $this->_select, $this->_where, $this->_groupBy);
+                $this->_orderBy = $this->_select = $this->_where = $this->_groupBy = array();
+//                unset($this->_orderBy, $this->_select, $this->_where, $this->_groupBy);
                 unset($this->getDialect()->dataSet, $this->getDialect()->resultSet);
 	}
 	
