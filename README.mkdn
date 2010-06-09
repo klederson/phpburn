@@ -2,6 +2,8 @@
 
 Developed by the manteiner Klederson Bueno, [phpBurn][phpburn] is a FRAMEWORK for [PHP][phpnet] usage, initialy born as an ORM like [hibernate][hn] and [Nhibernate][nhb] it allows you to create more and faster using [OO][woo] concepts and patterns with a log of time gain. Using resources for MVC (Model View Controller) [phpBurn][phpburn] will make your programming more easy, quick and fun.
 
+Now you can found this project hosted both GitHub and SourceForge at git version control.
+
 [phpburn]: http://www.phpburn.com/
 [phpnet]: http://www.php.net/
 [hn]: http://www.hibernate.org/
