@@ -392,16 +392,16 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 							$relKeyVal = $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']);
 							$relOutKeyVal = $relModel->getMap()->getFieldValue($infos['isRelationship']['relOutKey']);
 							
-							$sqlWHERE = sprintf('%s.%s = "%s"',$infos['isRelationship']['relTable'],$infos['isRelationship']['relKey'],addslashes($relKeyVal));
+							$sqlWHERE = sprintf("%s.%s = '%s'",$infos['isRelationship']['relTable'],$infos['isRelationship']['relKey'],addslashes($relKeyVal));
 							$sqlWHERE .= " AND ";
-							$sqlWHERE .= sprintf('%s.%s = "%s"',$infos['isRelationship']['relTable'],$infos['isRelationship']['outKey'],addslashes($relOutKeyVal));
+							$sqlWHERE .= sprintf("%s.%s = '%s'",$infos['isRelationship']['relTable'],$infos['isRelationship']['outKey'],addslashes($relOutKeyVal));
 							
 							$relationshipSQL = sprintf('SELECT * FROM %s WHERE %s',$infos['isRelationship']['relTable'], $sqlWHERE);
 							
 							$rs = $this->execute($relationshipSQL);
 							if($this->getModel()->getConnection()->affected_rows() == 0) {
 								unset($sqlWHERE, $relationshipSQL, $rs);
-								$relationshipSQL = sprintf('INSERT INTO %s ( %s, %s ) VALUES ( "%s" , "%s" ) ', $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'],$infos['isRelationship']['relOutKey'],$relKeyVal, $relOutKeyVal);
+								$relationshipSQL = sprintf("INSERT INTO %s ( %s, %s ) VALUES ( '%s' , '%s' ) ", $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'],$infos['isRelationship']['relOutKey'],$relKeyVal, $relOutKeyVal);
 								$rs = $this->execute($relationshipSQL);
 							}
 						break;
@@ -438,7 +438,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$insertFields[$infos['field']['tableReference']] .= $insertFields[$infos['field']['tableReference']] == null ? '' : ', ';
 					$insertFields[$infos['field']['tableReference']] .= $infos['field']['tableReference'] . '.' . $infos['field']['column'];
 					$insertValues[$infos['field']['tableReference']] .= $insertValues[$infos['field']['tableReference']] == null ? '' : ', ';
-					$insertValues[$infos['field']['tableReference']] .= sprintf('"%s"', addslashes($value));
+					$insertValues[$infos['field']['tableReference']] .= sprintf("'%s'", addslashes($value));
 				}
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 
@@ -464,7 +464,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			if($this->getModel()->getMap()->getRelationShip($field) != true && $this->getModel()->$infos['field']['alias'] != $infos['#value']) {
 				$this->getMap()->setFieldValue($field, $this->getModel()->$field);
 				$updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
-				$updatedFields[$infos['field']['tableReference']] .= sprintf('%s="%s"', $infos['field']['column'], addslashes($this->getModel()->$field));
+				$updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], addslashes($this->getModel()->$field));
 			} else if($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
 
 			}
