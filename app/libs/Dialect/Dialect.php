@@ -157,7 +157,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 			exit;
 		}
 
-		$from = 'FROM ' . $this->getModel()->_tablename;
+		$from = $this->getFromString();
 		
 		//Define Join SENTENCE
 		if(count($this->getModel()->_join) > 0) {
@@ -193,6 +193,18 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		return $sql;
 	}
+
+        public function getFromString() {
+            if(count($this->getModel()->_from) > 0) {
+                foreach($$this->getModel()->_from as $value) {
+                    $from .= empty($from) ? $value : sprintf(', %s', $value);
+                }
+            }
+
+            $from = empty($from) ? $this->getModel()->_tablename : sprintf('%s, %s', $this->getModel()->_tablename, $from);
+
+            return 'FROM ' . $from;
+        }
 	
 	public function getWhereString($pk, $pkField) {
 		if(count($this->getModel()->_where) > 0) {

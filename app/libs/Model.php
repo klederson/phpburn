@@ -380,11 +380,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
                 return $this;
 	}
 	
-	public function from($conditions, $override = false) {
+	public function from($table, $override = false) {
 		if($override == true) {
 			unset($this->_from);
 			$this->_from = array();
 		}
+                
 		array_push($this->_from, $conditions);
 
                 return $this;
