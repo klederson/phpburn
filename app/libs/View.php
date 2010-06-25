@@ -40,6 +40,7 @@ abstract class PhpBURN_Views implements IView {
 	public static $translationFolder = 'locale/';
 	
 	public static $autoLoad = PHPBURN_VIEWS_AUTOLOAD;
+        public static $viewMethod = null;
 	
 	public function autoLoad($status) {
 		self::$autoLoad = $status;
@@ -158,28 +159,23 @@ abstract class PhpBURN_Views implements IView {
 	 * @param Array $__phpBurnData
 	 * @return String
 	 */
-	private function processViewData($___phpBurnFilePath, array $__phpBurnData) {
-		//Flushing buffer
-		//ob_end_flush();
-			//Starting a new buffer
-			ob_start();
-				
-				foreach($__phpBurnData as $__index => $__value) {
-					$$__index = $__value;
-				}
-				
-				include($___phpBurnFilePath);
+	private function processViewData($___phpBurnFilePath, $__phpBurnData) {
+            $viewProcess = self::chooseViewMethod();
 
-				//eval("\$___phpBurnOutput = \"$___phpBurnFileContent\";");
-				//Storing buffer result to a var
-				$___phpBurnBufferStored = ob_get_contents();
-			//Cleaning the buffer for new sessions
-			ob_clean();
-			//ob_start();
-			
-		//unset($___phpBurnBufferStored);
-		return $___phpBurnBufferStored;
+            return $viewProcess->processViewData($___phpBurnFilePath, $__phpBurnData);
 	}
+
+        public function chooseViewMethod() {
+            self::$viewMethod = self::$viewMethod = !defined('PHPBURN_VIEWS_METHOD') ? 'default' : PHPBURN_VIEWS_METHOD;
+            PhpBURN::load('Tools.Views.'.self::$viewMethod);
+            $classString = sprintf("%s_PhpBURN_ViewProcess",self::$viewMethod);
+            
+            return new $classString;
+        }
+
+        public function setViewMethod($method) {
+            self::$viewMethod = $method;
+        }
 	
 	#####################################################
 	# Inteligent View Methods
