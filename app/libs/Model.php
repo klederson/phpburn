@@ -382,13 +382,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $field
 	 * @param String $alias
 	 */
-	public function select($field, $alias = null, $only = true, $override = false) {
-		$alias = $alias == null ? $field : $alias;
+	public function select($condition, $alias = null, $only = true, $override = false) {
+		$alias = $alias == null ? $condition : $alias;
                 if($override == true) {
 			unset($this->_select);
 			$this->_select = array();
 		}
-		array_push($this->_select, array('value'=>$field, 'alias'=>$alias, 'only' => $only));
+		array_push($this->_select, array('value'=>$condition, 'alias'=>$alias, 'only' => $only));
 
                 return $this;
 	}
@@ -407,7 +407,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
          *
          * @return PhpBURN_Core
 	 */
-	public function where($condition_start, $stringOperator = '=', $conditon_end = null, $condition = "AND", $override = false) {
+	public function where($condition_start, $stringOperator, $conditon_end = null, $condition = "AND", $override = false) {
             if($stringOperator != null && $conditon_end != null) {
 		$conditions = array();
 		$conditions['start'] = $condition_start;
@@ -455,7 +455,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
          *
          * @return PhpBURN_Core
          */
-        public function swhere($condition_start, $stringOperator = '=', $conditon_end = null, $condition = "AND", $override = false) {
+        public function swhere($condition_start, $stringOperator, $conditon_end = null, $condition = "AND", $override = false) {
             return $this->where($condition_start, $stringOperator, $conditon_end, $condition, $override);
         }
 
@@ -743,7 +743,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$this->$fieldInfo['thisKey'] = !is_numeric($this->$fieldInfo['thisKey']) ? sprintf("'%s'",$this->$fieldInfo['thisKey']) : $this->$fieldInfo['thisKey'];
 
 				$whereString = sprintf('%s %s.%s = %s',$conditionString, $this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
-				$this->$fieldInfo['alias']->where($whereString);
+				$this->$fieldInfo['alias']->mwhere($whereString);
 
 				return $this->$fieldInfo['alias']->find(null, $fluid);
 
