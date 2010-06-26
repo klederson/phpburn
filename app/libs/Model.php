@@ -380,19 +380,23 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public function where($condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
 		//$this->_exceptionObj->log('teste');
 
-		$conditions = array();
-		$conditions['start'] = $condition_start;
-		$conditions['end'] = $conditon_end;
-		$conditions['operator'] = $this->convertWhereOperators($stringOperator);
-		$conditions['condition'] = $condition;
+		if($condition_start != null && $stringOperator != null && $conditon_end != null) {
+                    $conditions = array();
+                    $conditions['start'] = $condition_start;
+                    $conditions['end'] = $conditon_end;
+                    $conditions['operator'] = $this->convertWhereOperators($stringOperator);
+                    $conditions['condition'] = $condition;
 
-		if($override == true) {
-			unset($this->_where);
-			$this->_where = array();
-		}
+                    if($override == true) {
+                            unset($this->_where);
+                            $this->_where = array();
+                    }
 
-		array_push($this->_where, $conditions);
-                return $this;
+                    array_push($this->_where, $conditions);
+                    return $this;
+                } else if($condition_start != null && $stringOperator == null) {
+                    $this->mwhere($condition_start, $override);
+                }
 	}
 
         /**
