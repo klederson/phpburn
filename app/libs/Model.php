@@ -455,7 +455,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Boolean $override
 	 */
 	public function swhere($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
-		$this->where($condition_start, $stringOperator, $conditon_end, $condition, $override);
+		return $this->where($condition_start, $stringOperator, $conditon_end, $condition, $override);
 	}
 	
 	/**
