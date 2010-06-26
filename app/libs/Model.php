@@ -57,6 +57,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public $_limit							= null;
 	public $_select							= array();
 	public $_join							= array();
+        public $_from                                                   = array();
 	
 	/**
 	 * This is an automatic configuration when a model inherit another PhpBURN Model
@@ -362,19 +363,50 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		
 		return true;
 	}
-	
-	/**
-	 * This defines WHERE clauses to your model if override is true it cleanup all old wheres
-	 * 
-	 * @param String $conditions
+
+
+        /**
+	 * This method allow your model to add various WHERE conditions before your get, search or find call.
+	 * However it uses a new way of define your conditions and keep ALL compatibility when database change.
+	 *
+	 * @author Kléderson Bueno <klederson@klederson.com>
+	 * @version 0.1a
+	 *
+	 * @param String $condition_start
+	 * @param String $stringOperator
+	 * @param String/Integer $conditon_end
 	 * @param Boolean $override
 	 */
-	public function where($conditions, $override = false) {
+	public function where($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
+		//$this->_exceptionObj->log('teste');
+
+		$conditions = array();
+		$conditions['start'] = $condition_start;
+		$conditions['end'] = $conditon_end;
+		$conditions['operator'] = $this->convertWhereOperators($stringOperator);
+		$conditions['condition'] = $condition;
+
 		if($override == true) {
 			unset($this->_where);
 			$this->_where = array();
 		}
-		
+
+		array_push($this->_where, $conditions);
+                return $this;
+	}
+
+        /**
+	 * This defines MANUAL WHERE clauses to your model if override is true it cleanup all old wheres
+	 *
+	 * @param String $conditions
+	 * @param Boolean $override
+	 */
+	public function mwhere($conditions, $override = false) {
+		if($override == true) {
+			unset($this->_where);
+			$this->_where = array();
+		}
+
 		array_push($this->_where, $conditions);
 
                 return $this;
@@ -423,22 +455,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param Boolean $override
 	 */
 	public function swhere($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
-		
-		//$this->_exceptionObj->log('teste');
-				
-		$conditions = array();
-		$conditions['start'] = $condition_start;
-		$conditions['end'] = $conditon_end;
-		$conditions['operator'] = $this->convertWhereOperators($stringOperator);
-		$conditions['condition'] = $condition;
-				
-		if($override == true) {
-			unset($this->_where);
-			$this->_where = array();
-		}
-		
-		array_push($this->_where, $conditions);
-                return $this;
+		$this->where($condition_start, $stringOperator, $conditon_end, $condition, $override);
 	}
 	
 	/**
@@ -977,27 +994,27 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$return = array();
 		foreach($this->getMap()->fields as $fieldName => $info) {
 			if($this->getMap()->getRelationShip($fieldName) == true && $recursive == true) {
-//				if(get_parent_class($this->$fieldName) == 'PhpBURN_Core') {
-//					if(count($this->$fieldName->getDialect()->dataSet) > 0)
-//					foreach($this->$fieldName->getDialect()->dataSet as $index => $value) {
-//						$return[$fieldName][] = $this->$fieldName->toArray();
-//					}
-//				}
+				if(get_parent_class($this->$fieldName) == 'PhpBURN_Core') {
+					if(count($this->$fieldName->getDialect()->dataSet) > 0)
+					foreach($this->$fieldName->getDialect()->dataSet as $index => $value) {
+						$return[$fieldName][] = $this->$fieldName->toArray();
+					}
+				}
 //
-                            if($full == true) {
-                                if( ($this->$fieldName instanceof PhpBURN_Core) && $insane == false) {
-                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full);
-                                } else if($insane==true){
-                                    if($this->$fieldName instanceof PhpBURN_Core) {
-                                        $this->$fieldName->find();
-                                        $this->$fieldName->getDialect()->moveFirst();
-                                    } else {
-                                        $this->getRelationship($fieldName);
-                                    }
-
-                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full, $insane);
-                                }
-                            }
+//                            if($full == true) {
+//                                if( ($this->$fieldName instanceof PhpBURN_Core) && $insane == false) {
+//                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full);
+//                                } else if($insane==true){
+//                                    if($this->$fieldName instanceof PhpBURN_Core) {
+//                                        $this->$fieldName->find();
+//                                        $this->$fieldName->getDialect()->moveFirst();
+//                                    } else {
+//                                        $this->getRelationship($fieldName);
+//                                    }
+//
+//                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full, $insane);
+//                                }
+//                            }
 
 			} else {
 				$return[$fieldName] = $this->getMap()->getFieldValue($fieldName);
