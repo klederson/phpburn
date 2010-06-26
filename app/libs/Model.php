@@ -445,7 +445,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 		
 	/**
-	 * SuperWhere (swhere)
+	 * SuperWhere (swhere) DEPRECATED USE WHERE INSTEAD
 	 * 
 	 * This method allow your model to add various WHERE conditions before your get, search or find call.
 	 * However it uses a new way of define your conditions and keep ALL compatibility when database change.
@@ -790,11 +790,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
                 }
             }
 
-            if($existis == true && $stringOperator == null && $condition_start != null) {
-                $this->$linkName->where($condition_start);
-                return $this;
-            } else if( $existis == true && $stringOperator != null ) {
-                $this->$linkName->swhere($condition_start, $stringOperator, $conditon_end, $condition, $override);
+            if($existis == true ) {
+
+                $this->$linkName->where($condition_start, $stringOperator, $conditon_end, $condition, $override);
 
                 return $this;
             } else {
