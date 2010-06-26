@@ -377,7 +377,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String/Integer $conditon_end
 	 * @param Boolean $override
 	 */
-	public function where($condition_start, $stringOperator, $conditon_end, $condition = "AND", $override = false) {
+	public function where($condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
 		//$this->_exceptionObj->log('teste');
 
 		$conditions = array();
