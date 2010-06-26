@@ -195,8 +195,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	}
 
         public function getFromString() {
+//            $from = 'FROM ' . $this->getModel()->_tablename;
             if(count($this->getModel()->_from) > 0) {
-                foreach($$this->getModel()->_from as $value) {
+                foreach($this->getModel()->_from as $value) {
                     $from .= empty($from) ? $value : sprintf(', %s', $value);
                 }
             }
