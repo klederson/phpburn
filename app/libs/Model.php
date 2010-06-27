@@ -144,11 +144,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 
 	/**
-	 * This method search a content based in many arguments like: where, order, primary key, etc.
-	 *
-	 * @param String $sql
-	 * @return Integer
-	 */
+         * This method search a content based in many arguments like: where, order, primary key, etc.
+         *
+         * @param Mixed $pk
+         * @param Boolean $fluid
+         * @return Integer/PhpBURN_Core
+         */
 	public function find($pk = null, $fluid = false) {
             $amount = $this->getDialect()->find($pk);
             return $fluid == false ? $amount : $this;
@@ -267,7 +268,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	/**
 	 * join Function inserts a JOIN clause in the get()/find() method and than returns the join result in a array into the object
 	 * Ex. $obj->join('users');
-	 * returns $obj->_users->name and $obj->_users->login (but only as object not a PhpBURN model if you want methods in user use _getLink())
+	 * $obj->_users->name and $obj->_users->login (but only as object not a PhpBURN model if you want methods in user use _getLink())
 	 *
 	 * @author Kléderson Bueno <klederson@klederson.com>
 	 * @version 0.1a
@@ -277,6 +278,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $fieldRight
 	 * @param String $operator
 	 * @param String $joinType
+         * @param String $tableRight
+         * @return PhpBURN_Core
 	 */
 	public function join($tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null) {
 //		$this->_join[$tableLeft][] 										= array();
@@ -301,8 +304,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $fieldRight
 	 * @param String $operator
 	 */
-	public function joinLeft($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'LEFT JOIN');
+	public function joinLeft($tableName, $fieldLeft = null, $fieldRight = null, $tableRight = null,$operator = '=') {
+		return $this->join($tableName, $fieldLeft, $fieldRight, $operator,'LEFT JOIN', $tableRight);
 	}
 
 	/**
@@ -313,8 +316,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $fieldRight
 	 * @param String $operator
 	 */
-	public function joinRight($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'RIGHT JOIN');
+	public function joinRight($tableName, $fieldLeft = null, $fieldRight = null, $tableRight = null, $operator = '=') {
+		return $this->join($tableName, $fieldLeft, $fieldRight, $operator,'RIGHT JOIN', $tableRight);
 	}
 
 	/**
@@ -325,8 +328,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $fieldRight
 	 * @param String $operator
 	 */
-	public function joinInner($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'INNER JOIN');
+	public function joinInner($tableName, $fieldLeft = null, $fieldRight = null, $tableRight = null, $operator = '=') {
+		return $this->join($tableName, $fieldLeft, $fieldRight, $operator,'INNTER JOIN', $tableRight);
 	}
 
 	/**
@@ -337,8 +340,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $fieldRight
 	 * @param String $operator
 	 */
-	public function joinOutter($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=') {
-		return $this->join($tableName, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'OUTTER JOIN');
+	public function joinOutter($tableName, $fieldLeft = null, $fieldRight = null, $tableRight = null, $operator = '=') {
+		return $this->join($tableName, $fieldLeft, $fieldRight, $operator,'OUTTER JOIN', $tableRight);
 	}
 
 	/**
@@ -377,11 +380,15 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 
 	/**
-	 * This method create SELECT method for your call
-	 *
-	 * @param String $field
-	 * @param String $alias
-	 */
+         * This method create customized element alias for you SELECT ( find, get ) queries
+         *
+         * @param String $condition
+         * @param String $alias
+         * @param Boolean $only ( DEPRECATED )
+         * @param Boolean $override
+         *
+         * @return PhpBURN_Core
+         */
 	public function select($condition, $alias = null, $only = true, $override = false) {
 		$alias = $alias == null ? $condition : $alias;
                 if($override == true) {
@@ -403,6 +410,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $condition_start
 	 * @param String $stringOperator
 	 * @param String/Integer $conditon_end
+         * @param String $condition
 	 * @param Boolean $override
          *
          * @return PhpBURN_Core
@@ -429,10 +437,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 
         /**
-	 * This defines WHERE clauses to your model if override is true it cleanup all old wheres
+	 * This defines MANUAL WHERE clauses to your model if override is true it cleanup all old wheres
 	 *
 	 * @param String $conditions
 	 * @param Boolean $override
+         * @return PhpBURN_Core
 	 */
 	public function mwhere($conditions, $override = false) {
 		if($override == true) {
@@ -460,13 +469,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
         }
 
 	/**
-	 * Like method
-	 *
-	 * Add a LIKE condition to your select query
-	 *
-	 * @param String $field
-	 * @param String $condition
-	 */
+         * Add a LIKE condition to your select query
+         *
+         * @param String $field
+         * @param String $content
+         * @param String $condition
+         * @return PhpBURN_Core
+         */
 	public function like($field, $content, $condition = 'AND') {
 
 
@@ -569,9 +578,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see app/libs/IPhpBurn#get()
-	 */
+         * This find and fetch a registry from the database and is always used with a Primary Key to identify the searched object.
+         * @param Mixed $pk
+         * @return PhpBURN_Core
+         */
 	public function get($pk = null) {
 		$amount = $this->find($pk);
 		if($amount >= 1) {
@@ -585,25 +595,30 @@ abstract class PhpBURN_Core implements IPhpBurn {
     }
 
 	/**
-	 * (non-PHPdoc)
-	 * @see app/libs/IPhpBurn#save()
-	 */
+         * Saves all changes into the Model ( including relationships )
+         * @return Boolean
+         */
 	public function save() {
 		return $this->getDialect()->save();
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see app/libs/IPhpBurn#delete()
-	 */
+         * Delete an entry
+         * @param Mixed $pk
+         * @return Mixed ( false for errors )
+         */
 	public function delete($pk = null) {
 		return $this->getDialect()->delete($pk);
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see app/libs/IPhpBurn#order()
-	 */
+         * It will order your results based on given params
+         *
+         * @param String $field
+         * @param String $orderType
+         * @param Boolean $override
+         * @return PhpBURN_Core
+         */
 	public function order($field, $orderType = "ASC", $override = false) {
 		if($override == true) {
 			unset($this->_orderBy);
@@ -622,6 +637,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
                 return $this;
 	}
 
+        /**
+         * Groups a set of results based in one common param
+         *
+         * @param String $field
+         * @param Boolean $override
+         * @return PhpBURN_Core
+         */
         public function groupBy($field, $override = false) {
                 if($override == true) {
 			unset($this->_groupBy);
@@ -640,9 +662,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
         }
 
 	/**
-	 * (non-PHPdoc)
-	 * @see app/libs/IPhpBurn#limit()
-	 */
+         * Limits and/or Paginate your results by changing the query to bring
+         * only the correct amount or the range.
+         *
+         * @param Integer $offset
+         * @param Integer $limit
+         * @return PhpBURN_Core
+         */
 	public function limit($offset = null, $limit = null) {
 		$this->_limit = $limit == null ? $offset : $offset . ',' . $limit;
 
@@ -652,29 +678,16 @@ abstract class PhpBURN_Core implements IPhpBurn {
 //	Relationships functions
 
 	/**
-	 * This method gets a relationship of the model based on mapping informations
-	 *
-	 * @param String $name
-	 * @param String $linkWhere
-	 * @param Integer $offset
-	 * @param Integer $limit
-	 * @return PhpBURN_Core
-	 */
+         * Works like $model->find() but instead it search ofr a mapped relationship.
+         * Generate a SELECT into the relationship.
+         *
+         * @param String $name
+         * @param Boolean $fluid
+         * @param Array $options
+         * @return Mixed ( Integer/PhpBURN_Core )
+         */
 	public function getRelationship($name, $fluid = false, array $options = array()) {
-		return self::_getLink($name, $fluid, $options);
-	}
-
-	/**
-	 * This method gets a relationship of the model based on mapping informations
-	 *
-	 * @param String $name
-	 * @param String $linkWhere
-	 * @param Integer $offset
-	 * @param Integer $limit
-	 * @return PhpBURN_Core
-	 */
-	public function _getLink($name, $fluid = false, array $options = array()) {
-		//Cheking if the link existis
+                //Cheking if the link existis
 
                 $defaultOptions = array(
                     "offset"    => null,
@@ -751,6 +764,19 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		}
 	}
 
+	/**
+	 * This method gets a relationship of the model based on mapping informations
+	 *
+	 * @param String $name
+	 * @param String $linkWhere
+	 * @param Integer $offset
+	 * @param Integer $limit
+	 * @return PhpBURN_Core
+	 */
+	public function _getLink($name, $fluid = false, array $options = array()) {
+		return self::getRelationship($name, $fluid, $options);
+	}
+
 
 	/**
 	 * It puts a WHERE clause when you want to get a relationship with specific caracteristics.
@@ -760,7 +786,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 *
 	 * @example
 	 * <code>
-	 * $model->_linkWhere('pictures','date','>', '10/10/2010','AND',true);
+	 * $model->relationshipWhere('pictures','date','>', '10/10/2010','AND',true);
 	 * $model->getRelationship('albums');
 	 * </code>
 	 *
@@ -776,7 +802,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 *
 	 * @return Boolean
 	 */
-	public function _linkWhere($linkName, $condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
+        public function relationshipWhere($linkName, $condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
             $existis = $this->getMap()->getRelationShip($linkName);
 
             if($existis) {
@@ -798,9 +824,23 @@ abstract class PhpBURN_Core implements IPhpBurn {
                 PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]',PhpBURN_Message::ERROR);
                 return false;
             }
+        }
+
+	public function _linkWhere($linkName, $condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
+            return $this->relationshipWhere($linkName, $condition_start, $stringOperator, $conditon_end, $condition, $override);
 	}
 
-        public function _linkSelect($linkName, $field, $alias = null, $only = true, $override = false) {
+        /**
+         *
+         * @param String $linkName
+         * @param String $field
+         * @param String $alias
+         * @param Boolean $only
+         * @param Boolean $override
+         *
+         * @return PhpBURN_Core
+         */
+        public function relationshipSelect($linkName, $field, $alias = null, $only = true, $override = false) {
             $existis = $this->getMap()->getRelationShip($linkName);
 
             if($existis) {
@@ -818,9 +858,26 @@ abstract class PhpBURN_Core implements IPhpBurn {
                 PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]',PhpBURN_Message::ERROR);
                 return false;
             }
+        }
+
+        public function _linkSelect($linkName, $field, $alias = null, $only = true, $override = false) {
+            return $this->relationshipSelect($linkName, $field, $alias, $only, $override);
 	}
 
-        public function _linkJoin($linkName, $tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null) {
+        /**
+         * Works like join() but for getRelationship() call         *
+         *
+         * @param String $linkName
+         * @param String $tableLeft
+         * @param String $fieldLeft
+         * @param String $fieldRight
+         * @param String $operator
+         * @param String $joinType
+         * @param String $tableRight
+         *
+         * @return PhpBURN_Core
+         */
+        public function relationshipJoin($linkName, $tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null) {
             $existis = $this->getMap()->getRelationShip($linkName);
 
             if($existis) {
@@ -840,6 +897,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
             }
         }
 
+        public function _linkJoin($linkName, $tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null) {
+            return $this->relationshipJoin($linkName, $tableLeft, $fieldLeft, $fieldRight, $operator, $joinType, $tableRight);
+        }
+
 	/**
 	 * Just checks if a model exists based on the configured packages you just have to know the name
 	 *
@@ -854,96 +915,127 @@ abstract class PhpBURN_Core implements IPhpBurn {
             }
 	}
 
-	/**
-	 * It sets a limit or pagination in you link call
-	 *
-	 * @author Kléderson Bueno <klederson@klederson.com>
-	 * @version 0.1a
-	 *
-	 * @param String $linkName
-	 * @param Integer $start
-	 * @param Integer $end
-	 */
+        /**
+         * Works like limit() but for getRelationship() call
+         *
+         * @param String $linkName
+         * @param Integer $offset
+         * @param Integer $limit
+         *
+         * @return PhpBURN_Core
+         */
+        public function relationshipLimit($linkName, $offset = null, $limit = null) {
+            if( $this->getMap()->getRelationShip($linkName) == true ) {
+                $infos = $this->getMap()->fields[$linkName];
+
+                if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+                                $this->$linkName = new $infos['isRelationship']['foreignClass'];
+                }
+
+                $this->$linkName->limit($offset, $limit);
+                return $this;
+            } else {
+                PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
+
+                return false;
+            }
+        }
+
 	public function _linkLimit($linkName, $offset = null, $limit = null) {
-		if( $this->getMap()->getRelationShip($linkName) == true ) {
-			$infos = $this->getMap()->fields[$linkName];
-
-			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
-					$this->$linkName = new $infos['isRelationship']['foreignClass'];
-			}
-
-			$this->$linkName->limit($offset, $limit);
-			return $this;
-		} else {
-			PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
-
-			return false;
-		}
+            return $this->relationshipLimit($linkName, $offset, $limit);
 	}
+
+        /**
+         * Works like like() but for getRelationship() call
+         *
+         * @param String $linkName
+         * @param String $field
+         * @param Mixed $content
+         * @param String $condition
+         *
+         * @return PhpBURN_Core
+         */
+        public function relationshipLike($linkName, $field, $content, $condition = 'AND') {
+            if( $this->getMap()->getRelationShip($linkName) == true ) {
+                $infos = $this->getMap()->fields[$linkName];
+
+                if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+                                $this->$linkName = new $infos['isRelationship']['foreignClass'];
+                }
+
+                $this->$linkName->like($field, $content, $condition);
+                return $this;
+            } else {
+                PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
+
+                return false;
+            }
+        }
 
 	public function _linkLike($linkName, $field, $content, $condition = 'AND') {
-		if( $this->getMap()->getRelationShip($linkName) == true ) {
-			$infos = $this->getMap()->fields[$linkName];
-
-			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
-					$this->$linkName = new $infos['isRelationship']['foreignClass'];
-			}
-
-			$this->$linkName->like($field, $content, $condition);
-			return $this;
-		} else {
-			PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
-
-			return false;
-		}
+            return $this->relationshipLike($linkName, $field, $content, $condition);
 	}
 
-	/**
-	 * It creates a order into your link list
-	 *
-	 * @author Kléderson Bueno <klederson@klederson.com>
-	 * @version 0.1a
-	 *
-	 * @param String $linkName
-	 * @param String $field
-	 * @param String $orderType
-	 */
+        /**
+         * Works like order() but for getRelationship() calls
+         *
+         * @param String $linkName
+         * @param String $field
+         * @param String $orderType
+         * @param Boolean $override
+         *
+         * @return PhpBURN_Core
+         */
+        public function relationshipOrder($linkName, $field, $orderType = "ASC", $override = false) {
+            if( $this->getMap()->getRelationShip($linkName) == true ) {
+                $infos = $this->getMap()->fields[$linkName];
+
+                if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+                                $this->$linkName = new $infos['isRelationship']['foreignClass'];
+                }
+
+                $this->$linkName->order($field, $orderType, $override);
+                return $this;
+            } else {
+                PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
+
+                return false;
+            }
+        }
+
 	public function _linkOrder($linkName, $field, $orderType = "ASC", $override = false) {
-		if( $this->getMap()->getRelationShip($linkName) == true ) {
-			$infos = $this->getMap()->fields[$linkName];
-
-			if( !($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
-					$this->$linkName = new $infos['isRelationship']['foreignClass'];
-			}
-
-			$this->$linkName->order($field, $orderType, $override);
-                        return $this;
-		} else {
-			PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this),PhpBURN_Message::ERROR);
-
-			return false;
-		}
+            return $this->relationshipOrder($linkName, $field, $orderType, $override);
 	}
 
-	/**
-	 * Auxiliar Method : Begins a Transaction
-	 */
+
+        /**
+         * Begins a Transaction
+         *
+         * @return PhpBURN_Core
+         */
 	public function begin() {
 		$this->getConnection()->begin();
+
+                return $this;
 	}
 
 	/**
-	 * Auxiliar Method : Begins a Transaction
-	 */
+         * Commit a Transaction
+         * @return PhpBURN_Core
+         */
 	public function commit() {
 		$this->getConnection()->commit();
+
+                return $this;
 	}
 
 	/**
-	 * Auxiliar Method : Begins a Transaction
+	 * Auxiliar Method : Rolls back a Transaction
 	 */
 	public function rollback() {
 		$this->getConnection()->rollback();
+
+                return $this;
 	}
 
 	/**
@@ -974,7 +1066,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 
 	/**
-	 * This method convert all mapped informationg (including cascating relatioinships) into a array to better manage it into views or anything you want to.
+         * This method convert all mapped informationg (including cascating relatioinships) into a array to better manage it into views or anything you want to.
 	 * By default recursive is true and full recursive is false.
 	 *
 	 * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to array too.
@@ -986,11 +1078,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * <code>
 	 * Array('name'=>'Klederson', 'albums'=>Array(0 => 'name' = 'My First Album', 1 => 'name' => 'My Second Album')
 	 * </code>
-	 *
-	 * @param Boolean $recursive
-	 * @param Boolean $full
-	 * @return Array
-	 */
+         *
+         * @param Boolean $recursive
+         * @param Boolean $full
+         * @param Boolean (DEPRECATED) $insane
+         * @return Array
+         */
 	public function toArray($recursive = true, $full = false, $insane = false) {
 		$return = array();
 		foreach($this->getMap()->fields as $fieldName => $info) {
@@ -1027,7 +1120,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 	/**
 	 * This method convert all mapped informationg (including cascating relatioinships) into a JSON format to better manage it into views or anything you want to.
-	 * By default recursive is true and full recursive is false.
+         * By default recursive is true and full recursive is false.
+         * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to array too.
 	 *
 	 * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to array too.
 	 * <code>
