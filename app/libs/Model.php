@@ -150,8 +150,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return Integer
 	 */
 	public function find($pk = null, $fluid = false) {
-            $amount = $this->getDialect()->find($pk);
-            return $fluid == false ? $amount : $this;
+		// find(true|false) and find(null, true|false); are the same since $pk should not be boolean
+		if (is_bool($pk)) {
+			$fluid = $pk;
+			$pk = null;
+		}
+		$amount = $this->getDialect()->find($pk);
+		return $fluid == false ? $amount : $this;
 	}
 
 	/**
