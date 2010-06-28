@@ -174,7 +174,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$truePointer = $this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists(0) ? 0 : $this->getDialect()->getPointer()+1;//$this->getDialect()->moveNext();
 
 		if($truePointer <= $this->getDialect()->getLast() && $truePointer !== false) {
-			$this->_moveTo($truePointer);
+			return $this->_moveTo($truePointer);
 		} else {
 			PhpBURN_Message::output('[!Can not move to register!]: #'. $truePointer .  ' [!at!] '  . get_class($this) . ' | [!Current pointer!]: #' . $this->getDialect()->getPointer());
 			return false;
@@ -185,7 +185,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$truePointer = $this->getDialect()->movePrev();
 
 		if($truePointer >= 0 ) {
-			$this->_moveTo($truePointer);
+			return $this->_moveTo($truePointer);
 		} else {
 			PhpBURN_Message::output('[!Can not move to register!]: #'. $truePointer .  ' [!at!] '  . get_class($this) . ' | [!Current pointer!]: #' . $this->getDialect()->getPointer());
 			return false;
@@ -194,12 +194,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 	public function _moveLast() {
 		$truePointer = $this->getDialect()->getLast();
-		$this->_moveTo($truePointer);
+		return $this->_moveTo($truePointer);
 	}
 
 	public function _moveFirst() {
-		$this->_moveTo(0);
+		return $this->_moveTo(0);
 	}
+
+
 
 	public function _moveTo($pointer) {
 		$currentPosition = $pointer;//$this->getDialect()->getPointer();
@@ -222,6 +224,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 				$this->getDialect()->setPointer($pointer);
 			}
+                        return $this;
 		} else {
 			PhpBURN_Message::output('[!You can not move to!]: #'. $pointer .  ' [!at!] '  . get_class($this) . ' | [!Current pointer!]: #' . $this->getDialect()->getPointer(), PhpBURN_Message::ERROR);
 			return false;
@@ -1126,9 +1129,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	/**
 	 * This method convert all mapped informationg (including cascating relatioinships) into a JSON format to better manage it into views or anything you want to.
          * By default recursive is true and full recursive is false.
-         * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to array too.
+         * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to JSON too.
 	 *
-	 * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to array too.
 	 * <code>
 	 * @TODO PUT AN EXAMPLE HERE
 	 * </code>

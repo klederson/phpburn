@@ -378,6 +378,8 @@ class PhpBURN_Map implements IMap {
 	 * @param String $type
 	 * @param String $range
 	 * @param Array $options
+         *
+         * @return PhpBURN_Map
 	 */
 	public function addField($name, $column, $type, $length, array $options) {
 			$parentClass = get_parent_class($this->modelObj);
