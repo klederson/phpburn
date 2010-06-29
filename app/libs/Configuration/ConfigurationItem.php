@@ -18,12 +18,18 @@ class phpBURN_ConfigurationItem {
 	public $options = array();
 	
 	public function __construct($package,$packageOptions, array $config) {
+		if (array_key_exists('packages', $config)) {
+			// that's useless
+			unset($config['packages']);
+		}
 		/**
 		 * Automatic setup
 		 */
 		$class_attr = (get_class_vars(get_class($this)));
 		foreach($class_attr as $key => $value) {
-                    $this->$key = $config[$key];
+			if (array_key_exists($key, $config)) {
+				$this->$key = $config[$key];
+			}
 		}
 		
 		/**
@@ -40,8 +46,6 @@ class phpBURN_ConfigurationItem {
 				$this->$key = $value;
 			}
 		}
-		
-		return $this;
 	}
 }
 ?>

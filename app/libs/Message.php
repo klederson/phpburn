@@ -92,7 +92,7 @@ class PhpBURN_Message {
   	 */
   	public static function output($originalMessage, $type = self::NOTICE, $priority = self::NORMAL) {
   		if(self::$mode == null) {
-  			return false;
+			self::setMode(self::CONSOLE);
   		}
   		
   		if($type == null) {
@@ -103,7 +103,7 @@ class PhpBURN_Message {
 		if(array_search('PhpBURN_Views',get_declared_classes()) == true) {
 			$messageClass = 'PhpBURN_Views';			
 		} else {
-			$messageClass = self;
+			$messageClass = __CLASS__;
 		}
   		
   		//Now time

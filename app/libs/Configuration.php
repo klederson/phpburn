@@ -11,6 +11,18 @@ class PhpBURN_Configuration {
 	private $connection = null;
 	
 	public function __construct(array $options) {
+		$default_options = Array(
+			'database' => '',
+			'user' => '',
+			'password' => '',
+			'class_path' => '',
+			'dialect' => 'MySQL',
+			'port' => 3306,
+			'host' => 'localhost',
+			'packages' => array()
+		);
+		$options = array_merge($default_options, $options);
+
 		/*
 		 * Fatal Errors
 		 */
@@ -32,26 +44,6 @@ class PhpBURN_Configuration {
 		}
 		
 		/**
-		 * Auto-configurable options
-		 */
-		if(empty($options['dialect']))
-		{
-			PhpBURN_Message::output('[!Empty dialect into configuration!]',PhpBURN_Message::WARNING);
-			$options['dialect'] = 'MySQL';
-		}
-		
-		if(empty($options['port']))
-		{
-			PhpBURN_Message::output('[!Empty database port into configuration!]',PhpBURN_Message::WARNING);
-//			$options['port'] = '3306';
-		}
-		if(empty($options['host']))
-		{
-			PhpBURN_Message::output('[!Empty database host into configuration!]',PhpBURN_Message::WARNING);
-			$options['host'] = 'localhost';
-		}
-		
-		/**
 		 * Search for all package in that Driver Connection/Configuration and
 		 * create specific configurations for them.
 		 * 
@@ -61,7 +53,7 @@ class PhpBURN_Configuration {
 		 */
 		foreach($options['packages'] as $key => $value) {
 			$key = is_array($value) ? $key : $value;
-			self::$options[$key] = new PhpBURN_ConfigurationItem($key,$value,$options);
+			self::$options[$key] = new phpBURN_ConfigurationItem($key, $value, $options);
 		}
 	}
 	
