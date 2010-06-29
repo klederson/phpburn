@@ -203,6 +203,13 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 
 
+        /**
+         * Moves the resultSet pointer to a determined pointer if the index
+         * does not exists it will return a Boolean FALSE
+         *
+         * @param Integer $pointer
+         * @return Boolean/PhpBURN_Core
+         */
 	public function _moveTo($pointer) {
 		$currentPosition = $pointer;//$this->getDialect()->getPointer();
 		$lastPosition = $this->getDialect()->getLast();
@@ -808,7 +815,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @param String $condition
 	 * @param Boolean $override
 	 *
-	 * @return Boolean
+	 * @return PhpBURN_Core
 	 */
         public function relationshipWhere($linkName, $condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
             $existis = $this->getMap()->getRelationShip($linkName);
@@ -839,7 +846,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 
         /**
-         *
+         * Works like select() but for getRelationship() calls
          * @param String $linkName
          * @param String $field
          * @param String $alias
