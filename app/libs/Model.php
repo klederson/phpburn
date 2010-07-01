@@ -58,6 +58,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public $_select							= array();
 	public $_join							= array();
 
+//      Utils
+        public $_amount                                                 = 0;
+
 	/**
 	 * This is an automatic configuration when a model inherit another PhpBURN Model
 	 * than the model will use two or more mapItens.
@@ -157,8 +160,17 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			$pk = null;
 		}
 		$amount = $this->getDialect()->find($pk);
+                $this->_amount = $amount;
 		return $fluid == false ? $amount : $this;
 	}
+
+        /**
+         * Returns the amount of registers finded by find() or get() or related
+         * @return Integer
+         */
+        public function getAmount() {
+            return $this->_amount;
+        }
 
 	/**
 	 * This method resets the fields at the model ( CLEAR ALL FIELDS )
@@ -1154,5 +1166,69 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public function toJSON($recursive = true, $full = false) {
 		return json_encode(self::toArray($recursive, $full));
 	}
+
+        public function toStdClass($recursive = true) {
+            return $this->arrayToObject($this->toArray($recursive));
+        }
+
+        /**
+         * This returns all model finded/fetched entries into an Array
+         * 
+         * @return Array
+         */
+        public function transformArray() {
+            $return = array();
+
+            $currentPosition = $this->getDialect()->getPointer();
+            
+            if($this->getAmount() > 0) {
+                while($this->fetch()) {
+                    $return[] = $this->toArray();
+                }
+            }
+
+            $this->_moveTo($currentPosition);
+
+            return $return;
+        }
+
+        /**
+         * Transform all model finded/fetched entries into an JSON String
+         *
+         * @return String
+         */
+        public function transformJSON() {
+            return json_encode($this->transformArray());
+        }
+
+        /**
+         * Transform all model finded/fetched entries into an stdClass Object
+         *
+         * @return stdClass
+         */
+        public function transformStdClass() {
+            return $this->arrayToObject($this->transformArray());
+        }        
+
+        /**
+         * Transform recursively an array into an stdClass Object
+         * 
+         * @param Array $array
+         * @return stdClass
+         */
+        public function arrayToObject(array $array) {
+            $object = new stdClass();
+
+            foreach ($array as $index => $value) {
+                if ( !is_null($index) ) {
+                    $object->$index = is_array($value) ? $this->arrayToObject($value) : $value;
+                } else {
+                    $object->$index = new stdClass();
+                }
+            }
+            
+            return $object;
+            
+        }
 }
 ?>
