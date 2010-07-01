@@ -1167,9 +1167,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	}
 
         /**
-         * This method convert all mapped informationg (including cascating relatioinships) into a JSON format to better manage it into views or anything you want to.
+         * This method convert all mapped informationg (including cascating relatioinships) into a stdClass Objecto to better manage it into views or anything you want to.
          * By default recursive is true and full recursive is false.
-         * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to JSON too.
+         * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to stdClass Object too.
 	 *
 	 * <code>
 	 * $user = new Users();
