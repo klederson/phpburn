@@ -1151,12 +1151,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
          * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to JSON too.
 	 *
 	 * <code>
-	 * @TODO PUT AN EXAMPLE HERE
-	 * </code>
-	 *
-	 * Full means (PLEASE BE VERY CAREFUL WHEN USE IT OR YOU WILL PROBABLY CRASH YOUR APP) it will take ALL relationships (yes all dataset) and ALL sub-relationships ( infinite and alldataset ) and convert giving you for each relationship a array pretty much like:
-	 * <code>
-	 * @TODO PUT AN EXAMPLE HERE
+	 * $user = new Users();
+         *
+         * $user->get(1);
+         *
+         * var_dump($user->toJSON());
 	 * </code>
 	 *
 	 * @param Boolean $recursive
@@ -1167,6 +1166,22 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		return json_encode(self::toArray($recursive, $full));
 	}
 
+        /**
+         * This method convert all mapped informationg (including cascating relatioinships) into a JSON format to better manage it into views or anything you want to.
+         * By default recursive is true and full recursive is false.
+         * Recursive means it will take all relationships ( currently or not ) and convert in a zero level to JSON too.
+	 *
+	 * <code>
+	 * $user = new Users();
+         *
+         * $user->get(1);
+         *
+         * var_dump($user->toStdClass());
+	 * </code>
+         *
+         * @param Boolean $recursive
+         * @return stdClass
+         */
         public function toStdClass($recursive = true) {
             return $this->arrayToObject($this->toArray($recursive));
         }
