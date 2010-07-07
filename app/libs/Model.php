@@ -80,8 +80,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * PHP magic method that automaticaly executes when a new instance of this class is been created
 	 * Also here we configure the basics for the well work of PhpBURN Models
 	 */
-	public function __construct() {
-		if(!isset($this->_tablename) || !isset($this->_package)) {
+	public function __construct($tablename = null, $package = null) {
+
+                $this->_tablename = isset($this->_tablename) ? $this->_tablename : $tablename;
+                $this->_package = isset($this->_package) ? $this->_package : $package;
+
+		if(empty($this->_tablename) || empty($this->_package)) {
 			throw new PhpBURN_Exeption(PhpBURN_Message::EMPTY_PACKAGEORTABLE);
 		}
 
