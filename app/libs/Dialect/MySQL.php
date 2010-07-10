@@ -148,6 +148,7 @@ class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
 			case 'longtext':
 			case 'date':
 			case 'timestamp':
+			case 'datetime':
 				$length = '';
 			break;
 			case 'enum':

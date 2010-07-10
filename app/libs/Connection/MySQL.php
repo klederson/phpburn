@@ -248,6 +248,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 			$fks[ $name ]['from'] = $matches[1][$i];
 			$fks[ $name ]['to'] = $matches[2][$i];
 			$fks[ $name ]['to_column'] = $matches[3][$i];
+                        $fks[ $name ]['table_from'] = $tablename;
 			
 			$reg = array();
 			if(preg_match('@(.*?)ON UPDATE (RESTRICT|CASCADE)@i', $matches[4][$i], $reg))
@@ -296,44 +297,44 @@ class PhpBURN_Connection_MySQL implements IConnection
 	
 	public function describe($tablename)
 	{
-		$sql = "DESCRIBE ". $tablename;
-		$rs = $this->executeSQL( $sql );
-		
-		$data = array();
-		while($row = mysql_fetch_row($rs))
-		{
-			$name           = $row[0];
-			$type_native    = $row[1];
-			if(preg_match('@(\w+)\((\d+)\)@', $row[1], $r))
-			{
-				$type       = $r[1];
-				$length     = $r[2];
-			} else {
-				$type       = $row[1];
-				$length     = null;
-			}
-			
-			switch( strtolower($type) )
-			{
-				case 'tinyblob': $length = 255; break;
-				case 'tinytext': $length = 255; break;
-				case 'blob': $length = 65535; break;
-				case 'text': $length = 65535; break;
-				case 'mediumblob': $length = 16777215; break;
-				case 'mediumtext': $length = 16777215; break;
-				case 'longblob': $length = 4294967295; break;
-				case 'longtext': $length = 4294967295; break;
-				case 'enum': $length = 65535; break;
-			}
-			
-			$notnull        = $row[2] == 'YES' ? false : true;
-			$primary        = $row[3] == 'PRI' ? true : false;
-			$default        = $row[4] == 'NULL' ? null : $row[4];
-			$autoincrement  = $row[5] == 'auto_increment' ? true : false;
-			
-			$data[] = array($name, $type_native, $type, $length, $primary, $notnull, $default, $autoincrement);
-		}
-		return $data;
+            $sql = "DESCRIBE ". $tablename;
+            $rs = $this->executeSQL( $sql );
+
+            $data = array();
+            while($row = mysql_fetch_row($rs))
+            {
+                $name           = $row[0];
+                $type_native    = $row[1];
+                if(preg_match('@(\w+)\((\d+)\)@', $row[1], $r))
+                {
+                    $type       = $r[1];
+                    $length     = $r[2];
+                } else {
+                    $type       = $row[1];
+                    $length     = null;
+                }
+
+                switch( strtolower($type) )
+                {
+                    case 'tinyblob': $length = 255; break;
+                    case 'tinytext': $length = 255; break;
+                    case 'blob': $length = 65535; break;
+                    case 'text': $length = 65535; break;
+                    case 'mediumblob': $length = 16777215; break;
+                    case 'mediumtext': $length = 16777215; break;
+                    case 'longblob': $length = 4294967295; break;
+                    case 'longtext': $length = 4294967295; break;
+                    case 'enum': $length = 65535; break;
+                }
+
+                $notnull        = $row[2] == 'YES' ? false : true;
+                $primary        = $row[3] == 'PRI' ? true : false;
+                $default        = $row[4] == 'NULL' ? null : $row[4];
+                $autoincrement  = $row[5] == 'auto_increment' ? true : false;
+
+                $data[] = array($name, $type_native, $type, $length, $primary, $notnull, $default, $autoincrement);
+            }
+            return $data;
 	}
 	
 	public function executeSQL($sql)

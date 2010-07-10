@@ -36,9 +36,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		
 		$modelName = get_class($this->getModel());
 		
-		if($sql != null) {
-			$this->execute($sql);
-			$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
+		if($sql != null) {			
+			$this->resultSet = &$this->execute($sql);
 		} else {
 			PhpBURN_Message::output("[!No query found!] - <b>$modelName</b>");
 			return false;
@@ -60,25 +59,25 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 */
 	public function fetch() {
 					
-			if($this->getPointer() > $this->getLast() ) {
-				$this->setPointer($this->getLast());
-				return false;
-			} else {						
-				$data = $this->dataExists($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
-				
-				//PhpBURN_Message::output("Pointer ".$this->getPointer());
-				
+            if($this->getPointer() > $this->getLast() ) {
+                $this->setPointer($this->getLast());
+                return false;
+            } else {
+                $data = $this->dataExists($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
+
+                //PhpBURN_Message::output("Pointer ".$this->getPointer());
+
 //				Remove slashes
-				foreach($data as $index => $value) {
-					$data[$index] = stripslashes($value); 
-				}
-				
-				if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
-					$this->dataSet[$this->getPointer()] = $data;
-				}
-				
-				return $data;
-			}
+                foreach($data as $index => $value) {
+                        $data[$index] = stripslashes($value);
+                }
+
+                if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
+                        $this->dataSet[$this->getPointer()] = $data;
+                }
+
+                return $data;
+            }
 			
 	}
 	
@@ -89,23 +88,23 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @return Boolean
 	 */
 	public function dataExists($pointer) {
-		return is_array($this->dataSet[$pointer]) ? true : false;
+            return is_array($this->dataSet[$pointer]) ? true : false;
 	}
 	
 	public function prepareDelete($pk) {
-		//Defnine FROM tables
-		$from = 'FROM ' . $this->getModel()->_tablename;
-		
-		$whereConditions = null;
-			
-		$pkField = $this->getModel()->getMap()->getPrimaryKey();
-		$pk = $pk == null ? $this->getModel()->getMap()->getFieldValue($pkField['field']['alias']) : $pk;
-		
-		if(isset($pk) && !empty($pk) && $pk != null) {
-			$whereConditions = sprintf("WHERE %s='%s'",$pkField['field']['column'],$pk);
-		}
-			
-		return $sql = $whereConditions == null ? null : sprintf("DELETE %s %s", $from, $whereConditions);
+            //Defnine FROM tables
+            $from = 'FROM ' . $this->getModel()->_tablename;
+
+            $whereConditions = null;
+
+            $pkField = $this->getModel()->getMap()->getPrimaryKey();
+            $pk = $pk == null ? $this->getModel()->getMap()->getFieldValue($pkField['field']['alias']) : $pk;
+
+            if(isset($pk) && !empty($pk) && $pk != null) {
+                $whereConditions = sprintf("WHERE %s='%s'",$pkField['field']['column'],$pk);
+            }
+
+            return $sql = $whereConditions == null ? null : sprintf("DELETE %s %s", $from, $whereConditions);
 	}
 	
 	/**
@@ -116,82 +115,82 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * @return String $sql
 	 */
 	public function prepareSelect($pk = null) {		
-		//Globals
-		$pkField = $this->getModel()->getMap()->getPrimaryKey();
-		$parentFields = $this->getModel()->getMap()->getParentFields();
-		$parentClass = get_parent_class($this->getModel());
-		
-		
-		//Join the extended classes
-		foreach($parentFields as $index => $value) {
-			$classVars = get_class_vars($parentClass);
-			if($parentClass == $value['classReference']) {
-				$tableLeft = $this->getModel()->_tablename;
-			} else {
-				$tableLeft = $classVars['_tablename'];
-			}
-			
-			$this->getModel()->join($value['field']['tableReference'],$value['field']['column'],$value['field']['column'],'=', 'JOIN', $tableLeft);
-			unset($classVars);
-		}
-		
-		//Creating the selectable fields
-		if(count($this->getModel()->_select) <= 0) {
-			//Selecting from the map
-			foreach($this->getModel()->getMap()->fields as $index => $value) {
-				//Parsing non-relationship fields
-				if(!$value['isRelationship'] && $value['field']['column'] != null) { //&& $value['classReference'] == get_class($this->getModel())) {
-					$fields .= $fields == null ? "" : ", ";
-					$fields .= sprintf("%s.%s AS %s", $value['field']['tableReference'],$value['field']['column'], $index);
-				}
-			}
-		} elseif(count($this->getModel()->_select) > 0) {
-			//Select based ONLY in the $obj->select(); method
-			foreach($this->getModel()->_select as $index => $value) {
-				$fields .= $fields == null ? "" : ", ";
-				$fields .= sprintf("%s AS %s", $value['value'], $value['alias']);
-			}
-		} else {
-			$model = get_class($this->modelObj);
-			PhpBURN_Message::output("$model [!is not an mapped or valid PhpBURN Model!]",PhpBURN_Message::ERROR);
-			exit;
-		}
+            //Globals
+            $pkField = $this->getModel()->getMap()->getPrimaryKey();
+            $parentFields = $this->getModel()->getMap()->getParentFields();
+            $parentClass = get_parent_class($this->getModel());
 
-		$from = $this->getFromString();
-		
-		//Define Join SENTENCE
-		if(count($this->getModel()->_join) > 0) {
-			$joinString = $this->getJoinString();
-		}
-				
-		//Define Where SENTENCE
-		$whereConditions = $this->getWhereString($pk, $pkField);
-		
-		if($whereConditions != null && isset($whereConditions) && !empty($whereConditions)) {
-        	$conditions = 'WHERE ';
-		}
-		
-		//Define OrderBY SENTENCE
-		if(count($this->getModel()->_orderBy) > 0) {
-			$orderConditions = $this->getOrderByString();
-		}
 
-                //Define GroupBy SENTENCE
-		if(count($this->getModel()->_groupBy) > 0) {
-			$groupConditions = $this->getGroupByString();
-		}
-		
-		//Define Limit SENTENCE
-		if($this->getModel()->_limit != null) {
-			$limits = explode(',',$this->getModel()->_limit);
-			$limit = $this->setLimit($limits[0],$limits[1]);
-		}
-		
-		//Construct SQL
-		$sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $groupConditions, $limit,$limits);
-		unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass, $groupConditions);
-		
-		return $sql;
+            //Join the extended classes
+            foreach($parentFields as $index => $value) {
+                $classVars = get_class_vars($parentClass);
+                if($parentClass == $value['classReference']) {
+                    $tableLeft = $this->getModel()->_tablename;
+                } else {
+                    $tableLeft = $classVars['_tablename'];
+                }
+
+                $this->getModel()->join($value['field']['tableReference'],$value['field']['column'],$value['field']['column'],'=', 'JOIN', $tableLeft);
+                unset($classVars);
+            }
+
+            //Creating the selectable fields
+            if(count($this->getModel()->_select) <= 0) {
+                //Selecting from the map
+                foreach($this->getModel()->getMap()->fields as $index => $value) {
+                    //Parsing non-relationship fields
+                    if(!$value['isRelationship'] && $value['field']['column'] != null) { //&& $value['classReference'] == get_class($this->getModel())) {
+                        $fields .= $fields == null ? "" : ", ";
+                        $fields .= sprintf("%s.%s AS %s", $value['field']['tableReference'],$value['field']['column'], $index);
+                    }
+                }
+            } elseif(count($this->getModel()->_select) > 0) {
+                //Select based ONLY in the $obj->select(); method
+                foreach($this->getModel()->_select as $index => $value) {
+                    $fields .= $fields == null ? "" : ", ";
+                    $fields .= sprintf("%s AS %s", $value['value'], $value['alias']);
+                }
+            } else {
+                $model = get_class($this->modelObj);
+                PhpBURN_Message::output("$model [!is not an mapped or valid PhpBURN Model!]",PhpBURN_Message::ERROR);
+                exit;
+            }
+
+            $from = $this->getFromString();
+
+            //Define Join SENTENCE
+            if(count($this->getModel()->_join) > 0) {
+                $joinString = $this->getJoinString();
+            }
+
+            //Define Where SENTENCE
+            $whereConditions = $this->getWhereString($pk, $pkField);
+
+            if($whereConditions != null && isset($whereConditions) && !empty($whereConditions)) {
+                $conditions = 'WHERE ';
+            }
+
+            //Define OrderBY SENTENCE
+            if(count($this->getModel()->_orderBy) > 0) {
+                $orderConditions = $this->getOrderByString();
+            }
+
+            //Define GroupBy SENTENCE
+            if(count($this->getModel()->_groupBy) > 0) {
+                $groupConditions = $this->getGroupByString();
+            }
+
+            //Define Limit SENTENCE
+            if($this->getModel()->_limit != null) {
+                $limits = explode(',',$this->getModel()->_limit);
+                $limit = $this->setLimit($limits[0],$limits[1]);
+            }
+
+            //Construct SQL
+            $sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $groupConditions, $limit,$limits);
+            unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass, $groupConditions);
+
+            return $sql;
 	}
 
         public function getFromString() {
