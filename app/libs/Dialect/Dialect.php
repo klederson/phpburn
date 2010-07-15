@@ -24,6 +24,39 @@ abstract class PhpBURN_Dialect  implements IDialect  {
         public function reset() {
 //            unset($this->dataSet, $this->resultSet, $this->pointer);
         }
+
+        /**
+         * EXPERIMENTAL cacheSearch
+         * Looks for some condition and content into the already cached results
+         * without connect the database again. Then it returns you an array of ocurrencies
+         * 
+         * @param String $field
+         * @param String $content
+         * @param String $condition
+         *
+         * @return Mixed Numeric/False
+         */
+        public function cacheSearch($field, $content, $condition = '==') {
+            $pointers = array();
+            
+            if(count($this->dataSet) > 0) {
+                foreach($this->dataSet as $pointer => $arrContent) {
+                    $strCheck = sprintf('if( "%s" %s "%s" ) { return %s; } else { return false; }',$arrContent[$field], $condition, $content, $pointer);
+
+                    $newPointer = eval($strCheck);
+
+                    if(is_numeric($newPointer)) {
+                        $pointers[] = $newPointer;
+                    }
+                }
+            }
+
+            return $pointers;
+        }
+
+        public function cacheSearchRegex($field, $pattern) {
+            
+        }
 	
 	/**
 	 * Prepares and returns a dataset of resuts from the database
@@ -61,15 +94,13 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	 * (non-PHPdoc)
 	 * @see app/libs/Dialect/IDialect#fetch()
 	 */
-	public function fetch() {
-					
+	public function fetch() {		
             if($this->getPointer() > $this->getLast() ) {
 //                $this->setPointer($this->getLast());
                 $this->moveFirst();
                 return false;
             } else {
                 $data = $this->dataExists($this->getPointer()) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
-
 
 //              Remove slashes
                 foreach($data as $index => $value) {
@@ -81,8 +112,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
                 }
 
                 return $data;
-            }
-			
+            }		
 	}
 	
 	/**
