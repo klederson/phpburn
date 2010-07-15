@@ -70,14 +70,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
             } else {
                 $data = $this->dataExists($this->getPointer()) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
 
-                //PhpBURN_Message::output("Pointer ".$this->getPointer());
 
-//				Remove slashes
+//              Remove slashes
                 foreach($data as $index => $value) {
                         $data[$index] = stripslashes($value);
                 }
-//                print "<pre>";
-//                print_r($this->dataSet);
 
                 if($data != null && count($data) > 0 && !$this->dataExists($this->getPointer()) ) {
                         $this->dataSet[$this->getPointer()] = $data;
