@@ -20,6 +20,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	function __destruct() {
 		unset($this);
 	}
+
+        public function reset() {
+//            unset($this->dataSet, $this->resultSet, $this->pointer);
+        }
 	
 	/**
 	 * Prepares and returns a dataset of resuts from the database
@@ -60,10 +64,11 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	public function fetch() {
 					
             if($this->getPointer() > $this->getLast() ) {
-                $this->setPointer($this->getLast());
+//                $this->setPointer($this->getLast());
+                $this->moveFirst();
                 return false;
             } else {
-                $data = $this->dataExists($this->dataSet[$this->getPointer()]) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
+                $data = $this->dataExists($this->getPointer()) ? $this->dataSet[$this->getPointer()] : $this->getModel()->getConnection()->fetch($this->resultSet);
 
                 //PhpBURN_Message::output("Pointer ".$this->getPointer());
 
@@ -71,8 +76,10 @@ abstract class PhpBURN_Dialect  implements IDialect  {
                 foreach($data as $index => $value) {
                         $data[$index] = stripslashes($value);
                 }
+//                print "<pre>";
+//                print_r($this->dataSet);
 
-                if($data != null && count($data) > 0 && !is_array($this->dataSet[$this->getPointer()])) {
+                if($data != null && count($data) > 0 && !$this->dataExists($this->getPointer()) ) {
                         $this->dataSet[$this->getPointer()] = $data;
                 }
 

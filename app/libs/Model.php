@@ -180,10 +180,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * This method resets the fields at the model ( CLEAR ALL FIELDS )
 	 */
 	public function reset() {
-		$this->getMap()->reset();
-                $this->_orderBy = $this->_select = $this->_where = $this->_groupBy = array();
-//                unset($this->_orderBy, $this->_select, $this->_where, $this->_groupBy);
-                unset($this->getDialect()->dataSet, $this->getDialect()->resultSet);
+//          Reset MapFields values
+            $this->getMap()->reset();
+
+//          Reset Model Conditions
+            $this->_orderBy = $this->_select = $this->_where = $this->_limit = $this->_groupBy = array();
+
+//          Reset Dialect values
+            $this->getDialect()->reset();
 	}
 
 	public function _moveNext() {
@@ -570,11 +574,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 */
 	public function fetch() {
 
-		if($this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists($this->getDialect()->getPointer())) {
-
-		} else {
-			$this->getDialect()->moveNext();
-		}
+//		if($this->getDialect()->getPointer() == 0 && !$this->getDialect()->dataExists($this->getDialect()->getPointer())) {
+//
+//		} else {
+//			$this->getDialect()->moveNext();
+//		}
 
 		$result = $this->getDialect()->fetch();
 		if ($result) {
@@ -601,6 +605,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				}
 			}
 			*/
+
+                        $this->getDialect()->moveNext();
 
                         return $this;
 		}
