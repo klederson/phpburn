@@ -227,37 +227,42 @@ class PhpBURN_Connection_MySQL implements IConnection
 		{
 			return false;
 		}
+                
 		
 		$fks = array();
-		$rs = $this->executeSQL("SHOW CREATE TABLE ".$tablename);
-		
+                $sql = sprintf("SHOW CREATE TABLE `%s`",$tablename);
+		$rs = $this->executeSQL($sql);
 		$result = mysql_fetch_row($rs);
+                print_r( $result );
 		$result[0] = preg_replace("(\r|\n)",'\n', $result[0]);
-		$matches = array();
 
-		preg_match_all('@FOREIGN KEY \(`([a-z,A-Z,0-9,_]+)`\) REFERENCES `([a-z,A-Z,0-9,_]+)` \(`([a-z,A-Z,0-9,_]+)`\)(.*?)(\r|\n|\,)@i', $result[1], $matches);
-		
-		for($i=0; $i<count($matches[0]); $i++)
+                $matches = array();
+
+		preg_match_all('@FOREIGN KEY \(`([a-z,A-Z,0-9,_]+)`\) REFERENCES (`([a-z,A-Z,0-9,_]+)`\.)?`([a-z,A-Z,0-9\.,_]+)` \(`([a-z,A-Z,0-9,_]+)`\)(.*?)(\r|\n|\,)@i', $result[1], $matches);
+		print_r($matches);
+                for($i=0; $i<count($matches[0]); $i++)
 		{
-			$name = $matches[2][$i];
+			$name = !empty($matches[2][$i]) ? preg_replace("([`\.])", '', $matches[2][$i]) .':' . $matches[4][$i] : $matches[4][$i];
 			if(isset($fks[ $name ]))
 			{
-				$name = $name . '_' . $matches[3][$i];
+				$name = $name . '_' . $matches[4][$i];
 			}
 			
-			$fks[ $name ]['from'] = $matches[1][$i];
-			$fks[ $name ]['to'] = $matches[2][$i];
-			$fks[ $name ]['to_column'] = $matches[3][$i];
-                        $fks[ $name ]['table_from'] = $tablename;
+			$fks[ $name ]['from_column'] = $matches[1][$i];
+                        $fks[ $name ]['from_table'] = $tablename;
+			$fks[ $name ]['to_db'] = !empty($matches[2][$i]) ? preg_replace("([`\.])", '', $matches[2][$i]) : null;
+                        $fks[ $name ]['to_table'] = $matches[4][$i];
+			$fks[ $name ]['to_column'] = $matches[5][$i];
+                        
 			
 			$reg = array();
-			if(preg_match('@(.*?)ON UPDATE (RESTRICT|CASCADE)@i', $matches[4][$i], $reg))
+			if(preg_match('@(.*?)ON UPDATE (RESTRICT|CASCADE)@i', $matches[6][$i], $reg))
 			{
 				$fks[ $name ]['update'] = strtoupper($reg[2]);
 			} else {
 				$fks[ $name ]['update'] = 'RESTRICT';
 			}
-			if(preg_match('@(.*?)ON DELETE (RESTRICT|CASCADE)@i', $matches[4][$i], $reg))
+			if(preg_match('@(.*?)ON DELETE (RESTRICT|CASCADE)@i', $matches[6][$i], $reg))
 			{
 				$fks[ $name ]['delete'] = strtoupper($reg[2]);
 			} else {
@@ -265,7 +270,6 @@ class PhpBURN_Connection_MySQL implements IConnection
 			}
 			
 		}
-		
 		return $fks;
 	}
 	
@@ -297,7 +301,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	
 	public function describe($tablename)
 	{
-            $sql = "DESCRIBE ". $tablename;
+            $sql = sprintf("DESCRIBE `%s`", $tablename);
             $rs = $this->executeSQL( $sql );
 
             $data = array();
