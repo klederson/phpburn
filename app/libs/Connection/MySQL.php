@@ -241,7 +241,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 
                 for($i=0; $i<count($matches[0]); $i++)
 		{
-                    $name = !empty($matches[2][$i]) ? preg_replace("([`\.])", '', $matches[2][$i]) .':' . $matches[4][$i] : $matches[4][$i];
+                    $name = $matches[4][$i];
                     if(isset($fks[ $name ]))
                     {
                             $name = $name . '_' . $matches[4][$i];

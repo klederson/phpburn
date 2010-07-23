@@ -6,7 +6,7 @@ class PhpBURN_Reverse {
     private static $thisPath;
 
     public function init() {
-        print self::$thisPath = realpath(dirname(__FILE__));
+        self::$thisPath = realpath(dirname(__FILE__));
         print "<pre>";
         
         $packages = PhpBURN_Configuration::getConfig();
@@ -51,7 +51,7 @@ class PhpBURN_Reverse {
                 foreach($tableFks as $index => $keyArr) {
                     self::$rawFks[$index][] = $keyArr;
 
-                    self::$thisTableFks[$keyArr['references']][] = $keyArr;
+                    self::$thisTableFks[$keyArr['referencedTable']][] = $keyArr;
                 }
 
     //          post-reverse
@@ -70,7 +70,7 @@ class PhpBURN_Reverse {
 
         foreach(self::$thisTableFks as $origin => $item) {
             foreach($item as $index => $value) {
-                self::$fks[$value['toDatabase'].'.'.$value['referencedTable']][] = self::generateRelationship($origin, $value);
+                self::$fks[$value['referencedTable']][] = self::generateRelationship($origin, $value);
             }
         }
 //
@@ -80,7 +80,7 @@ class PhpBURN_Reverse {
 //        print "<h1> ===== FINAL FKS ===== </h1>";
 //        print_r(self::$fks);
 
-//        self::constructModelFiles();
+        self::constructModelFiles();
     }
     
     public function generateRelationship($origin, array $value) {
@@ -95,11 +95,20 @@ class PhpBURN_Reverse {
         if($isManyToMany && $value['referencedTable'] == $checkMany[1][0]) {
             $relType = 'self::MANY_TO_MANY';
             $name = $foreignClass = $checkMany[2][0];
+//            print "<h1>$foreignClass</h1>";
+//            print_r($value);
+//            print_r($checkMany);
+
+            $outArr = self::$rawFks[$checkMany[2][0]];
+
+            foreach($outArr as $index => $arrValue) {
+                if($checkMany[0][0] == $arrValue['thisTable']) {
+                    $outKey = $arrValue['referencedColumn'];
+                    $relOutKey = $arrValue['thisColumn'];
+                }
+            }            
 
             $keys = array_keys(self::$rawFks);
-
-            $outKey = 'a';
-            $relOutKey = 'b';
             
             $relTemplate = sprintf('$this->getMap()->addRelationship("%s", %s, "%s", "%s", "%s", "%s", "%s", "%s");',$foreignClass, $relType, $foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable);
         } else if($isManyToMany == 0) {
@@ -141,10 +150,11 @@ class PhpBURN_Reverse {
 
             $viewData['package'] = $separation[2][0];
             $viewData['tableName'] = $separation[3][0];
+            $viewData['className'] = ucwords(str_replace('.','_',$separation[3][0]));
             $viewData['rawFields'] = $arrContent;
             $viewData['fields'] = self::$fields[$fullName];
-            $viewData['rawFks'] = self::$rawFks[$fullName];
-            $viewData['fks'] = self::$fks[$fullName];
+            $viewData['rawFks'] = self::$rawFks[$separation[3][0]];
+            $viewData['fks'] = self::$fks[$separation[3][0]];
 
             $content = "<?php\r\n";
             $content .= PhpBURN_Views::loadViewFile(self::$thisPath . DS . 'modelTemplate.html',$viewData, true);
@@ -152,10 +162,11 @@ class PhpBURN_Reverse {
 
             if(!is_dir(SYS_MODEL_PATH . $viewData['package'])) {
                 SYS_MODEL_PATH . $viewData['package'];
-                mkdir(SYS_MODEL_PATH . $viewData['package'],0777);
+                mkdir(SYS_MODEL_PATH . $viewData['package'],0777,true);
             }
 
-            $fileName = sprintf("%s%s",$viewData['tableName'],SYS_MODEL_EXT);
+            $file = str_replace('.', '_', $viewData['tableName']);
+            $fileName = sprintf("%s%s",$file,SYS_MODEL_EXT);
             $filePath = SYS_MODEL_PATH . $viewData['package'];
             $file = fopen( $filePath . DS . $fileName ,'w+');
             fwrite($file, $content);
