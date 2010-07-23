@@ -147,6 +147,18 @@ abstract class PhpBURN_Views implements IView {
 			return false;
 		}
 	}
+
+        public function loadViewFile($path, $data, $toVar = false) {
+
+		if(file_exists($path)) {
+			PhpBURN_Message::output('[!Loading view file:!] ' . $path);
+			$output = self::processViewData($path, $data);
+			unset($path, $path);
+			return $toVar == false ? print $output : $output;
+		} else {
+			return false;
+		}
+	}
 	
 	/**
 	 * This method is used to process the data into the view and than return it to the main method that will handle what to do.
@@ -166,7 +178,10 @@ abstract class PhpBURN_Views implements IView {
 	}
 
         public function chooseViewMethod() {
-            self::$viewMethod = self::$viewMethod = !defined('PHPBURN_VIEWS_METHOD') ? 'default' : PHPBURN_VIEWS_METHOD;
+            self::$viewMethod = !defined('PHPBURN_VIEWS_METHOD') || !empty(self::$viewMethod) ? self::$viewMethod : PHPBURN_VIEWS_METHOD;
+            if(self::$viewMethod == null) {
+                self::$viewMethod = 'default';
+            }
             PhpBURN::load('Tools.Views.'.self::$viewMethod);
             $classString = sprintf("%s_PhpBURN_ViewProcess",self::$viewMethod);
             

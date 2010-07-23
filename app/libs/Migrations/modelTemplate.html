@@ -1,0 +1,35 @@
+/**
+ * This is an automatic generated Model by Reverse Migrations at PhpBURN Framework
+ * You can find more information about it at http://www.phpburn.com
+ *
+ * @author Klederson Bueno <klederson@klederson.com>
+ * @license GPL
+ * @package <?=$package?> 
+ */
+class <?=$tableName?> extends PhpBURN_Core {
+    public $_tablename = "<?=$tableName?>";
+    public $_package = "<?=$package?>";
+
+
+<?
+foreach($rawFields as $field) {
+echo sprintf("      public $%s; \r\n", $field['name']);
+}
+?>
+
+    public function _mapping() {
+<?
+foreach($fields as $field) {
+print sprintf("         %s\r\n", $field);
+}
+?>
+
+<?
+if(count($fks) > 0) {
+foreach($fks as $fk) {
+print sprintf("         %s\r\n", $fk);
+}
+}
+?>
+    }
+}
