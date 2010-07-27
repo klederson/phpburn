@@ -317,15 +317,12 @@ abstract class PhpBURN_Core implements IPhpBurn {
          * @return PhpBURN_Core
 	 */
 	public function join($tableLeft, $fieldLeft = null, $fieldRight = null, $operator = '=', $joinType = 'JOIN', $tableRight = null) {
-//		$this->_join[$tableLeft][] 										= array();
 
-//		$index = count($this->_join[$tableLeft])-1;
-
-		$this->_join[$tableLeft]['tableLeft'] 				= $tableLeft;
-		$this->_join[$tableLeft]['fieldLeft'] 				= $fieldLeft;
+		$this->_join[$tableLeft]['tableLeft'] 			= $tableLeft;
+		$this->_join[$tableLeft]['fieldLeft'] 			= $fieldLeft;
 		$this->_join[$tableLeft]['fieldRight'] 			= $fieldRight;
-		$this->_join[$tableLeft]['operator'] 				= $operator;
-		$this->_join[$tableLeft]['type']						= $joinType;
+		$this->_join[$tableLeft]['operator'] 			= $operator;
+		$this->_join[$tableLeft]['type']			= $joinType;
 		$this->_join[$tableLeft]['tableRight'] 			= $tableRight;
 
                 return $this;
@@ -723,25 +720,28 @@ abstract class PhpBURN_Core implements IPhpBurn {
 			$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
 		}
 
+                
+
 //		Define rules to get it
 		switch($fieldInfo['type']) {
-				case self::ONE_TO_ONE:
-				case self::MANY_TO_ONE:
+                            case self::ONE_TO_ONE:
+                            case self::MANY_TO_ONE:
 //				Looking for ONE TO ONE relationship
 
 //				Define WHERE based on relationship fields
-				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
+                            $this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
 
 //				Verify database consistence if there's more then one than we have a database problem
-				$amount = $this->$fieldInfo['alias']->find();
-				if( $amount > 1 && $fieldInfo['type'] == self::ONE_TO_ONE) {
-					$modelName = get_class($this);
-					PhpBURN_Message::output("<b>$modelName</b> [!has an inconsistent relationship!] ONE_TO_ONE [!called!] <b>$name</b> [[!results!] ($amount)]", PhpBURN_Message::WARNING);
-					return false;
-					exit;
-				}
+                            $amount = $this->$fieldInfo['alias']->find();
+                            $this->getDialect()->dataSet[$this->getDialect()->getPointer()-1][$fieldInfo['alias']] = &$this->$fieldInfo['alias']->getDialect()->dataSet;
+                            if( $amount > 1 && $fieldInfo['type'] == self::ONE_TO_ONE) {
+                                $modelName = get_class($this);
+                                PhpBURN_Message::output("<b>$modelName</b> [!has an inconsistent relationship!] ONE_TO_ONE [!called!] <b>$name</b> [[!results!] ($amount)]", PhpBURN_Message::WARNING);
+                                return false;
+                                exit;
+                            }
 
-				return $fluid == false ? $amount : $this->$fieldInfo['alias'];
+                            return $fluid == false ? $amount : $this->$fieldInfo['alias'];
 			break;
 
 			case self::ONE_TO_MANY:
@@ -749,8 +749,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 //				Define WHERE based on relationship fields
 				$this->$fieldInfo['alias']->swhere($fieldInfo['relKey'],'=',$this->$fieldInfo['thisKey']);
-
-				return $this->$fieldInfo['alias']->find(null, $fluid);
+                                $return = $this->$fieldInfo['alias']->find(null, $fluid);
+                                $this->getDialect()->dataSet[$this->getDialect()->getPointer()-1][$fieldInfo['alias']] = &$this->$fieldInfo['alias']->getDialect()->dataSet;
+				return $return;
 			break;
 
 			case self::MANY_TO_MANY:
@@ -770,7 +771,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
 				$whereString = sprintf('%s %s.%s = %s',$conditionString, $this->_tablename,$fieldInfo['thisKey'],$this->$fieldInfo['thisKey']);
 				$this->$fieldInfo['alias']->mwhere($whereString);
 
-				return $this->$fieldInfo['alias']->find(null, $fluid);
+				$return = $this->$fieldInfo['alias']->find(null, $fluid);
+                                $this->getDialect()->dataSet[$this->getDialect()->getPointer()-1][$fieldInfo['alias']] = &$this->$fieldInfo['alias']->getDialect()->dataSet;
+				return $return;
 
 			break;
 		}
@@ -786,7 +789,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 * @return PhpBURN_Core
 	 */
 	public function _getLink($name, $fluid = false, array $options = array()) {
-		return self::getRelationship($name, $fluid, $options);
+            PhpBURN_Message::output("[!->_getLink() is deprecated from now on use ->getRelationship()", PhpBURN_Message::WARNING);
+            return self::getRelationship($name, $fluid, $options);
 	}
 
 
