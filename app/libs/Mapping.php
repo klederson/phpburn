@@ -80,7 +80,7 @@ class PhpBURN_Mapping
 	 * @return Boolean
 	 */
 	private function isChild(PhpBURN_Core &$modelObj) {
-		if(get_parent_class($modelObj) != 'PhpBURN_Core') {
+		if(get_parent_class($modelObj) != 'PhpBURN_Core' && empty($modelObj->_tablename)) {
 			return true;
 		} else {
 			return false;
