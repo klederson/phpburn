@@ -101,12 +101,14 @@ class PhpBURN_Reverse {
 
             $outArr = self::$rawFks[$checkMany[2][0]];
 
-            foreach($outArr as $index => $arrValue) {
-                if($checkMany[0][0] == $arrValue['thisTable']) {
-                    $outKey = $arrValue['referencedColumn'];
-                    $relOutKey = $arrValue['thisColumn'];
+            if(is_array($outArr)) {
+                foreach($outArr as $index => $arrValue) {
+                    if($checkMany[0][0] == $arrValue['thisTable']) {
+                        $outKey = $arrValue['referencedColumn'];
+                        $relOutKey = $arrValue['thisColumn'];
+                    }
                 }
-            }            
+            }
 
             $keys = array_keys(self::$rawFks);
             
@@ -148,6 +150,8 @@ class PhpBURN_Reverse {
         foreach(self::$rawFields as $fullName => $arrContent) {
             preg_match_all("((([a-z,A-Z,0-9,_]+)\.)?([a-z,A-Z,0-9\.,_]+))", $fullName, $separation);
 
+            PhpBURN_Views::setViewMethod('default');
+
             $viewData['package'] = $separation[2][0];
             $viewData['tableName'] = $separation[3][0];
             $viewData['className'] = ucwords(str_replace('.','_',$separation[3][0]));
@@ -165,7 +169,7 @@ class PhpBURN_Reverse {
                 mkdir(SYS_MODEL_PATH . $viewData['package'],0777,true);
             }
 
-            $file = str_replace('.', '_', $viewData['tableName']);
+            $file = $viewData['className'];
             $fileName = sprintf("%s%s",$file,SYS_MODEL_EXT);
             $filePath = SYS_MODEL_PATH . $viewData['package'];
             $file = fopen( $filePath . DS . $fileName ,'w+');
