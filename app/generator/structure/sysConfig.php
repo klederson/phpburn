@@ -51,7 +51,7 @@ define('SYS_CONTROLLER_EXT', 'php',true);
 ################################
 # Infos
 ################################
-define('PHPBURN_VERSION','0.763',true);
+define('PHPBURN_VERSION','0.9b',true);
 define('PHPBURN_WEBSITE','http://www.phpburn.com/',true);
 define('PHPBURN_REPOSITORY_TYPE','git',true);
 define('PHPBURN_REPOSITORY','http://github.com/klederson/phpburn/tree/master',true);
