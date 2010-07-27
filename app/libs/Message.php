@@ -20,23 +20,24 @@ class PhpBURN_Message {
 	
 	/* MODE */
 	const CONSOLE 					= 300001;
-  	const BROWSER 				= 300002;
+  	const BROWSER                                   = 300002;
   	const FIREBUG 					= 300003;
-  	const FILE    						= 300004;
-  	const DATABASE    			= 300005;
+        const FIREPHP 					= 300003;
+  	const FILE    					= 300004;
+  	const DATABASE                                  = 300005;
 
   	/* TYPE */
-  	const NOTICE						= '[!Notice!]';
-  	const EXCEPTION				= '[!Exception!]';
+  	const NOTICE                                    = '[!Notice!]';
+  	const EXCEPTION                                 = '[!Exception!]';
   	const WARNING					= '[!Warning!]';
-  	const LOG							= '[!Log!]';
-  	const ERROR						= '[!Error!]';
+  	const LOG					= '[!Log!]';
+  	const ERROR                                     = '[!Error!]';
   	
   	/* PRIORITY */
-  	const LOW							= 300100;
+  	const LOW					= 300100;
   	const NORMAL					= 300101;
-  	const HIGH						= 300102;
-  	const INSANE						= 300103; //this one will ALWAYS be show, even when the message type is not allowed (will not only when message system is turned off)
+  	const HIGH                                      = 300102;
+  	const INSANE                                    = 300103; //this one will ALWAYS be show, even when the message type is not allowed (will not only when message system is turned off)
   
   	/* STAGE */
   	public static $mode;
