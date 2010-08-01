@@ -4,7 +4,7 @@
  * @author Klederson Bueno
  *
  */
-interface IPhpBurn {
+interface IPhpBurn extends Iterator {
 
 	public function get();
 	

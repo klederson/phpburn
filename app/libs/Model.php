@@ -595,7 +595,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$amount = $this->find($pk);
 		if($amount >= 1) {
 			if($amount > 1 && $pk != null) {
-				PhpBURN_Message::output('[!There are more than one results for primary key!]: '. $pk, PhpBURN_Message::WARNING);
+                            PhpBURN_Message::output('[!There are more than one results for primary key!]: '. $pk, PhpBURN_Message::WARNING);
 			}
 			return $this->fetch();
 		} else {
@@ -619,6 +619,24 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	public function delete($pk = null) {
 		return $this->getDialect()->delete($pk);
 	}
+
+        public function deleteLink($child, $linkName) {
+            $fieldInfo = $relantionshipInfo = $this->getMap()->getField($linkName);
+//            $pkField = $this->getMap()->getPrimaryKey();
+
+            
+            if($child instanceof PhpBURN_Core) {
+               $childValue = $child->$fieldInfo['isRelationship']['outKey'];
+               PhpBURN_Message::output($childValue);
+            } else {
+                $childValue = $child;
+            }            
+
+            $sql = sprintf("DELETE FROM %s WHERE %s = %s AND %s = %s", $fieldInfo['isRelationship']['relTable'], $fieldInfo['isRelationship']['relKey'], $this->$fieldInfo['isRelationship']['thisKey'],$fieldInfo['isRelationship']['relOutKey'],$childValue);
+
+
+            return $this->getDialect()->execute($sql);
+        }
 
 	/**
          * It will order your results based on given params
@@ -1234,5 +1252,31 @@ abstract class PhpBURN_Core implements IPhpBurn {
             return $object;
             
         }
+
+//      Iterator Utils
+
+    function rewind() {
+        $this->_moveFirst();
+    }
+
+    function current() {
+        return $this;
+    }
+
+    function key() {
+        return $this->getDialect()->getPointer();
+    }
+
+    function next() {
+        return $this->fetch();
+    }
+
+    function valid() {
+        if($this->getDialect()->getPointer() > $this->getDialect()->getLast() ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
 ?>
