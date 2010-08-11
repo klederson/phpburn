@@ -2,7 +2,7 @@
 
 //Load firephp only when we need
 if(@SYS_USE_FIREPHP == true) {
-	PhpBURN::load('Tools.Extras.FirePHPCore.fb');
+	PhpBURN::load('Addons.FirePHPCore.fb');
 }
 
 /**
