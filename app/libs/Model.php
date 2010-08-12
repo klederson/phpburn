@@ -116,7 +116,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		//Then now we have all set... let's rock!
 		$this->_initialize();
 
-
+                return $this;
 	}
 
         public function __clone() {
@@ -188,6 +188,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 //          Reset Dialect values
             $this->getDialect()->reset();
+
+            return $this;
 	}
 
 	public function _moveNext() {

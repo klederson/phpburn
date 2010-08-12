@@ -1,5 +1,6 @@
 <?php
 PhpBURN::load('Tools.Views.IProcessView');
+
 class phptal_PhpBURN_ViewProcess implements IProcessView {
 
     public function _construct() {
@@ -40,8 +41,7 @@ class phptal_PhpBURN_ViewProcess implements IProcessView {
 //        //Cleaning the buffer for new sessions
         ob_clean();
 
-        return $___phpBurnBufferStored;
-            
+        return $___phpBurnBufferStored;            
 
     }
 }

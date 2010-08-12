@@ -343,24 +343,24 @@ class PhpBURN_Map implements IMap {
 	public function getClassParentField($className) {
 		if (count($this->parentFieldsReferences) > 0)
 		foreach($this->parentFieldsReferences as $index => $value) {
-			if($this->fields[$value]['classReference'] == $className) {
-				return $this->fields[$value];
-			}
+                    if($this->fields[$value]['classReference'] == $className) {
+                        return $this->fields[$value];
+                    }
 		}
 	}
 	
 	public function getTableChildClass($tableName) {
-		foreach($this->fields as $index => $field) {
-			if($field['field']['tableReference'] == $tableName) {
-				$classReference = $field['classReference'];
-				
-				foreach($this->fields as $index => $value) {
-					if(is_subclass_of($value['classReference'], $classReference) == true && get_parent_class($value['classReference']) == $classReference) {
-						return $value['classReference'];
-					}
-				}
-			}
-		}
+            foreach($this->fields as $index => $field) {
+                if($field['field']['tableReference'] == $tableName) {
+                    $classReference = $field['classReference'];
+
+                    foreach($this->fields as $index => $value) {
+                        if(is_subclass_of($value['classReference'], $classReference) == true && get_parent_class($value['classReference']) == $classReference) {
+                            return $value['classReference'];
+                        }
+                    }
+                }
+            }
 	}
 	
 	public function getTableParentClass($tableName) {
