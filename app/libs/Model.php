@@ -424,7 +424,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
          * @return PhpBURN_Core
          */
 	public function select($condition, $alias = null, $only = true, $override = false) {
-		$alias = $alias == null ? $condition : $alias;
+		$alias = $alias == null ? null : $alias;
                 if($override == true) {
 			unset($this->_select);
 			$this->_select = array();
@@ -610,7 +610,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
          * @return Boolean
          */
 	public function save() {
-		return $this->getDialect()->save();
+            return $this->getDialect()->save();
 	}
 
 	/**
@@ -619,7 +619,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
          * @return Mixed ( false for errors )
          */
 	public function delete($pk = null) {
-		return $this->getDialect()->delete($pk);
+            return $this->getDialect()->delete($pk);
 	}
 
         public function deleteLink($child, $linkName) {
