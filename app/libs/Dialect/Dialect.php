@@ -134,9 +134,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
             $pkField = $this->getModel()->getMap()->getPrimaryKey();
             $pk = $pk == null ? $this->getModel()->getMap()->getFieldValue($pkField['field']['alias']) : $pk;
 
-            if(isset($pk) && !empty($pk) && $pk != null) {
-                $whereConditions = sprintf("WHERE %s='%s'",$pkField['field']['column'],$pk);
-            }
+            $pkField = $this->getModel()->getMap()->getPrimaryKey();
+            $whereConditions = $this->getWhereString($pk, $pkField);
+            $whereConditions = !empty($whereConditions) ? "WHERE " . $whereConditions : $whereConditions;
 
             return $sql = $whereConditions == null ? null : sprintf("DELETE %s %s", $from, $whereConditions);
 	}
