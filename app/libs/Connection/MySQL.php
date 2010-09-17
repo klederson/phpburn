@@ -357,6 +357,22 @@ class PhpBURN_Connection_MySQL implements IConnection
 		//$this->dispatchEvent('posExecute', $this, $sql);
 		return $rs;
 	}
+
+        public function unbuffExecuteSQL($sql) {
+            //$this->dispatchEvent('preExecute', $this, $sql);
+		$this->connect();
+		$rs = @mysql_unbuffered_query($sql, $this->conn_id);
+		if( ! $rs )
+		{
+			$msg = "[!Database error:!] " . $this->getErrorMsg();
+			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
+			return false;
+			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
+		}
+		//$this->close();
+		//$this->dispatchEvent('posExecute', $this, $sql);
+		return $rs;
+        }
 	
 	public function escape($str) 
 	{
