@@ -449,7 +449,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
          *
          * @return PhpBURN_Core
 	 */
-	public function where($condition_start, $stringOperator, $conditon_end = null, $condition = "AND", $override = false) {
+	public function where($condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
             if($stringOperator != null && $conditon_end != null) {
 		$conditions = array();
 		$conditions['start'] = $condition_start;
