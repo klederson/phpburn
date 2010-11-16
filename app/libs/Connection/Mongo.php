@@ -16,7 +16,7 @@ PhpBURN::load('Connection.IConnection');
  * @author Klederson Bueno Bezerra da Silva
  *
  */
-class PhpBURN_Connection_MySQL implements IConnection
+class PhpBURN_Connection_Mongo implements IConnection
 {
 
 	const CLOSED					= 100201;
@@ -39,12 +39,12 @@ class PhpBURN_Connection_MySQL implements IConnection
 	private $database;
 	private $user;
 	private $password;
-	private $port;
-	private $host;
-	private $options;
+	private $port = 27017;
+	private $host = "locahost";
+	private $options = array();
 	private $state;
 	
-	public $mode = MYSQL_ASSOC;
+	public $mode = NULL;
 	
 	private static $instance = null;
 	
@@ -52,53 +52,58 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		if(self::$instance == null)
 		{
-			self::$instance = new PhpBURN_Connection_MySQL();
+			self::$instance = new PhpBURN_Connection_Mongo();
 		}
 		
 		return self::$instance;
 	}
+
+        private function getConnPrefix() {
+            if(isset($this->user) && isset($this->password))
+                return sprintf("%s:%s@",$this->user, $this->password);
+        }
+
+        private function getConnSulfix() {
+            if(isset($this->port) && isset($this->database)) {
+                return sprintf(":%s/%s", $this->port, $this->database);
+            } else if(isset($this->database)) {
+                return sprintf("/%s", $this->database);
+            }
+        }
 	
 	public function connect()
 	{
 		
-		if($this->conn_id && $this->state == self::OPEN)
-		{
-			mysql_select_db($this->getDatabase(), $this->conn_id);
-			return true;
+		if($this->conn_id && $this->state == self::OPEN) {
+                    $this->conn_id->selectDB($this->getDatabase());
+                    return true;
 		}
 		
-		//TODO preConnect actions should be called from here
-		
-		$hostString = $this->getHost();
-		if($this->getPort() != '') 
-		{
-			$hostString .=  ':' . $this->getPort();
-		}
-		if(isset($this->options['socket']) && $this->options['socket'] != '')
-		{
-			$hostString .= ':' . $this->options['socket'];
-		}
-		$flags = isset($this->options['flags']) ? $this->options['flags'] : null;
-					
-		if(isset($this->options['persistent']) && $this->options['persistent'] == true)
-		{
-			$this->conn_id = @mysql_pconnect($hostString, $this->getUser(), $this->getPassword(), $flags);
-		} else {
-			$this->conn_id = @mysql_connect($hostString, $this->getUser(), $this->getPassword(), $flags);
-		}
+		//TODO preConnect actions should be called from here		
+
+                //Build the Connection String Prefix ( username:password@ )
+                $connPrefix = $this->getConnPrefix();
+
+                //Build the Connection String Host
+                $hostString = $this->getHost();
+
+                //Build the Connection String Sulfix ( :port/database or /database ) and select database
+                $connSulfix = $this->getConnSulfix();
+
+                $connString = sprintf("mongodb://%s%s%s",$connPrefix,$hostString,$connSulfix);
+
+                $this->conn_id = new Mongo($connString);
 		
 		if( !$this->conn_id )
 		{
-			$this->state = self::CLOSED;
-			$msg = '[!Database connection error!]: ' . $this->getDatabase().' - '.$this->getErrorMsg();
-			
-			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);			
-			return false;
-		}
-		
-		//Selecting database
-		mysql_select_db($this->getDatabase(), $this->conn_id);
-		$this->state = self::OPEN;
+                    $this->state = self::CLOSED;
+                    $msg = '[!Database connection error!]: ' . $this->getDatabase().' - '.$this->getErrorMsg();
+
+                    PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
+                    return false;
+		} else {
+                    $this->state = self::OPEN;
+                }
 		
 		//TODO onConnectSucess actions should be called from here
 		
@@ -107,13 +112,12 @@ class PhpBURN_Connection_MySQL implements IConnection
 	
 	public function close()
 	{
-		//$this->dispatchEvent('preClose', $this);
-		if($this->conn_id && $this->state != self::CLOSED)
-		{
+//		@TODO preCloseEvents
+		if($this->conn_id && $this->state != self::CLOSED) {
 			$this->state = self::CLOSED;
-			mysql_close($this->conn_id);
+			$this->conn_id->close();
 		}
-		//$this->dispatchEvent('posClose', $this);
+//		@TODO postCloseEvents
 	}
 	
 	public function getState()
@@ -193,84 +197,111 @@ class PhpBURN_Connection_MySQL implements IConnection
 
 	public function getErrorMsg()
 	{
-		$msg = '';
-		if($this->conn_id) 
-		{
-			$msg = mysql_error($this->conn_id);
-		} else {
-			$msg = mysql_error();
-		}
-		return $msg;
+		
+		return $this->conn_id->__toString();
 	}
 	
 	public function getTables()
 	{
-		if( ! $this->connect() )
-		{
-			return false;
+		if( !$this->connect() )	{
+                    return false;
 		}
 		
-		$rs = $this->executeSQL("show tables");
+		$rs = $this->conn_id->listCollections();
 		
 		$list = array();
 		
-		while($row = mysql_fetch_row($rs))
-		{
-			$list[] = $row[0];
-		}
+		foreach($rs as $collection) {
+                    $list[] = $collection->getName();
+                }
+
+                unset($rs);                
 		return $list;
 	}
+
+        /**
+        * Get Current References ( From ActiveMongo by @crodas )
+        *
+        * Inspect the current document trying to get any references,
+        * if any.
+        *
+        * @param array $document Current document
+        * @param array &$refs References found in the document.
+        * @param array $parent_key Parent key
+        *
+        * @return void
+        */
+        final protected function getDocumentReferences($document, &$refs, $parent_key=NULL) {
+            foreach ($document as $key => $value) {
+               if (is_array($value)) {
+                   if (MongoDBRef::isRef($value)) {
+                       $pkey = $parent_key;
+                       $pkey[] = $key;
+                       $refs[] = array('ref' => $value, 'key' => $pkey);
+                   } else {
+                       $parent_key1 = $parent_key;
+                       $parent_key1[] = $key;
+                       $this->getDocumentReferences($value, $refs, $parent_key1);
+                   }
+               }
+            }
+        }
 	
-	public function getForeignKeys($tablename)
-	{
-		if( ! $this->connect() )
-		{
-			return false;
-		}
+	public function getForeignKeys($tablename) {
+            if( ! $this->connect() ) {
+                return false;
+            }
+
+            foreach($this->conn_id->listCollections() as $document) {
                 
-		
-		$fks = array();
-                $sql = sprintf("SHOW CREATE TABLE `%s`",$tablename);
-		$rs = $this->executeSQL($sql);
-		$result = mysql_fetch_row($rs);
-		$result[0] = preg_replace("(\r|\n)",'\n', $result[0]);
-
-                $matches = array();
-
-		preg_match_all('@FOREIGN KEY \(`([a-z,A-Z,0-9,_]+)`\) REFERENCES (`([a-z,A-Z,0-9,_]+)`\.)?`([a-z,A-Z,0-9\.,_]+)` \(`([a-z,A-Z,0-9,_]+)`\)(.*?)(\r|\n|\,)@i', $result[1], $matches);
-
-                for($i=0; $i<count($matches[0]); $i++)
-		{
-                    $name = $matches[4][$i];
-                    if(isset($fks[ $name ]))
-                    {
-                            $name = $name . '_' . $matches[4][$i];
-                    }
-
-                    $fks[ $name ]['thisColumn'] = $matches[1][$i];
-                    $fks[ $name ]['thisTable'] = $tablename;
-                    $fks[ $name ]['toDatabase'] = !empty($matches[2][$i]) ? preg_replace("([`\.])", '', $matches[2][$i]) : $this->database;
-                    $fks[ $name ]['references'] = !empty($matches[3][$i]) ? $matches[3][$i].'.'.$matches[4][$i] : $matches[4][$i];
-                    $fks[ $name ]['referencedTable'] = $matches[4][$i];
-                    $fks[ $name ]['referencedColumn'] = $matches[5][$i];
+            }
 
 
-                    $reg = array();
-                    if(preg_match('@(.*?)ON UPDATE (RESTRICT|CASCADE)@i', $matches[6][$i], $reg))
-                    {
-                            $fks[ $name ]['onUpdate'] = strtoupper($reg[2]);
-                    } else {
-                            $fks[ $name ]['onUpdate'] = 'RESTRICT';
-                    }
-                    if(preg_match('@(.*?)ON DELETE (RESTRICT|CASCADE)@i', $matches[6][$i], $reg))
-                    {
-                            $fks[ $name ]['onDelete'] = strtoupper($reg[2]);
-                    } else {
-                            $fks[ $name ]['onDelete'] = 'RESTRICT';
-                    }
-			
-		}
-		return $fks;
+
+//
+//
+//		$fks = array();
+//                $sql = sprintf("SHOW CREATE TABLE `%s`",$tablename);
+//		$rs = $this->executeSQL($sql);
+//		$result = mysql_fetch_row($rs);
+//		$result[0] = preg_replace("(\r|\n)",'\n', $result[0]);
+//
+//                $matches = array();
+//
+//		preg_match_all('@FOREIGN KEY \(`([a-z,A-Z,0-9,_]+)`\) REFERENCES (`([a-z,A-Z,0-9,_]+)`\.)?`([a-z,A-Z,0-9\.,_]+)` \(`([a-z,A-Z,0-9,_]+)`\)(.*?)(\r|\n|\,)@i', $result[1], $matches);
+//
+//                for($i=0; $i<count($matches[0]); $i++)
+//		{
+//                    $name = $matches[4][$i];
+//                    if(isset($fks[ $name ]))
+//                    {
+//                            $name = $name . '_' . $matches[4][$i];
+//                    }
+//
+//                    $fks[ $name ]['thisColumn'] = $matches[1][$i];
+//                    $fks[ $name ]['thisTable'] = $tablename;
+//                    $fks[ $name ]['toDatabase'] = !empty($matches[2][$i]) ? preg_replace("([`\.])", '', $matches[2][$i]) : $this->database;
+//                    $fks[ $name ]['references'] = !empty($matches[3][$i]) ? $matches[3][$i].'.'.$matches[4][$i] : $matches[4][$i];
+//                    $fks[ $name ]['referencedTable'] = $matches[4][$i];
+//                    $fks[ $name ]['referencedColumn'] = $matches[5][$i];
+//
+//
+//                    $reg = array();
+//                    if(preg_match('@(.*?)ON UPDATE (RESTRICT|CASCADE)@i', $matches[6][$i], $reg))
+//                    {
+//                            $fks[ $name ]['onUpdate'] = strtoupper($reg[2]);
+//                    } else {
+//                            $fks[ $name ]['onUpdate'] = 'RESTRICT';
+//                    }
+//                    if(preg_match('@(.*?)ON DELETE (RESTRICT|CASCADE)@i', $matches[6][$i], $reg))
+//                    {
+//                            $fks[ $name ]['onDelete'] = strtoupper($reg[2]);
+//                    } else {
+//                            $fks[ $name ]['onDelete'] = 'RESTRICT';
+//                    }
+//
+//		}
+//		return $fks;
 	}
 	
 	public function getServerInfo($type = null)
@@ -345,34 +376,18 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		//$this->dispatchEvent('preExecute', $this, $sql);
 		$this->connect();
-		$rs = @mysql_query($sql, $this->conn_id);
-		if( ! $rs )
-		{	
-			$msg = "[!Database error:!] " . $this->getErrorMsg();
-			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
-			return false;
-			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
-		} 
-		//$this->close();
-		//$this->dispatchEvent('posExecute', $this, $sql);
-		return $rs;
+//		$rs = @mysql_query($sql, $this->conn_id);
+//		if( ! $rs )
+//		{
+//			$msg = "[!Database error:!] " . $this->getErrorMsg();
+//			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
+//			return false;
+//			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
+//		}
+//		//$this->close();
+//		//$this->dispatchEvent('posExecute', $this, $sql);
+//		return $rs;
 	}
-
-        public function unbuffExecuteSQL($sql) {
-            //$this->dispatchEvent('preExecute', $this, $sql);
-		$this->connect();
-		$rs = @mysql_unbuffered_query($sql, $this->conn_id);
-		if( ! $rs )
-		{
-			$msg = "[!Database error:!] " . $this->getErrorMsg();
-			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
-			return false;
-			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
-		}
-		//$this->close();
-		//$this->dispatchEvent('posExecute', $this, $sql);
-		return $rs;
-        }
 	
 	public function escape($str) 
 	{
@@ -397,7 +412,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		if($this->state == self::OPEN)
 		{
-			return mysql_affected_rows($this->conn_id);
+			return true;
 		}
 		//throw new PhpBURN_Exception() TODO CREATE EXCETION CLASS AND INPUT AN EXCEPTION HERE;
 	}
@@ -437,7 +452,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	
 	//Utils
 	public function last_id() {
-		return mysql_insert_id($this->conn_id);
+//		return mysql_insert_id($this->conn_id);
 	}
 	
 	public function __destruct() {
