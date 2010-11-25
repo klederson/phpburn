@@ -9,6 +9,11 @@ Now you can found this project hosted both GitHub and SourceForge at git version
 # Instalation
 To install PhpBURN is quite easy first you need to fork or clone PhpBURN code from [PhpBURN Official Repository][PhpBURN Official Repository] and than you need to use it into your include path by doing in one of this ways:
 
+You can also go to [PhpBURN Official Repository][PhpBURN Official Repository] and click in DOWNLOAD and choose zip or tar.gz version from that branch.
+
+## OBS:
+Please note master is equivalent to dev or in-development version and sometimes something can go wrong using it ( some bug or something ) we strongly recommed you to use the stable version in stable branch.
+
 ## php.ini
 
 Should look something like this:
