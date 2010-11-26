@@ -40,6 +40,10 @@ abstract class PhpBURN {
 	
 		}
 	}
+
+        public function loadSpice($name, array $versions) {
+            self::load('Spices.'.$name);
+        }
 	
 	public static function loadModule() {
 		$args = func_get_args();
