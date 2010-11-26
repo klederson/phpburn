@@ -46,6 +46,9 @@ PhpBURN::loadModule('View');
 # Controller
 PhpBURN::loadModule('Controller');
 
-# To load the module just remove the # comment from the line
+# Model/ORM/DataMapper/DAO
 PhpBURN::loadModule('Model');
+
+# Spices
+PhpBURN::loadModule('Spices');
 ?>
