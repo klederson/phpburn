@@ -74,7 +74,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 	 *
 	 * @var Boolean
 	 */
-	public $_multiMap							= false;
+	public $_multiMap                                               = false;
 
 	/**
 	 * PHP magic method that automaticaly executes when a new instance of this class is been created
@@ -86,7 +86,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
                 $this->_package = isset($this->_package) ? $this->_package : $package;
 
 		if(empty($this->_tablename) || empty($this->_package)) {
-			throw new PhpBURN_Exeption(PhpBURN_Message::EMPTY_PACKAGEORTABLE);
+			throw new Exeption(PhpBURN_Message::EMPTY_PACKAGEORTABLE);
 		}
 
 		//Internal objects
@@ -95,14 +95,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		$this->_dialectObj							= null;
 
 		//Fields mapping
-		$this->_fields									= array();
+		$this->_fields								= array();
 
 		//Persistent methods storage
 		$this->_where								= array();
 		$this->_orderBy								= null;
-		$this->_limit									= null;
+		$this->_limit								= null;
 		$this->_select								= array();
-		$this->_join									= array();
+		$this->_join								= array();
 
 		//Mapping the object ( _mapObj )
 		PhpBURN_Mapping::create($this);
