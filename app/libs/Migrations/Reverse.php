@@ -93,9 +93,6 @@ class PhpBURN_Reverse {
         $relOutKey = null;
         $relTemplate = null;
 
-        if($isManyToMany)
-            var_dump($isManyToMany, $checkMany, $value);
-
         if($isManyToMany && ( strtolower($value['referencedTable']) == strtolower($checkMany[1][0])) ) {
             $relType = 'self::MANY_TO_MANY';
             $name = $foreignClass = $checkMany[2][0];
@@ -116,7 +113,7 @@ class PhpBURN_Reverse {
 
             $keys = array_keys(self::$rawFks);
             
-            PRINT $relTemplate = sprintf('$this->getMap()->addRelationship("%s", %s, "%s", "%s", "%s", "%s", "%s", "%s");',$foreignClass, $relType, $foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable);
+            $relTemplate = sprintf('$this->getMap()->addRelationship("%s", %s, "%s", "%s", "%s", "%s", "%s", "%s");',$foreignClass, $relType, $foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable);
         } else if($isManyToMany == 0) {
             $relType = 'self::ONE_TO_MANY';
             $name = $foreignClass = $value['thisTable'];
