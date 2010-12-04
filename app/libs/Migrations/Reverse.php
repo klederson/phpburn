@@ -7,7 +7,7 @@ class PhpBURN_Reverse {
 
     public function init() {
         self::$thisPath = realpath(dirname(__FILE__));
-        print "<pre>";
+        $fks = null;
         
         $packages = PhpBURN_Configuration::getConfig();
 
@@ -91,8 +91,12 @@ class PhpBURN_Reverse {
         $relTable = $value['thisTable'];
         $outKey = null;
         $relOutKey = null;
+        $relTemplate = null;
 
-        if($isManyToMany && $value['referencedTable'] == $checkMany[1][0]) {
+        if($isManyToMany)
+            var_dump($isManyToMany, $checkMany, $value);
+
+        if($isManyToMany && ( strtolower($value['referencedTable']) == strtolower($checkMany[1][0])) ) {
             $relType = 'self::MANY_TO_MANY';
             $name = $foreignClass = $checkMany[2][0];
 //            print "<h1>$foreignClass</h1>";
@@ -112,7 +116,7 @@ class PhpBURN_Reverse {
 
             $keys = array_keys(self::$rawFks);
             
-            $relTemplate = sprintf('$this->getMap()->addRelationship("%s", %s, "%s", "%s", "%s", "%s", "%s", "%s");',$foreignClass, $relType, $foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable);
+            PRINT $relTemplate = sprintf('$this->getMap()->addRelationship("%s", %s, "%s", "%s", "%s", "%s", "%s", "%s");',$foreignClass, $relType, $foreignClass, $thisKey, $relKey, $outKey, $relOutKey, $relTable);
         } else if($isManyToMany == 0) {
             $relType = 'self::ONE_TO_MANY';
             $name = $foreignClass = $value['thisTable'];
@@ -126,7 +130,8 @@ class PhpBURN_Reverse {
     }
 
     public function generateField($name, $type, $lenght, array $options ) {
-
+        $optionStr = null;
+        
         foreach($options as $index => $value) {
             $value = $value == null ? null : $value;
             $value = is_string($value) ? sprintf("'%s'", $value) : $value;
@@ -142,11 +147,7 @@ class PhpBURN_Reverse {
 
     }
 
-    public function constructModelFiles($package = null, $tableName = null) {
-//        $modelTemplate = PhpBURN::loadFile();
-
-//        PhpBURN_Views::setViewMethod('phptal');
-        
+    public function constructModelFiles($package = null, $tableName = null) {  
         foreach(self::$rawFields as $fullName => $arrContent) {
             preg_match_all("((([a-z,A-Z,0-9,_]+)\.)?([a-z,A-Z,0-9\.,_]+))", $fullName, $separation);
 
@@ -157,8 +158,8 @@ class PhpBURN_Reverse {
             $viewData['className'] = ucwords(str_replace('.','_',$separation[3][0]));
             $viewData['rawFields'] = $arrContent;
             $viewData['fields'] = self::$fields[$fullName];
-            $viewData['rawFks'] = self::$rawFks[$separation[3][0]];
-            $viewData['fks'] = self::$fks[$separation[3][0]];
+            $viewData['rawFks'] = isset(self::$rawFks[strtolower($separation[3][0])]) ? self::$rawFks[strtolower($separation[3][0])] : self::$rawFks[($separation[3][0])];
+            $viewData['fks'] = isset(self::$fks[strtolower($separation[3][0])]) ? self::$fks[strtolower($separation[3][0])] : self::$fks[($separation[3][0])];
 
             $content = "<?php\r\n";
             $content .= PhpBURN_Views::loadViewFile(self::$thisPath . DS . 'modelTemplate.html',$viewData, true);
@@ -177,9 +178,7 @@ class PhpBURN_Reverse {
             fclose($file);
 
             unset($content);
-        }
-
-        
+        }        
     }
 }
 
