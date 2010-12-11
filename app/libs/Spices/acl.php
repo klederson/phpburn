@@ -15,7 +15,7 @@ class PhpBURN_ACL {
         } else if(!isset(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action]) && $methodRules['@aclDefault'] == 'allow') {
             $function = &self::$callBacks['granted'];
             $function($controllerName, $action, $parms);            
-        } else if(!isset(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action]) && self::$aclSettings['defaultPermission'] == 'allow') {
+        } else if(!isset(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action]) && $methodRules['@aclDefault'] != 'deny' && self::$aclSettings['defaultPermission'] == 'allow') {
             $function = &self::$callBacks['granted'];
             $function($controllerName, $action, $parms);
         } else {
