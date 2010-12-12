@@ -5,7 +5,7 @@ class PhpBURN_ACL {
 
     private static $aclSettings;
     public static $callBacks;
-
+    
     public function checkPermissions($controllerName, $action, $parms) {        
         $methodRules = PhpBURN_ACL_Control::$classRules[$controllerName][$action];
 
@@ -64,15 +64,18 @@ class PhpBURN_ACL_Control {
             $methods = self::getControllerMethods($className);
 
             foreach($methods as $method) {
-                $reflectionMethod = new \ReflectionMethod($className, $method);
-
-                $methodComment = $reflectionMethod->getDocComment();
-
                 foreach(self::$aclProperties as $aclProp) {
-                    self::$classRules[$className][$method][$aclProp] = self::getCommentTag($methodComment, $aclProp);
+                    self::$classRules[$className][$method][$aclProp] = self::getMethodRule($className, $method, $aclProp);
                 }
             }
         }
+    }
+
+    public static function getMethodRule($controllerName, $methodName, $tag) {
+        $reflectionMethod = new \ReflectionMethod($controllerName, $methodName);
+        $methodComment = $reflectionMethod->getDocComment();
+
+        return self::getCommentTag($methodComment, $tag);
     }
 
     /**
