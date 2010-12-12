@@ -124,6 +124,7 @@ class PhpBURN_Message {
   		//Sending the message
   		switch(self::$mode) {
   			case self::BROWSER:
+                        case self::CONSOLE:
   				print $message = call_user_func(array($messageClass,'lazyTranslate'),$message);
   			break;
   			case self::FIREBUG:
