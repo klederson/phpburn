@@ -19,16 +19,16 @@ PhpBURN::load('Connection.IConnection');
 class PhpBURN_Connection_MySQL implements IConnection
 {
 
-	const CLOSED							= 100201;
-	const OPEN								= 100202;
+	const CLOSED					= 100201;
+	const OPEN					= 100202;
 
 	const SERVER_VERSION				= 10;
 	const CLIENT_VERSION				= 11;
-	const HOST_INFO						= 12;
-	const PROTOCOL_VERSION			= 13;
-	const RANDOM_FUNCTION			= 'rand()';
+	const HOST_INFO					= 12;
+	const PROTOCOL_VERSION                          = 13;
+	const RANDOM_FUNCTION                           = 'rand()';
 	
-	const ESCAPE_CHAR					= '\\';
+	const ESCAPE_CHAR				= '\\';
 	
 	protected $_event_types = array(
 		'preExecute','posExecute','preConnect','onConnectSucess','preClose','posClose',
@@ -357,6 +357,22 @@ class PhpBURN_Connection_MySQL implements IConnection
 		//$this->dispatchEvent('posExecute', $this, $sql);
 		return $rs;
 	}
+
+        public function unbuffExecuteSQL($sql) {
+            //$this->dispatchEvent('preExecute', $this, $sql);
+		$this->connect();
+		$rs = @mysql_unbuffered_query($sql, $this->conn_id);
+		if( ! $rs )
+		{
+			$msg = "[!Database error:!] " . $this->getErrorMsg();
+			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
+			return false;
+			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
+		}
+		//$this->close();
+		//$this->dispatchEvent('posExecute', $this, $sql);
+		return $rs;
+        }
 	
 	public function escape($str) 
 	{

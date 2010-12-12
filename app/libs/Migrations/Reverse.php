@@ -7,7 +7,7 @@ class PhpBURN_Reverse {
 
     public function init() {
         self::$thisPath = realpath(dirname(__FILE__));
-        print "<pre>";
+        $fks = null;
         
         $packages = PhpBURN_Configuration::getConfig();
 
@@ -91,15 +91,16 @@ class PhpBURN_Reverse {
         $relTable = $value['thisTable'];
         $outKey = null;
         $relOutKey = null;
+        $relTemplate = null;
 
-        if($isManyToMany && $value['referencedTable'] == $checkMany[1][0]) {
+        if($isManyToMany && ( strtolower($value['referencedTable']) == strtolower($checkMany[1][0])) ) {
             $relType = 'self::MANY_TO_MANY';
             $name = $foreignClass = $checkMany[2][0];
 //            print "<h1>$foreignClass</h1>";
 //            print_r($value);
 //            print_r($checkMany);
 
-            $outArr = self::$rawFks[$checkMany[2][0]];
+            $outArr = self::$rawFks[strtolower($checkMany[2][0])];
 
             if(is_array($outArr)) {
                 foreach($outArr as $index => $arrValue) {
@@ -126,7 +127,8 @@ class PhpBURN_Reverse {
     }
 
     public function generateField($name, $type, $lenght, array $options ) {
-
+        $optionStr = null;
+        
         foreach($options as $index => $value) {
             $value = $value == null ? null : $value;
             $value = is_string($value) ? sprintf("'%s'", $value) : $value;
@@ -143,43 +145,49 @@ class PhpBURN_Reverse {
     }
 
     public function constructModelFiles($package = null, $tableName = null) {
-//        $modelTemplate = PhpBURN::loadFile();
 
-//        PhpBURN_Views::setViewMethod('phptal');
-        
-        foreach(self::$rawFields as $fullName => $arrContent) {
-            preg_match_all("((([a-z,A-Z,0-9,_]+)\.)?([a-z,A-Z,0-9\.,_]+))", $fullName, $separation);
+        if(is_writable(SYS_MODEL_PATH)) {
 
-            PhpBURN_Views::setViewMethod('default');
+            foreach(self::$rawFields as $fullName => $arrContent) {
+                preg_match_all("((([a-z,A-Z,0-9,_]+)\.)?([a-z,A-Z,0-9\.,_]+))", $fullName, $separation);
 
-            $viewData['package'] = $separation[2][0];
-            $viewData['tableName'] = $separation[3][0];
-            $viewData['className'] = ucwords(str_replace('.','_',$separation[3][0]));
-            $viewData['rawFields'] = $arrContent;
-            $viewData['fields'] = self::$fields[$fullName];
-            $viewData['rawFks'] = self::$rawFks[$separation[3][0]];
-            $viewData['fks'] = self::$fks[$separation[3][0]];
+                PhpBURN_Views::setViewMethod('default');
 
-            $content = "<?php\r\n";
-            $content .= PhpBURN_Views::loadViewFile(self::$thisPath . DS . 'modelTemplate.html',$viewData, true);
-            $content .= "\r\n?>\r\n";
+                $viewData['package'] = $separation[2][0];
+                $viewData['tableName'] = $separation[3][0];
+                $viewData['className'] = ucwords(str_replace('.','_',$separation[3][0]));
+                $viewData['rawFields'] = $arrContent;
+                $viewData['fields'] = self::$fields[$fullName];
+                $viewData['rawFks'] = isset(self::$rawFks[strtolower($separation[3][0])]) ? self::$rawFks[strtolower($separation[3][0])] : self::$rawFks[($separation[3][0])];
+                $viewData['fks'] = isset(self::$fks[strtolower($separation[3][0])]) ? self::$fks[strtolower($separation[3][0])] : self::$fks[($separation[3][0])];
 
-            if(!is_dir(SYS_MODEL_PATH . $viewData['package'])) {
-                SYS_MODEL_PATH . $viewData['package'];
-                mkdir(SYS_MODEL_PATH . $viewData['package'],0777,true);
+                $content = "<?php\r\n";
+                $content .= PhpBURN_Views::loadViewFile(self::$thisPath . DS . 'modelTemplate.html',$viewData, true);
+                $content .= "\r\n?>\r\n";
+
+                if(!is_dir(SYS_MODEL_PATH . $viewData['package'])) {
+                    SYS_MODEL_PATH . $viewData['package'];
+                    mkdir(SYS_MODEL_PATH . $viewData['package'],0777,true);
+
+                }
+
+                $file = $viewData['className'];
+                $fileName = sprintf("%s%s",$file,SYS_MODEL_EXT);
+                $filePath = SYS_MODEL_PATH . $viewData['package'];
+                $file = fopen( $filePath . DS . $fileName ,'w+');
+                fwrite($file, $content);
+                fclose($file);
+
+                $outputMessage = sprintf("[!Creating Model!]: %s",$filePath . DS . $fileName);
+                PhpBURN_Message::output($outputMessage);
+
+                unset($content);
             }
 
-            $file = $viewData['className'];
-            $fileName = sprintf("%s%s",$file,SYS_MODEL_EXT);
-            $filePath = SYS_MODEL_PATH . $viewData['package'];
-            $file = fopen( $filePath . DS . $fileName ,'w+');
-            fwrite($file, $content);
-            fclose($file);
-
-            unset($content);
+        } else {
+            $outputMessage = sprintf("%s [!is not writable!]",SYS_MODEL_PATH);
+            PhpBURN_Message::output($outputMessage);
         }
-
-        
     }
 }
 

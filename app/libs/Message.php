@@ -25,6 +25,7 @@ class PhpBURN_Message {
         const FIREPHP 					= 300003;
   	const FILE    					= 300004;
   	const DATABASE                                  = 300005;
+        const NONE                                      = 300006;
 
   	/* TYPE */
   	const NOTICE                                    = '[!Notice!]';
@@ -123,6 +124,7 @@ class PhpBURN_Message {
   		//Sending the message
   		switch(self::$mode) {
   			case self::BROWSER:
+                        case self::CONSOLE:
   				print $message = call_user_func(array($messageClass,'lazyTranslate'),$message);
   			break;
   			case self::FIREBUG:
@@ -156,7 +158,7 @@ class PhpBURN_Message {
 				//@chmod($fileName, 0755);
   			break;
   			default:
-  				print $message = call_user_func(array($messageClass,'lazyTranslate'),$message);
+                            
   			break;
   		}
   		

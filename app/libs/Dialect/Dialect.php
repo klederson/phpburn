@@ -134,9 +134,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
             $pkField = $this->getModel()->getMap()->getPrimaryKey();
             $pk = $pk == null ? $this->getModel()->getMap()->getFieldValue($pkField['field']['alias']) : $pk;
 
-            if(isset($pk) && !empty($pk) && $pk != null) {
-                $whereConditions = sprintf("WHERE %s='%s'",$pkField['field']['column'],$pk);
-            }
+            $pkField = $this->getModel()->getMap()->getPrimaryKey();
+            $whereConditions = $this->getWhereString($pk, $pkField);
+            $whereConditions = !empty($whereConditions) ? "WHERE " . $whereConditions : $whereConditions;
 
             return $sql = $whereConditions == null ? null : sprintf("DELETE %s %s", $from, $whereConditions);
 	}
@@ -337,12 +337,23 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 	
 	/**
 	 * Calls the Connection Object and perform a SQL QUERY into the Database
-	 * 
+	 *
 	 * @param String $sql
 	 */
 	public function execute($sql) {
 		PhpBURN_Message::output("[!Performing the query!]: $sql");
 		return $this->getModel()->getConnection()->executeSQL($sql);
+		//$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
+	}
+
+        /**
+	 * Calls the Connection Object and perform a SQL QUERY into the Database
+	 *
+	 * @param String $sql
+	 */
+	public function executeUnbuff($sql) {
+		PhpBURN_Message::output("[!Performing the query!]: $sql");
+		return $this->getModel()->getConnection()->unbuffExecuteSQL($sql);
 		//$this->resultSet = &$this->getModel()->getConnection()->executeSQL($sql);
 	}
 	

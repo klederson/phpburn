@@ -41,11 +41,14 @@ date_default_timezone_set('America/Sao_Paulo');
 # To load the module just remove the # comment from the line
 
 # Views
-#PhpBURN::loadModule('View');
+PhpBURN::loadModule('View');
 
 # Controller
-#PhpBURN::loadModule('Controller');
+PhpBURN::loadModule('Controller');
 
-# To load the module just remove the # comment from the line
-#PhpBURN::loadModule('Model');
+# Model/ORM/DataMapper/DAO
+PhpBURN::loadModule('Model');
+
+# Spices
+PhpBURN::loadModule('Spices');
 ?>

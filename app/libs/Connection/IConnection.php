@@ -9,10 +9,21 @@
 interface IConnection
 {
 	static public function getInstance();
-	
+
+        /**
+         * It connect to the Model Package database, if the connection does not exists
+         * it create one.
+         */
 	public function connect();
+
+        /**
+         * It close a Model Package connection
+         */
 	public function close();
-	
+
+        /**
+         * Get the state of a Model Package connection
+         */
 	public function getState();
 	
 	public function setDatabase($database);

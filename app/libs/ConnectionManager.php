@@ -38,12 +38,22 @@ class PhpBURN_ConnectionManager
 				$className = self::getConnectionClass($config->dialect);
 				$connectionClass = new $className;
 				
-				$connectionClass->setHost($config->host);
-				$connectionClass->setPort($config->port);
-				$connectionClass->setUser($config->user);
-				$connectionClass->setPassword($config->password);
-				$connectionClass->setDatabase($config->database);
+				if($config->host != null)
+                                    $connectionClass->setHost($config->host);
+
+                                if($config->port != null)
+                                    $connectionClass->setPort($config->port);
+
+                                if($config->user != null)
+                                    $connectionClass->setUser($config->user);
 				
+                                if($config->password != null)
+                                    $connectionClass->setPassword($config->password);
+
+                                if($config->database != null)
+                                    $connectionClass->setDatabase($config->database);
+
+//                                if($config->options != null)
 				//$connectionClass->setOptions($config->options);
 				
 				$conn = self::$connections[$config->package] = $connectionClass;

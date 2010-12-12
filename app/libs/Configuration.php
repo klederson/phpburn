@@ -21,28 +21,24 @@ class PhpBURN_Configuration {
 			'host' => 'localhost',
 			'packages' => array()
 		);
+                
 		$options = array_merge($default_options, $options);
 
 		/*
 		 * Fatal Errors
 		 */
 		if(empty($options['database']))
-		{
-			PhpBURN_Message::output('[!Empty database into configuration!]',PhpBURN_Message::EXCEPTION);
-		}
+                    PhpBURN_Message::output('[!Empty database into configuration!]',PhpBURN_Message::ERROR);
+
 		if(empty($options['user']))
-		{
-			PhpBURN_Message::output('[!Empty database user into configuration!]',PhpBURN_Message::EXCEPTION);
-		}
-		if(empty($options['password']))
-		{
-			PhpBURN_Message::output('[!Empty password into configuration!]',PhpBURN_Message::EXCEPTION);
-		}
-		if(empty($options['class_path']))
-		{
-			PhpBURN_Message::output('[!Empty class_path into configuration!]',PhpBURN_Message::EXCEPTION);
-		}
+                    PhpBURN_Message::output('[!Empty database user into configuration!]',PhpBURN_Message::ERROR);
+
+                if(empty($options['password']))
+                    PhpBURN_Message::output('[!Empty password into configuration!]',PhpBURN_Message::ERROR);
 		
+		if(empty($options['class_path']))
+                    PhpBURN_Message::output('[!Empty class_path into configuration!]',PhpBURN_Message::ERROR);
+				
 		/**
 		 * Search for all package in that Driver Connection/Configuration and
 		 * create specific configurations for them.

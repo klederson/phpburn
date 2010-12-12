@@ -40,6 +40,10 @@ abstract class PhpBURN {
 	
 		}
 	}
+
+        public function loadSpice($name, array $versions) {
+            self::load('Spices.'.$name);
+        }
 	
 	public static function loadModule() {
 		$args = func_get_args();
@@ -151,22 +155,29 @@ abstract class PhpBURN {
 	}
 
         /**
+         * Enables autoload for PhpBURN Models
+         */
+        public static function enableAutoload() {
+//          Setting up Model
+            if(array_search('PhpBURN_Core', get_declared_classes()) == true) {
+//                  Adds Models Paths to include Path
+                $packages = PhpBURN_Configuration::getConfig();
+                foreach($packages as $package => $configItem) {
+                    $includePath = get_include_path();
+                    $separator = strpos($includePath, ':') !== false ? ':' : ';';
+                    set_include_path($includePath . $separator . $configItem->class_path . DS . $package);
+                }
+            }
+        }
+
+        /**
          * Starts the PhpBURN Application - Should be called at the index of the application
          * <code>
          * PhpBURN::StartApplication();
          * </code>
          */
 	public static function startApplication() {
-//              Setting up Model
-                if(array_search('PhpBURN_Core', get_declared_classes()) == true) {
-//                  Adds Models Paths to include Path
-                    $packages = PhpBURN_Configuration::getConfig();
-                    foreach($packages as $package => $configItem) {
-                        $includePath = get_include_path();
-                        $separator = strpos($includePath, ':') !== false ? ':' : ';';
-                        set_include_path($includePath . $separator . $configItem->class_path . DS . $package);
-                    }
-                }
+                self::enableAutoload();
 
 //              Setting up Controller
 		if(array_search('Controller',get_declared_classes()) == true) {

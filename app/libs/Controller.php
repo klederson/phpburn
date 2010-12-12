@@ -13,10 +13,10 @@ PhpBURN::load('Tools.Controller.IController');
 abstract class Controller {	
 	
 	public $_viewData = array();
-	
-	protected function begin() {
-		
-	}
+
+        public function __construct() {
+            
+        }
 
         /**
          * List all files into a specified directory.
@@ -60,6 +60,40 @@ abstract class Controller {
 	}
 
         /**
+         * Executes functions settedUp on STATIC $onCallActionBefore
+         * @param String $action
+         * @param Array $parms
+         */
+        public function callActionBefore($controllerName, $action, array $parms) {
+            if(array_search('PhpBURN_ControllerConfig',get_declared_classes()) == true) {
+                if(is_array(PhpBURN_ControllerConfig::getOnCallActionBefore()) && count(PhpBURN_ControllerConfig::getOnCallActionBefore()) > 0) {
+                    foreach(PhpBURN_ControllerConfig::getOnCallActionBefore() as $function) {
+                        $function($controllerName, $action, $parms);
+                    }
+                }
+            } else {
+                PhpBURN_Message::output('[!onCallActionBefore cannot be loaded because PhpBURN_ControllerConfig is not instanced - Please add PhpBURN::load("Tools.Controller.ControllerConfig"); to your config/controller.php Configurations!]', PhpBURN_Message::WARNING);
+            }
+        }
+
+        /**
+         * Executes functions settedUp on STATIC $onCallActionAfter
+         * @param String $action
+         * @param Array $parms
+         */
+        public function callActionAfter($controllerName, $action, array $parms) {
+            if(array_search('PhpBURN_ControllerConfig',get_declared_classes()) == true) {
+                if(is_array(PhpBURN_ControllerConfig::getOnCallActionAfter()) && count(PhpBURN_ControllerConfig::getOnCallActionAfter()) > 0) {
+                    foreach(PhpBURN_ControllerConfig::getOnCallActionAfter() as $function) {
+                        $function($controllerName, $action, $parms);
+                    }
+                }
+            } else {
+                PhpBURN_Message::output('[!onCallActionBefore cannot be loaded because PhpBURN_ControllerConfig is not instanced - Please add PhpBURN::load("Tools.Controller.ControllerConfig"); to your config/controller.php Configurations!]', PhpBURN_Message::WARNING);
+            }
+        }
+
+        /**
          * Calls a controller Action
          * @param String $action
          * @param Array $parms
@@ -67,11 +101,17 @@ abstract class Controller {
          * @return Mixed
          */
 	public function callAction($action, $parms) {
-		//Calling action
-		call_user_func_array(array($this,$action),$parms);
-		if(PhpBURN_Views::$autoLoad == true) {
-			$this->loadRelativeView($action,false,true);
-		}
+            //onCallActionBefore
+            $this->callActionBefore(get_class($this), $action, $parms);
+
+            //Calling action
+            call_user_func_array(array($this,$action),$parms);
+            if(PhpBURN_Views::$autoLoad == true) {
+                    $this->loadRelativeView($action,false,true);
+            }
+
+            //onCallActionAfter
+            $this->callActionAfter(get_class($this), $action, $parms);
 	}
 
         /**

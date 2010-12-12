@@ -1,11 +1,8 @@
 <?php
 PhpBURN::load('Tools.Views.IProcessView');
+PhpBURN::load('Addons.PHPTAL.PHPTAL');
 
 class phptal_PhpBURN_ViewProcess implements IProcessView {
-
-    public function _construct() {
-        require_once('PHPTAL.php');
-    }
 
     /**
      * This method is used to process the data into the view and than return it to the main method that will handle what to do.
