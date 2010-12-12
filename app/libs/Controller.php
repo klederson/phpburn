@@ -64,11 +64,11 @@ abstract class Controller {
          * @param String $action
          * @param Array $parms
          */
-        public function callActionBefore($action, array $parms) {
+        public function callActionBefore($controllerName, $action, array $parms) {
             if(array_search('PhpBURN_ControllerConfig',get_declared_classes()) == true) {
                 if(is_array(PhpBURN_ControllerConfig::getOnCallActionBefore()) && count(PhpBURN_ControllerConfig::getOnCallActionBefore()) > 0) {
                     foreach(PhpBURN_ControllerConfig::getOnCallActionBefore() as $function) {
-                        $function($action, $parms);
+                        $function($controllerName, $action, $parms);
                     }
                 }
             } else {
@@ -81,11 +81,11 @@ abstract class Controller {
          * @param String $action
          * @param Array $parms
          */
-        public function callActionAfter($action, array $parms) {
+        public function callActionAfter($controllerName, $action, array $parms) {
             if(array_search('PhpBURN_ControllerConfig',get_declared_classes()) == true) {
                 if(is_array(PhpBURN_ControllerConfig::getOnCallActionAfter()) && count(PhpBURN_ControllerConfig::getOnCallActionAfter()) > 0) {
                     foreach(PhpBURN_ControllerConfig::getOnCallActionAfter() as $function) {
-                        $function($action, $parms);
+                        $function($controllerName, $action, $parms);
                     }
                 }
             } else {
@@ -102,7 +102,7 @@ abstract class Controller {
          */
 	public function callAction($action, $parms) {
             //onCallActionBefore
-            $this->callActionBefore($action, $parms);
+            $this->callActionBefore(get_class($this), $action, $parms);
 
             //Calling action
             call_user_func_array(array($this,$action),$parms);
@@ -111,7 +111,7 @@ abstract class Controller {
             }
 
             //onCallActionAfter
-            $this->callActionAfter($action, $parms);
+            $this->callActionAfter(get_class($this), $action, $parms);
 	}
 
         /**
