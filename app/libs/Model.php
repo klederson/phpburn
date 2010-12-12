@@ -739,7 +739,6 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		if( !($this->$fieldInfo['alias'] instanceof $fieldInfo['foreignClass']) && $this->modelExist($fieldInfo['foreignClass'])) {
 			$this->$fieldInfo['alias'] = new $fieldInfo['foreignClass'];
 		}
-
                 
 
 //		Define rules to get it
