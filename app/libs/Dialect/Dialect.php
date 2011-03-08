@@ -251,6 +251,8 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 				} else {
 					//SuperWhere
 					$fieldInfo = $this->getModel()->getMap()->getField($value['start']);
+
+                                        $value = gettype($value['end']) == "string" ? addslashes($value['end']) : $value['end'];
 					
 					$value['end'] = is_numeric($value['end']) || strpos($value['end'],'LIKE (') !== false ? $value['end'] : sprintf("'%s'",$value['end']);
 					
@@ -266,7 +268,9 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 					$value = $this->getModel()->$field;
 					if(isset($value) && !empty($value) && $value != null && $value != '') {
 						$fieldInfo = $this->getModel()->getMap()->getField($field);
-						
+                                                
+						$value = gettype($value) == "string" ? addslashes($value) : $value;
+                                                
 						$value = is_numeric($value) ? $value : sprintf("'%s'",$value);
 						
 						$whereConditions .= $whereConditions == null ? sprintf(' %s.%s %s %s ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',($value)) : sprintf(' AND %s.%s %s %s ',$fieldInfo['field']['tableReference'],$fieldInfo['field']['column'],'=',($value));
@@ -277,6 +281,7 @@ abstract class PhpBURN_Dialect  implements IDialect  {
 		}
 		
 		if($pk != null) {
+                                $pk = gettype($pk) == "string" ? addslashes($pk) : $pk;
 				$pk = is_numeric($pk) ? $pk : sprintf("'%s'",$pk);
 				
 				$whereConditions .= $whereConditions == null ? sprintf('%s.%s= %s ',$this->getModel()->_tablename,$pkField['field']['column'],$pk) : sprintf(" AND %s.%s= %s ",$this->getModel()->_tablename,$pkField['field']['column'],($pk));
