@@ -150,6 +150,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
 		unset($this->_connObj, $this->_mapObj, $this->_dialectObj);
 	}
 
+  public function  __toString() {
+    return $this->toJSON();
+  }
+
 	/**
          * This method search a content based in many arguments like: where, order, primary key, etc.
          *
