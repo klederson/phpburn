@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : modelStructure.xml
+    Created on : 15 de Setembro de 2010, 08:51
+    Author     : klederson
+    Description:
+        Purpose of the document follows.
+-->
+<phpburn-model package="phpburn">
+    <class name="Example" tablename="example">
+
+        <property name="idExample" column="idExample" type="int" lenght="10">
+            <options>
+                <autoIncrement>true</autoIncrement>
+                <notNull>true</notNull>
+                <primary>true</primary>
+                <unique>true</unique>
+            </options>
+        </property>
+
+        <property name="email" column="email" type="string" lenght="255">
+            <options>
+                <notNull>true</notNull>
+            </options>
+        </property>
+
+        <property name="name" column="name" type="varchar" lenght="255">
+            <options>
+                <notNull>true</notNull>
+            </options>
+        </property>
+
+        <property name="content" column="content" type="text" lenght="" />
+
+        <property name="file" column="file" type="blob" lenght="" />
+
+        <property name="type" column="type" type="enum" lenght="user,supplier,administrator">
+            <options>
+                <notNull>true</notNull>
+                <defaultValue>user</defaultValue>
+            </options>
+        </property>
+
+        <property name="altDate" column="altDate" type="datetime" lenght="">
+            <options>
+                <notNull>true</notNull>
+                <defaultValue>NOW()</defaultValue>
+            </options>
+        </property>
+
+        <property name="createdAt" column="createdAt" type="timestamp" lenght="">
+            <options>
+                <notNull>true</notNull>
+                <defaultValue>CURRENT_TIMESTAMP</defaultValue>
+            </options>
+        </property>
+
+    </class>
+</phpburn-model>
