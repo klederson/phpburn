@@ -252,7 +252,7 @@ abstract class PhpBURN_Dialect implements IDialect {
           //SuperWhere
           $fieldInfo = $this->getModel()->getMap()->getField($value['start']);
 
-          $value = gettype($value['end']) == "string" ? addslashes($value['end']) : $value['end'];
+          $value['end'] = gettype($value['end']) == "string" ? addslashes($value['end']) : $value['end'];
 
           $value['end'] = is_numeric($value['end']) || strpos($value['end'], 'LIKE (') !== false ? $value['end'] : sprintf("'%s'", $value['end']);
 
