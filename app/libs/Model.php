@@ -737,8 +737,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
       case self::MANY_TO_ONE:
 //				Looking for ONE TO ONE relationship
 //				Define WHERE based on relationship fields
-        $this->$fieldInfo['alias']->swhere($fieldInfo['relKey'], '=', $this->$fieldInfo['thisKey']);
-
+        $this->$fieldInfo['alias']->where($fieldInfo['relKey'], '=', $this->$fieldInfo['thisKey']);
+       
 //				Verify database consistence if there's more then one than we have a database problem
         $amount = $this->$fieldInfo['alias']->find();
         $this->getDialect()->dataSet[$this->getDialect()->getPointer() - 1][$fieldInfo['alias']] = &$this->$fieldInfo['alias']->getDialect()->dataSet;
