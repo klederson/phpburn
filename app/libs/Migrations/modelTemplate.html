@@ -2,34 +2,45 @@
  * This is an automatic generated Model by Reverse Migrations at PhpBURN Framework
  * You can find more information about it at http://www.phpburn.com
  *
+ * The identation here follows the 2 spaces identation.
+ * Please change this documentation for your model information.
+ *
+ * PhpBURN is distributed under GPL licence for development and cannot be sold.
+ * Do not forget to support Open Sources iniciatives, they provide tools like you this.
+ *
  * @author Klederson Bueno <klederson@klederson.com>
+ * @see http://www.phpburn.com
  * @license GPL
  * @package <?=$package?> 
  */
 class <?=$className?> extends PhpBURN_Core {
-    public $_tablename = "<?=$tableName?>";
-    public $_package = "<?=$package?>";
+  public $_tablename = "<?=$tableName?>";
+  public $_package = "<?=$package?>";
 
 
 <?
 foreach($rawFields as $field) {
-echo sprintf("      public $%s; \r\n", $field['name']);
+echo sprintf("  public $%s; \r\n", $field['name']);
 }
 ?>
 
-    public function _mapping() {
+  public function _mapping() {
 <?
 foreach($fields as $field) {
-print sprintf("         %s\r\n", $field);
+print sprintf("    %s\r\n", $field);
 }
 ?>
 
 <?
 if(count($fks) > 0) {
 foreach($fks as $fk) {
-print sprintf("         %s\r\n", $fk);
+print sprintf("    %s\r\n", $fk);
 }
 }
 ?>
-    }
+  }
+  
+  /* Do not change anything above this line unless you really know what are you doing */
+  /* Put all your customized code bellow this line */
+  
 }
