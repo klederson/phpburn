@@ -148,6 +148,19 @@ abstract class PhpBURN_Core implements IPhpBurn {
   public function __toString() {
     return $this->toJSON();
   }
+  
+  public function populateModel(PhpBURN_Core &$model, array $data) {
+    foreach($data as $index => $value) {
+      if(is_array($value)) {
+          if ($model->getMap()->isRelationship($index)) {
+            $model->$index = new $index;
+            $this->populateModel($model->$index, $value);
+          }
+      } else {
+        $model->$index = $value;
+      }      
+    }
+  }
 
   /**
    * This method search a content based in many arguments like: where, order, primary key, etc.
