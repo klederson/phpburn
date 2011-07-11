@@ -506,7 +506,7 @@ abstract class PhpBURN_Dialect implements IDialect {
     $updatedFields = null;
     //Checking each MAPPED field looking in cache for changes in field value, if existis it will be updated, if not we just update the right fields
     foreach ($this->getMap()->fields as $field => $infos) {
-      if ($this->getModel()->getMap()->getRelationShip($field) != true && $this->getModel()->$infos['field']['alias'] != $infos['#value']) {
+      if ($this->getModel()->getMap()->getRelationShip($field) != true && $this->getModel()->$infos['field']['alias'] != $infos['#fetch_value']) {
         $this->getMap()->setFieldValue($field, $this->getModel()->$field);
         $updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
         $updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], addslashes($this->getModel()->$field));

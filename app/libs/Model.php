@@ -153,11 +153,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
     foreach($data as $index => $value) {
       if(is_array($value)) {
           if ($model->getMap()->isRelationship($index)) {
-            $model->$index = new $index;
+            
+            if(!($model->$index instanceof $index))
+              $model->$index = new $index;
+            
             $this->populateModel($model->$index, $value);
           }
       } else {
-        $model->$index = $value;
+        $model->getMap()->setFieldValue($index, $value);//$index = $value;
       }      
     }
   }
@@ -583,6 +586,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
       $this->getMap()->reset();
       foreach ($result as $key => $value) {
         $this->getMap()->setFieldValue($key, $value);
+        $this->getMap()->fetchFieldValue($key, $value);
       }
 
       $this->getDialect()->moveNext();
