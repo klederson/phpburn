@@ -31,7 +31,8 @@ define('SYS_BASE_URL',$baseUrl,true);
 define('DS',DIRECTORY_SEPARATOR,true);
 define('SYS_BASE_PATH',$basePath,true);
 define('SYS_APPLICATION_PATH', SYS_BASE_PATH . DS . 'system');
-define('SYS_MODEL_PATH',SYS_APPLICATION_PATH . DS . 'model' . DS,true);
+//Customized
+define('SYS_MODEL_PATH',SYS_BASE_PATH . DS . '../libs/packages' . DS,true);
 define('SYS_VIEW_PATH',SYS_APPLICATION_PATH . DS . 'views' . DS,true);
 define('SYS_CONTROLLER_PATH',SYS_APPLICATION_PATH . DS . 'controllers' . DS,true);
 define('SYS_SPICES_PATH', SYS_APPLICATION_PATH . DS . 'config' . DS . 'spices' . DS);
@@ -54,6 +55,7 @@ define('SYS_SPICES_EXT','spices.php',true);
 ################################
 # Infos
 ################################
+define('PHPBURN_SESSIONNAME', md5(SYS_BASE_PATH), true);
 define('PHPBURN_VERSION','0.9b',true);
 define('PHPBURN_WEBSITE','http://www.phpburn.com/',true);
 define('PHPBURN_REPOSITORY_TYPE','git',true);

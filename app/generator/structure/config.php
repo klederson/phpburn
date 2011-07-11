@@ -10,13 +10,17 @@
  * @author Kléderson Bueno <klederson@klederson.com>
  * @version 1.0
  */
-@ob_start();
-@session_start();
 
 ################################
 # System Settings
 ################################
 require_once('sysConfig.php');
+
+################################
+# Getting current session if exists
+################################
+session_name(PHPBURN_SESSIONNAME);
+session_start();
 
 
 ################################
@@ -46,7 +50,7 @@ PhpBURN::loadModule('View');
 # Controller
 PhpBURN::loadModule('Controller');
 
-# Model/ORM/DataMapper/DAO
+# To load the module just remove the # comment from the line
 PhpBURN::loadModule('Model');
 
 # Spices
