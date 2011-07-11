@@ -493,6 +493,16 @@ class PhpBURN_Map implements IMap {
 	public function getModel() {
 		return $this->modelObj;
 	}
+  
+  public function fetchFieldValue($field, $value) {
+    $fields = new ArrayObject($this->fields);
+		$test = $fields->offsetExists($field);
+		if($test === false) {
+			PhpBURN_Message::output("[!This field doesn't exist in the Mapping!]: <strong>". get_class($this->modelObj) ."->$field </strong>", PhpBURN_Message::WARNING);
+		}
+		
+		return $this->fields[$field]['#fetch_value'] = $value;
+  }
 	
 	/**
 	 * This sets the value in a field based in name, value and Mapping Info
