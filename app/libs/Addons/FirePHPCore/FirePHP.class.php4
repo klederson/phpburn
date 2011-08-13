@@ -6,7 +6,7 @@
  * 
  * Software License Agreement (New BSD License)
  * 
- * Copyright (c) 2006-2009, Christoph Dorn
+ * Copyright (c) 2006-2010, Christoph Dorn
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification,
@@ -43,7 +43,7 @@
  * @author      Christoph Dorn <christoph@christophdorn.com>
  * @author      Michael Day <manveru.alma@gmail.com>
  * @license     http://www.opensource.org/licenses/bsd-license.php
- * @package     FirePHP
+ * @package     FirePHPCore
  */
  
 /**
@@ -51,7 +51,7 @@
  * 
  * @var string
  */
-define('FirePHP_VERSION', '0.3');
+define('FirePHP_VERSION', '0.3');   // @pinf replace '0.3' with '%%package.version%%'
 
 /**
  * Firebug LOG level
@@ -135,7 +135,7 @@ define('FirePHP_GROUP_END', 'GROUP_END');
  * @author      Christoph Dorn <christoph@christophdorn.com>
  * @author      Michael Day <manveru.alma@gmail.com>
  * @license     http://www.opensource.org/licenses/bsd-license.php
- * @package     FirePHP
+ * @package     FirePHPCore
  */
 class FirePHP {
   /**
@@ -150,8 +150,8 @@ class FirePHP {
    * 
    * @var array
    */
-  var $options = array('maxObjectDepth' => 10,
-                       'maxArrayDepth' => 20,
+  var $options = array('maxObjectDepth' => 5,
+                       'maxArrayDepth' => 5,
                        'useNativeJsonEncode' => true,
                        'includeLineNumbers' => true);
 
@@ -244,8 +244,8 @@ class FirePHP {
    * Set some options for the library
    * 
    * Options:
-   *  - maxObjectDepth: The maximum depth to traverse objects (default: 10)
-   *  - maxArrayDepth: The maximum depth to traverse arrays (default: 20)
+   *  - maxObjectDepth: The maximum depth to traverse objects (default: 5)
+   *  - maxArrayDepth: The maximum depth to traverse arrays (default: 5)
    *  - useNativeJsonEncode: If true will use json_encode() (default: true)
    *  - includeLineNumbers: If true will include line numbers and filenames (default: true)
    * 
@@ -488,12 +488,17 @@ class FirePHP {
    * @return boolean
    */
   function detectClientExtension() {
-    /* Check if FirePHP is installed on client */
-    if(!@preg_match_all('/\sFirePHP\/([\.|\d]*)\s?/si',$this->getUserAgent(),$m) ||
-       !version_compare($m[1][0],'0.0.6','>=')) {
-      return false;
+    // Check if FirePHP is installed on client via User-Agent header
+    if(@preg_match_all('/\sFirePHP\/([\.\d]*)\s?/si',$this->getUserAgent(),$m) &&
+       version_compare($m[1][0],'0.0.6','>=')) {
+      return true;
+    } else
+    // Check if FirePHP is installed on client via X-FirePHP-Version header
+    if(@preg_match_all('/^([\.\d]*)$/si',$this->getRequestHeader("X-FirePHP-Version"),$m) &&
+       version_compare($m[1][0],'0.0.6','>=')) {
+      return true;
     }
-    return true;    
+    return false;
   }
  
   /**
@@ -783,6 +788,41 @@ class FirePHP {
     return $_SERVER['HTTP_USER_AGENT'];
   }
 
+    /**
+     * Get all request headers
+     * 
+     * @return array
+     */
+    function getAllRequestHeaders() {
+        $headers = array();
+        if(function_exists('getallheaders')) {
+            foreach( getallheaders() as $name => $value ) {
+                $headers[strtolower($name)] = $value;
+            }
+        } else {
+            foreach($_SERVER as $name => $value) {
+                if(substr($name, 0, 5) == 'HTTP_') {
+                    $headers[strtolower(str_replace(' ', '-', str_replace('_', ' ', substr($name, 5))))] = $value;
+                }
+            }
+        }
+        return $headers;
+    }
+
+    /**
+     * Get a request header
+     *
+     * @return string|false
+     */
+    function getRequestHeader($Name)
+    {
+        $headers = $this->getAllRequestHeaders();
+        if (isset($headers[strtolower($Name)])) {
+            return $headers[strtolower($Name)];
+        }
+        return false;
+    }
+  
   /**
    * Encode an object into a JSON string
    * 

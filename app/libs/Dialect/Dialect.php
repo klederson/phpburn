@@ -255,6 +255,7 @@ abstract class PhpBURN_Dialect implements IDialect {
           $value['end'] = gettype($value['end']) == "string" ? addslashes($value['end']) : $value['end'];
 
           $value['end'] = is_numeric($value['end']) || strpos($value['end'], 'LIKE (') !== false ? $value['end'] : sprintf("'%s'", $value['end']);
+          $value['end'] = strpos($value['end'], 'LIKE (') !== FALSE ? stripslashes($value['end']) : $value['end'];
 
           $whereConditions .= $whereConditions == null ? "" : sprintf(" %s ", $value['condition']);
           $whereConditions .= sprintf(' %s.%s %s %s ', $fieldInfo['field']['tableReference'], $value['start'], $value['operator'], ($value['end']));

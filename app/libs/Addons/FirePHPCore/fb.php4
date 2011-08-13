@@ -6,7 +6,7 @@
  * 
  * Software License Agreement (New BSD License)
  * 
- * Copyright (c) 2006-2009, Christoph Dorn
+ * Copyright (c) 2006-2010, Christoph Dorn
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without modification,
@@ -40,7 +40,7 @@
  * @author      Christoph Dorn <christoph@christophdorn.com>
  * @author      Michael Day <manveru.alma@gmail.com>
  * @license     http://www.opensource.org/licenses/bsd-license.php
- * @package     FirePHP
+ * @package     FirePHPCore
  */
 
 require_once dirname(__FILE__).'/FirePHP.class.php4';
