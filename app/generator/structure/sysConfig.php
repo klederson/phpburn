@@ -31,8 +31,7 @@ define('SYS_BASE_URL',$baseUrl,true);
 define('DS',DIRECTORY_SEPARATOR,true);
 define('SYS_BASE_PATH',$basePath,true);
 define('SYS_APPLICATION_PATH', SYS_BASE_PATH . DS . 'system');
-//Customized
-define('SYS_MODEL_PATH',SYS_BASE_PATH . DS . '../libs/packages' . DS,true);
+define('SYS_MODEL_PATH',SYS_APPLICATION_PATH . DS . 'model' . DS,true);
 define('SYS_VIEW_PATH',SYS_APPLICATION_PATH . DS . 'views' . DS,true);
 define('SYS_CONTROLLER_PATH',SYS_APPLICATION_PATH . DS . 'controllers' . DS,true);
 define('SYS_SPICES_PATH', SYS_APPLICATION_PATH . DS . 'config' . DS . 'spices' . DS);

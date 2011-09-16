@@ -2,8 +2,9 @@
 
 PhpBURN::load('Tools.Views.IProcessView');
 PhpBURN::load('Addons.PHPTAL.PHPTAL');
+PhpBURN::load('Addons.PHPTAL.PHPTAL.GetTextTranslator');
 
-class phptal_PhpBURN_ViewProcess implements IProcessView {
+class dcampos_PhpBURN_ViewProcess implements IProcessView {
 
   /**
    * This method is used to process the data into the view and than return it to the main method that will handle what to do.
@@ -20,10 +21,24 @@ class phptal_PhpBURN_ViewProcess implements IProcessView {
     $tpl = new PHPTAL($___phpBurnFilePath);
 
     $tpl->setOutputMode(PHPTAL::HTML5);
+    
+    $tr = new PHPTAL_GetTextTranslator();
+    // set language to use for this session (first valid language will
+    // be used)
+    $tr->setLanguage('pt_BR.utf8', 'pt_BR');
+
+    // register gettext domain to use
+    $tr->addDomain('system', SYS_BASE_PATH . 'locale');
+
+    // specify current domain
+    $tr->useDomain('system');
+
+    // tell PHPTAL to use our translator
+    $tpl->setTranslator($tr);
 
     foreach ($__phpBurnData as $index => $value) {
       if (is_string($value))
-        $value = PhpBURN_Views::lazyTranslate($value);
+        $value = PhpBURN_Views::lazyTranslate($value, $_SESSION['lang']);
 
       $tpl->$index = $value;
     }

@@ -44,7 +44,8 @@ class PhpBURN_ACL_Control {
         '@aclAlias',
         '@aclVisible',
         '@aclDesc',
-        '@aclType'
+        '@aclType',
+        '@aclIgnore'
     );
 
     public static $classRules = array();
@@ -104,6 +105,7 @@ class PhpBURN_ACL_Control {
             require_once $fileName;
             $controllerList[$className]['className'] = $className;
             $controllerList[$className]['path'] =  $fileName;
+            $controllerList[$className]['name'] =  $className;
         }
 
         return $controllerList;
@@ -128,6 +130,14 @@ class PhpBURN_ACL_Control {
         }
 
         return '';
+    }
+    
+    public static function listControllerRules($controllerName) {
+      $methods = self::getControllerMethods($controllerName);
+      
+      foreach($methods as $method) {
+        
+      }
     }
 }
 ?>

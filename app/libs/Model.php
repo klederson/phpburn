@@ -523,7 +523,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
     $conditions = array();
     $conditions['start'] = $field;
-    $conditions['end'] = sprintf("LIKE ('%s')", $content);
+    $conditions['end'] = sprintf('LIKE ("%s")', $content);
     $conditions['operator'] = null; //$this->convertWhereOperators($stringOperator);
     $conditions['condition'] = $condition;
 
@@ -1131,23 +1131,9 @@ abstract class PhpBURN_Core implements IPhpBurn {
               $return[$fieldName][] = $this->$fieldName->toArray();
             }
         }
-//
-//                            if($full == true) {
-//                                if( ($this->$fieldName instanceof PhpBURN_Core) && $insane == false) {
-//                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full);
-//                                } else if($insane==true){
-//                                    if($this->$fieldName instanceof PhpBURN_Core) {
-//                                        $this->$fieldName->find();
-//                                        $this->$fieldName->getDialect()->moveFirst();
-//                                    } else {
-//                                        $this->getRelationship($fieldName);
-//                                    }
-//
-//                                    $return[$fieldName][] = $this->$fieldName->toArray($recursive, $full, $insane);
-//                                }
-//                            }
       } else {
-        $return[$fieldName] = $this->getMap()->getFieldValue($fieldName);
+//        $return[$fieldName] = $this->getMap()->getFieldValue($fieldName);
+        $return[$fieldName] = $this->$fieldName;
       }
     }
 
