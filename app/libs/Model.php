@@ -50,6 +50,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
   public $_fields = array();
   //Persistent methods storage
   public $_where = array();
+  public $_defaultWhereGroup = '__default';
   public $_orderBy = array();
   public $_groupBy = array();
   public $_limit = null;
@@ -457,13 +458,16 @@ abstract class PhpBURN_Core implements IPhpBurn {
    *
    * @return PhpBURN_Core
    */
-  public function where($condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
+  public function where($condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false, $whereGroup = NULL) {
+    $whereGroup = $whereGroup == NULL ? $this->_defaultWhereGroup : $whereGroup;
+    
     if ($stringOperator != null && $conditon_end != null) {
       $conditions = array();
       $conditions['start'] = $condition_start;
       $conditions['end'] = $conditon_end;
       $conditions['operator'] = $this->convertWhereOperators($stringOperator);
       $conditions['condition'] = $condition;
+      $conditions['group'] = $whereGroup;
 
       if ($override == true) {
         unset($this->_where);
@@ -472,7 +476,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
       array_push($this->_where, $conditions);
     } else {
-      $this->mwhere($condition_start, $override);
+      $this->mwhere($condition_start, $override, $whereGroup);
     }
 
     return $this;
@@ -485,13 +489,18 @@ abstract class PhpBURN_Core implements IPhpBurn {
    * @param Boolean $override
    * @return PhpBURN_Core
    */
-  public function mwhere($conditions, $override = false) {
+  public function mwhere($string, $override = false, $whereGroup = NULL) {
+    $whereGroup = $whereGroup == NULL ? $this->_defaultWhereGroup : $whereGroup;
+    
     if ($override == true) {
       unset($this->_where);
       $this->_where = array();
     }
+    
+    $condition['mwhere'] = $string;
+    $condition['group'] = $whereGroup;
 
-    array_push($this->_where, $conditions);
+    array_push($this->_where, $condition);
 
     return $this;
   }
@@ -506,8 +515,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
    *
    * @return PhpBURN_Core
    */
-  public function swhere($condition_start, $stringOperator, $conditon_end = null, $condition = "AND", $override = false) {
-    return $this->where($condition_start, $stringOperator, $conditon_end, $condition, $override);
+  public function swhere($condition_start, $stringOperator, $conditon_end = null, $condition = "AND", $override = false, $whereGroup = NULL) {
+    return $this->where($condition_start, $stringOperator, $conditon_end, $condition, $override, $whereGroup);
   }
 
   /**
@@ -792,7 +801,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
         $this->$fieldInfo['thisKey'] = !is_numeric($this->$fieldInfo['thisKey']) ? sprintf("'%s'", $this->$fieldInfo['thisKey']) : $this->$fieldInfo['thisKey'];
 
         $whereString = sprintf('%s %s.%s = %s', $conditionString, $this->_tablename, $fieldInfo['thisKey'], $this->$fieldInfo['thisKey']);
-        $this->$fieldInfo['alias']->mwhere($whereString);
+        $this->$fieldInfo['alias']->mwhere($whereString, false, 'relLink');
 
         $return = $this->$fieldInfo['alias']->find(null, $fluid);
         $this->getDialect()->dataSet[$this->getDialect()->getPointer() - 1][$fieldInfo['alias']] = &$this->$fieldInfo['alias']->getDialect()->dataSet;

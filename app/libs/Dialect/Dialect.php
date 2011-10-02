@@ -245,9 +245,12 @@ abstract class PhpBURN_Dialect implements IDialect {
 
       foreach ($this->getModel()->_where as $index => $value) {
         //Checking swhere and where
-        if (!is_array($value)) {
+        if (!empty($value['mwhere'])) {
           //Normal where
-          $whereConditions .= ( $value);
+//        THIS FIXES GROUPS WHEN MANUAL WHERE HAVE AND/OR CONDITION BUT HAVE NO PREDECESSOR
+          $value['mwhere'] = empty($whereConditions[$this->getModel()->_defaultWhereGroup]) ? preg_replace('/^([ ]+)?(AND|OR)/', ' ', $value['mwhere']) : $value['mwhere'];
+          
+          $whereConditions[$value['group']] .= ( $value['mwhere'] );
         } else {
           //SuperWhere
           $fieldInfo = $this->getModel()->getMap()->getField($value['start']);
@@ -257,8 +260,8 @@ abstract class PhpBURN_Dialect implements IDialect {
           $value['end'] = is_numeric($value['end']) || strpos($value['end'], 'LIKE (') !== false ? $value['end'] : sprintf("'%s'", $value['end']);
           $value['end'] = strpos($value['end'], 'LIKE (') !== FALSE ? stripslashes($value['end']) : $value['end'];
 
-          $whereConditions .= $whereConditions == null ? "" : sprintf(" %s ", $value['condition']);
-          $whereConditions .= sprintf(' %s.%s %s %s ', $fieldInfo['field']['tableReference'], $value['start'], $value['operator'], ($value['end']));
+          $whereConditions[$value['group']] .= empty($whereConditions[$value['group']]) ? "" : sprintf(" %s ", $value['condition']);
+          $whereConditions[$value['group']] .= sprintf(' %s.%s %s %s ', $fieldInfo['field']['tableReference'], $value['start'], $value['operator'], ($value['end']));
         }
       }
     } else {
@@ -272,7 +275,7 @@ abstract class PhpBURN_Dialect implements IDialect {
 
             $value = is_numeric($value) ? $value : sprintf("'%s'", $value);
 
-            $whereConditions .= $whereConditions == null ? sprintf(' %s.%s %s %s ', $fieldInfo['field']['tableReference'], $fieldInfo['field']['column'], '=', ($value)) : sprintf(' AND %s.%s %s %s ', $fieldInfo['field']['tableReference'], $fieldInfo['field']['column'], '=', ($value));
+            $whereConditions[$this->getModel()->_defaultWhereGroup] .= empty($whereConditions[$this->getModel()->_defaultWhereGroup]) ? sprintf(' %s.%s %s %s ', $fieldInfo['field']['tableReference'], $fieldInfo['field']['column'], '=', ($value)) : sprintf(' AND %s.%s %s %s ', $fieldInfo['field']['tableReference'], $fieldInfo['field']['column'], '=', ($value));
           }
           unset($value);
         }
@@ -283,10 +286,15 @@ abstract class PhpBURN_Dialect implements IDialect {
       $pk = gettype($pk) == "string" ? addslashes($pk) : $pk;
       $pk = is_numeric($pk) ? $pk : sprintf("'%s'", $pk);
 
-      $whereConditions .= $whereConditions == null ? sprintf('%s.%s= %s ', $this->getModel()->_tablename, $pkField['field']['column'], $pk) : sprintf(" AND %s.%s= %s ", $this->getModel()->_tablename, $pkField['field']['column'], ($pk));
+      $whereConditions[$this->getModel()->_defaultWhereGroup] .= empty($whereConditions[$this->getModel()->_defaultWhereGroup]) == null ? sprintf('%s.%s= %s ', $this->getModel()->_tablename, $pkField['field']['column'], $pk) : sprintf(" AND %s.%s= %s ", $this->getModel()->_tablename, $pkField['field']['column'], ($pk));
     }
 
-    return $whereConditions;
+    foreach($whereConditions as $conditions) {
+      $finalConditions .= !empty($finalConditions) ? ' AND ' : '';
+      $finalConditions .= sprintf(' ( %s ) ', $conditions);
+    }
+    
+    return $finalConditions;
   }
 
   public function getJoinString() {
