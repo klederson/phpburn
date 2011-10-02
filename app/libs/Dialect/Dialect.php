@@ -241,6 +241,7 @@ abstract class PhpBURN_Dialect implements IDialect {
   }
 
   public function getWhereString($pk, $pkField) {
+    
     if (count($this->getModel()->_where) > 0) {
 
       foreach ($this->getModel()->_where as $index => $value) {
@@ -248,7 +249,8 @@ abstract class PhpBURN_Dialect implements IDialect {
         if (!empty($value['mwhere'])) {
           //Normal where
 //        THIS FIXES GROUPS WHEN MANUAL WHERE HAVE AND/OR CONDITION BUT HAVE NO PREDECESSOR
-          $value['mwhere'] = empty($whereConditions[$this->getModel()->_defaultWhereGroup]) ? preg_replace('/^([ ]+)?(AND|OR)/', ' ', $value['mwhere']) : $value['mwhere'];
+          if(empty($whereConditions[$value['group']]))                  
+            $value['mwhere'] = preg_replace('(^(([ ]+)?AND|OR) )', ' ', $value['mwhere']);
           
           $whereConditions[$value['group']] .= ( $value['mwhere'] );
         } else {
