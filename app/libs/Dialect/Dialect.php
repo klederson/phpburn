@@ -289,9 +289,11 @@ abstract class PhpBURN_Dialect implements IDialect {
       $whereConditions[$this->getModel()->_defaultWhereGroup] .= empty($whereConditions[$this->getModel()->_defaultWhereGroup]) == null ? sprintf('%s.%s= %s ', $this->getModel()->_tablename, $pkField['field']['column'], $pk) : sprintf(" AND %s.%s= %s ", $this->getModel()->_tablename, $pkField['field']['column'], ($pk));
     }
 
-    foreach($whereConditions as $conditions) {
-      $finalConditions .= !empty($finalConditions) ? ' AND ' : '';
-      $finalConditions .= sprintf(' ( %s ) ', $conditions);
+    if(is_array($whereConditions)) {
+      foreach($whereConditions as $conditions) {
+        $finalConditions .= !empty($finalConditions) ? ' AND ' : '';
+        $finalConditions .= sprintf(' ( %s ) ', $conditions);
+      }
     }
     
     return $finalConditions;

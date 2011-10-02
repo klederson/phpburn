@@ -763,7 +763,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
       case self::MANY_TO_ONE:
 //				Looking for ONE TO ONE relationship
 //				Define WHERE based on relationship fields
-        $this->$fieldInfo['alias']->where($fieldInfo['relKey'], '=', $this->$fieldInfo['thisKey']);
+        $this->$fieldInfo['alias']->where($fieldInfo['relKey'], '=', $this->$fieldInfo['thisKey'], 'AND', false, '__relLink');
        
 //				Verify database consistence if there's more then one than we have a database problem
         $amount = $this->$fieldInfo['alias']->find();
@@ -781,7 +781,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
       case self::ONE_TO_MANY:
 //				Looking for ONE TO MANY relationship
 //				Define WHERE based on relationship fields
-        $this->$fieldInfo['alias']->swhere($fieldInfo['relKey'], '=', $this->$fieldInfo['thisKey']);
+        $this->$fieldInfo['alias']->whwre($fieldInfo['relKey'], '=', $this->$fieldInfo['thisKey'], 'AND', false, '__relLink');
         $return = $this->$fieldInfo['alias']->find(null, $fluid);
         $this->getDialect()->dataSet[$this->getDialect()->getPointer() - 1][$fieldInfo['alias']] = &$this->$fieldInfo['alias']->getDialect()->dataSet;
         return $return;
@@ -801,7 +801,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
         $this->$fieldInfo['thisKey'] = !is_numeric($this->$fieldInfo['thisKey']) ? sprintf("'%s'", $this->$fieldInfo['thisKey']) : $this->$fieldInfo['thisKey'];
 
         $whereString = sprintf('%s %s.%s = %s', $conditionString, $this->_tablename, $fieldInfo['thisKey'], $this->$fieldInfo['thisKey']);
-        $this->$fieldInfo['alias']->mwhere($whereString, false, 'relLink');
+        $this->$fieldInfo['alias']->mwhere($whereString, false, '__relLink');
 
         $return = $this->$fieldInfo['alias']->find(null, $fluid);
         $this->getDialect()->dataSet[$this->getDialect()->getPointer() - 1][$fieldInfo['alias']] = &$this->$fieldInfo['alias']->getDialect()->dataSet;
