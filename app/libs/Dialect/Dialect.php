@@ -287,8 +287,8 @@ abstract class PhpBURN_Dialect implements IDialect {
     if ($pk != null) {
       $pk = gettype($pk) == "string" ? addslashes($pk) : $pk;
       $pk = is_numeric($pk) ? $pk : sprintf("'%s'", $pk);
-
-      $whereConditions[$this->getModel()->_defaultWhereGroup] .= empty($whereConditions[$this->getModel()->_defaultWhereGroup]) == null ? sprintf('%s.%s= %s ', $this->getModel()->_tablename, $pkField['field']['column'], $pk) : sprintf(" AND %s.%s= %s ", $this->getModel()->_tablename, $pkField['field']['column'], ($pk));
+      
+      $whereConditions[$this->getModel()->_defaultWhereGroup] .= empty($whereConditions[$this->getModel()->_defaultWhereGroup]) ? sprintf('%s.%s= %s ', $this->getModel()->_tablename, $pkField['field']['column'], $pk) : sprintf(" AND %s.%s= %s ", $this->getModel()->_tablename, $pkField['field']['column'], ($pk));
     }
 
     if(is_array($whereConditions)) {
@@ -558,7 +558,7 @@ abstract class PhpBURN_Dialect implements IDialect {
     $sql = $this->prepareDelete($pk);
 
     if ($sql != null) {
-      $this->execute($sql);
+      return $this->execute($sql);
     } else {
       $modelName = get_class($this->getModel());
       PhpBURN_Message::output("[!Nothing to delete!] - <b>$modelName</b>");
