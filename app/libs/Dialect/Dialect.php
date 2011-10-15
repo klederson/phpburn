@@ -124,6 +124,26 @@ abstract class PhpBURN_Dialect implements IDialect {
   public function dataExists($pointer) {
     return is_array($this->dataSet[$pointer]) ? true : false;
   }
+  
+  public function getDeclaredSelectableFields() {
+    if (count($this->getModel()->_select) > 0) {
+      
+      //Select based ONLY in the $obj->select(); method
+      foreach ($this->getModel()->_select as $index => $value) {
+        $fields .= empty($fields) ? "" : ", ";
+        $fields .= $value['alias'] != null ? sprintf("%s AS %s", $value['value'], $value['alias']) : sprintf("%s", $value['value']);
+        
+        $declaredOnly = $declaredOnly != TRUE && $value['only'] != TRUE ? FALSE : TRUE;
+      }
+      
+      return array(
+          'declaredOnly' => $declaredOnly,
+          'fields' => $fields
+      );
+    } else {
+      return FALSE;
+    }
+  }
 
   public function prepareDelete($pk) {
     //Defnine FROM tables
@@ -167,24 +187,24 @@ abstract class PhpBURN_Dialect implements IDialect {
       $this->getModel()->join($value['field']['tableReference'], $value['field']['column'], $value['field']['column'], '=', 'JOIN', $tableLeft);
       unset($classVars);
     }
+    
+//    Getting declared select fields/expressions
+    $declaredSelect = $this->getDeclaredSelectableFields();
 
+//    Define declared select into SELECT expression
+    $fields .= $declaredSelect != FALSE ? $declaredSelect['fields'] : '';
+    
     //Creating the selectable fields
-    if (count($this->getModel()->_select) <= 0) {
+    if (!$declaredSelect['declaredOnly']) {
       //Selecting from the map
       foreach ($this->getModel()->getMap()->fields as $index => $value) {
         //Parsing non-relationship fields
         if (!$value['isRelationship'] && $value['field']['column'] != null) { //&& $value['classReference'] == get_class($this->getModel())) {
-          $fields .= $fields == null ? "" : ", ";
+          $fields .= empty($fields) ? "" : ", ";
           $fields .= sprintf("%s.%s AS %s", $value['field']['tableReference'], $value['field']['column'], $index);
         }
       }
-    } elseif (count($this->getModel()->_select) > 0) {
-      //Select based ONLY in the $obj->select(); method
-      foreach ($this->getModel()->_select as $index => $value) {
-        $fields .= $fields == null ? "" : ", ";
-        $fields .= $value['alias'] != null ? sprintf("%s AS %s", $value['value'], $value['alias']) : sprintf("%s", $value['value']);
-      }
-    } else {
+    } elseif(!$declaredSelect['declaredOnly'] && empty($fields)) {
       $model = get_class($this->modelObj);
       PhpBURN_Message::output("$model [!is not an mapped or valid PhpBURN Model!]", PhpBURN_Message::ERROR);
       exit;
@@ -223,7 +243,7 @@ abstract class PhpBURN_Dialect implements IDialect {
     //Construct SQL
     $sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $groupConditions, $limit, $limits);
     unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass, $groupConditions);
-
+    
     return $sql;
   }
 

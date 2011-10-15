@@ -427,7 +427,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
    *
    * @param String $condition
    * @param String $alias
-   * @param Boolean $only ( DEPRECATED )
+   * @param Boolean $only
    * @param Boolean $override
    *
    * @return PhpBURN_Core
@@ -794,8 +794,21 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
 //				Current Model table
         $this->$fieldInfo['alias']->join($this->_tablename, $fieldInfo['thisKey'], $fieldInfo['relKey'], '=', 'JOIN', $fieldInfo['relTable']);
-
-
+        
+//        Select relationship fields if is set a model for relationship table otherwise does not select anything from rel table
+        if(class_exists($fieldInfo['relTable'])) {
+          
+          $relModel = new $fieldInfo['relTable'];
+          
+          foreach($relModel->getMap()->fields as $relFieldName => $relFieldInfo) {
+            if($relModel->getMap()->isField($relFieldName)) {
+              $condition = sprintf('%s.%s',$fieldInfo['relTable'],$relFieldName);
+              $alias = sprintf('_rel_%s', $relFieldName);
+              $this->$fieldInfo['alias']->select($condition, $alias, FALSE);
+            }
+          }
+        }
+        
 //				Define HOW TO FIND
         $conditionString = count($this->$fieldInfo['alias']->_where) > 0 ? ' AND ' : '';
         $this->$fieldInfo['thisKey'] = !is_numeric($this->$fieldInfo['thisKey']) ? sprintf("'%s'", $this->$fieldInfo['thisKey']) : $this->$fieldInfo['thisKey'];
