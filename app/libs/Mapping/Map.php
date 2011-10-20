@@ -419,13 +419,21 @@ class PhpBURN_Map implements IMap {
                         return $this;
 	}
 	
-	public function getPrimaryKey() {
+	public function getPrimaryKey($firstOnly = TRUE) {
 		//Check for a PK field
 		foreach($this->fields as $index => $content) {
 			if($content['field']['options']['primary'] == true) {
-				return $content;
+        if($firstOnly == TRUE) {
+          return $content;
+        } else {
+          $pks[$index] = $content;
+        }
 			}
 		}
+    
+    if(count($pks) > 0) {
+      return $pks;
+    }
 		
 		$modelName = get_class($this->modelObj);
 		PhpBURN_Message::output("<b>$modelName</b> [!has no Primary Key. How did you did it?!]", PhpBURN_Message::EXCEPTION);

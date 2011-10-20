@@ -481,7 +481,26 @@ abstract class PhpBURN_Dialect implements IDialect {
                 unset($sqlWHERE, $relationshipSQL, $rs);
                 $relationshipSQL = sprintf("INSERT INTO %s ( %s, %s ) VALUES ( '%s' , '%s' ) ", $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'], $infos['isRelationship']['relOutKey'], $relKeyVal, $relOutKeyVal);
                 $rs = $this->execute($relationshipSQL);
+              } else if($this->getModel()->getConnection()->affected_rows() > 0 && class_exists($infos['isRelationship']['relTable'])) {
+                $relModel = new $infos['isRelationship']['relTable'];
+                
+                $relModel->$infos['isRelationship']['relKey'] = $relKeyVal;
+                $relModel->$infos['isRelationship']['relOutKey'] = $relOutKeyVal;
+                
+                if($relModel->find() > 0) {
+                  $relModel->fetch();
+                                    
+                  foreach($relModel->toArray() as $relFieldName => $value) {
+                    $_name = sprintf('_rel_%s', $relFieldName);
+                    if(isset($this->getModel()->$_name))
+                      $relModel->$relFieldName = $this->getModel()->$_name;
+                  }
+                  
+                  $relModel->save();
+                }
               }
+              
+//              @TODO maybe this is a nice place to put save relationship data to reltable
               break;
           }
         }
@@ -536,27 +555,33 @@ abstract class PhpBURN_Dialect implements IDialect {
   }
 
   public function prepareUpdate() {
+    //Searching for compound PKs or all Pks ( including parent and childs ones )
+    $pkFields = &$this->getMap()->getPrimaryKey(FALSE);
+    
     $updatedFields = null;
     //Checking each MAPPED field looking in cache for changes in field value, if existis it will be updated, if not we just update the right fields
     foreach ($this->getMap()->fields as $field => $infos) {
-      if ($this->getModel()->getMap()->getRelationShip($field) != true && $this->getModel()->$infos['field']['alias'] != $infos['#fetch_value']) {
+      if ($this->getModel()->getMap()->getRelationShip($field) != true && ( isset($this->getModel()->getMap()->fields[$infos['field']['alias']]) && $this->getModel()->$infos['field']['alias'] != $infos['#fetch_value'] ) ) {
         $this->getMap()->setFieldValue($field, $this->getModel()->$field);
         $updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
         $updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], addslashes($this->getModel()->$field));
-      } else if ($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
-
+        
+//      Prepare the wehere for one or many pk fields
+        if(is_array($pkFields)) {
+          foreach($pkFields as $pkFname => $pkArray) {
+            $pkWhere[$pkArray['field']['tableReference']] .= !empty($pkWhere[$pkArray['field']['tableReference']]) ? "AND" : "";
+            $pkWhere[$pkArray['field']['tableReference']] .= sprintf(" %s = '%s'",$pkFname, $pkArray['#fetch_value']);
+          }
+        } 
       }
     }
-
-    //To see more about pkField Structure see addField at MapObject
-    $pkField = &$this->getMap()->getPrimaryKey();
-
+    
     //Define sqls based on each table from the parent to the child
     if (count($updatedFields) > 0) {
       foreach ($updatedFields as $index => $updatedFieldsUnique) {
-        $pkField = $index == $this->getModel()->_tablename ? $this->getMap()->getPrimaryKey() : $this->getMap()->getTableParentField($index);
+//        $pkField = $index == $this->getModel()->_tablename ? $this->getMap()->getPrimaryKey() : $this->getMap()->getTableParentField($index);
 
-        $sql[$index] = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s='%s';", $index, $updatedFieldsUnique, $pkField['field']['column'], $pkField['#value']) : null;
+        $sql[$index] = $updatedFields != null ? sprintf("UPDATE %s SET %s WHERE %s;", $index, $updatedFieldsUnique, $pkWhere[$index]) : null;
       }
     }
 
