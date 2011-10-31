@@ -38,7 +38,7 @@ $aclSettings = array(
     'defaultType' => 'unknown',
 
     'authInfo' => array(
-        'allowedMethods' => &$_SESSION['iFind']['userInfo']['allowedMethods']
+        'allowedMethods' => &$_SESSION['phpburn']['userInfo']['allowedMethods']
     )
 );
 
