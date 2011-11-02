@@ -54,9 +54,15 @@ abstract class Controller {
    *
    * @param String $page
    */
-  public function callErrorPage($page = '404') {
+  public function callErrorPage($page = '404', $content = array()) {
     PhpBURN_Message::output('[!Calling error page:!] ' . $page, PhpBURN_Message::ERROR);
-    require_once(SYS_VIEW_PATH . DS . '_errorPages' . DS . $page . '.php');
+    
+    if( class_exists('PhpBURN_Views') ) {
+      self::loadView('_errorPages/'.$page,$content);
+    } else {
+      require_once(SYS_VIEW_PATH . DS . '_errorPages' . DS . $page . '.php');
+    }
+    
     exit;
   }
 
