@@ -45,6 +45,16 @@ abstract class PhpBURN_Views implements IView {
 	public function autoLoad($status) {
 		self::$autoLoad = $status;
 	}
+  
+  public function setLang($lang = 'pt_BR', $domain = NULL, $translationFolder = NULL) {
+    self::$lang = $lang;
+    self::$domain = $domain == NULL ? self::$domain : $domain;
+    self::$translationFolder = $translationFolder == NULL ? self::$translationFolder : $translationFolder;
+  }
+  
+  public function getLang() {
+    return self::$lang;
+  }
 	
 	
 	/**

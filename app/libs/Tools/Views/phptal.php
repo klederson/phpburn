@@ -23,7 +23,7 @@ class phptal_PhpBURN_ViewProcess implements IProcessView {
 
     foreach ($__phpBurnData as $index => $value) {
       if (is_string($value))
-        $value = PhpBURN_Views::lazyTranslate($value);
+        $value = PhpBURN_Views::lazyTranslate($value,PhpBURN_Views::getLang());
 
       $tpl->$index = $value;
     }
@@ -41,7 +41,7 @@ class phptal_PhpBURN_ViewProcess implements IProcessView {
 //        //Cleaning the buffer for new sessions
     ob_clean();
 
-    return $___phpBurnBufferStored;
+    return PhpBURN_Views::lazyTranslate($___phpBurnBufferStored,PhpBURN_Views::getLang());
   }
 
 }
