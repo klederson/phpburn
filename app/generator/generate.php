@@ -1,3 +1,4 @@
+#!/opt/local/bin/php
 <?php
 /**
  * Setting-up the PhpBURN information
