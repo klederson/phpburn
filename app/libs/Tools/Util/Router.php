@@ -132,7 +132,7 @@ class Router {
 					$parms = explode('/',$value);
 					$finalValue = $parms[0] . '/' . $finalValue;
 				}
-
+        
 				$return['action'] = $finalValue== null ? $value : $finalValue;
 
 				return $return;
