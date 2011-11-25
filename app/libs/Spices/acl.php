@@ -1,21 +1,23 @@
 <?php
 namespace PhpBURN\Spices\ACL;
 
+use PhpBURN\Spices\PDocs\PDocs as docs;
+
 class PhpBURN_ACL {
 
     private static $aclSettings;
     public static $callBacks;
     
     public function checkPermissions($controllerName, $action, $parms) {        
-        $methodRules = PhpBURN_ACL_Control::$classRules[$controllerName][$action];
+        $methodRules = PhpBURN_ACL_Control::$classRules->$controllerName->$action;
 
         if(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action] == true) {
             $function = &self::$callBacks['granted'];
             $function($controllerName, $action, $parms);            
-        } else if(!isset(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action]) && $methodRules['@aclDefault'] == 'allow') {
+        } else if(!isset(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action]) && $methodRules->aclDefault == 'allow') {
             $function = &self::$callBacks['granted'];
             $function($controllerName, $action, $parms);            
-        } else if(!isset(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action]) && $methodRules['@aclDefault'] != 'deny' && self::$aclSettings['defaultPermission'] == 'allow') {
+        } else if(!isset(self::$aclSettings['authInfo']['allowedMethods'][$controllerName][$action]) && $methodRules->aclDefault != 'deny' && self::$aclSettings['defaultPermission'] == 'allow') {
             $function = &self::$callBacks['granted'];
             $function($controllerName, $action, $parms);
         } else {
@@ -40,15 +42,15 @@ class PhpBURN_ACL {
 class PhpBURN_ACL_Control {
 
     public static $aclProperties = array(
-        '@aclDefault',
-        '@aclAlias',
-        '@aclVisible',
-        '@aclDesc',
-        '@aclType',
-        '@aclIgnore'
+        'aclDefault',
+        'aclAlias',
+        'aclVisible',
+        'aclDesc',
+        'aclType',
+        'aclIgnore'
     );
 
-    public static $classRules = array();
+    public static $classRules;
 
     /**
      * It populates self::$classRules with all Controllers Methods Rules
@@ -66,7 +68,7 @@ class PhpBURN_ACL_Control {
 
             foreach($methods as $method) {
                 foreach(self::$aclProperties as $aclProp) {
-                    self::$classRules[$className][$method][$aclProp] = self::getMethodRule($className, $method, $aclProp);
+                    self::$classRules->$className->$method->$aclProp = self::getMethodRule($className, $method, $aclProp);
                 }
             }
         }

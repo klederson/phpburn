@@ -1,4 +1,6 @@
 <?php
+namespace PhpBURN\Spices\PDocs;
+
 /**
  * <p>
  *  PDocs is a simple and fast phpBURN Spice that allow you to reand and manipule
@@ -25,8 +27,8 @@ class PDocs {
   private $obj;
   private $cacheComment;
   
-  public function __construct(&$object) {
-    $this->obj = &$obj;
+  public function __construct($object) {
+    $this->obj = &$object;
   }
   
   public function listMethods() {
@@ -48,20 +50,23 @@ class PDocs {
     switch($type) {
       case self::OBJECT:
         $target = $target == NULL ? $this->obj : $target;
-        $target = new ReflectionObject($target);
+        $reflection = new ReflectionClass($target);
         break;
       case self::METHOD:
-        $target = new ReflectionMethod($this->obj,$target);
+        $reflection = new ReflectionMethod($this->obj,$target);
         break;
       case self::ATTR:
-        $target = new ReflectionProperty($this->obj, $target);
+        $reflection = new ReflectionProperty($this->obj, $target);
         break;
       default:
         return FALSE;
         break;
     }
     
-    return $this->cacheComment[get_class($this->obj)][$target] = $target->getDocComment();
+    if(is_object($target))
+      $target = get_class($target);
+    
+    return $this->cacheComment[@get_class($this->obj)][$target] = $reflection->getDocComment();
   }
   
   
@@ -79,7 +84,7 @@ class PDocs {
    * @param String $type
    */
   public function getCommentTag($tag, $target = NULL, $type = self::OBJECT) {
-    $docComment = empty($this->cacheComment[get_class($this->obj)][$target]) ? $this->getDocumentation($target,$type) : $this->cacheComment[get_class($this->obj)][$target];
+    $docComment = empty($this->cacheComment[@get_class($this->obj)][$target]) ? $this->getDocumentation($target,$type) : $this->cacheComment[get_class($this->obj)][$target];
     
     $matches = array();
     preg_match("/" . $tag . " (.*)(\\r\\n|\\r|\\n)/U", $docComment, $matches);
