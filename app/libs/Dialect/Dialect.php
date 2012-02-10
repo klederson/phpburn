@@ -56,7 +56,7 @@ abstract class PhpBURN_Dialect implements IDialect {
   }
 
   public function cacheSearchRegex($field, $pattern) {
-
+    
   }
 
   /**
@@ -124,18 +124,18 @@ abstract class PhpBURN_Dialect implements IDialect {
   public function dataExists($pointer) {
     return is_array($this->dataSet[$pointer]) ? true : false;
   }
-  
+
   public function getDeclaredSelectableFields() {
     if (count($this->getModel()->_select) > 0) {
-      
+
       //Select based ONLY in the $obj->select(); method
       foreach ($this->getModel()->_select as $index => $value) {
         $fields .= empty($fields) ? "" : ", ";
         $fields .= $value['alias'] != null ? sprintf("%s AS %s", $value['value'], $value['alias']) : sprintf("%s", $value['value']);
-        
+
         $declaredOnly = $declaredOnly != TRUE && $value['only'] != TRUE ? FALSE : TRUE;
       }
-      
+
       return array(
           'declaredOnly' => $declaredOnly,
           'fields' => $fields
@@ -187,13 +187,13 @@ abstract class PhpBURN_Dialect implements IDialect {
       $this->getModel()->join($value['field']['tableReference'], $value['field']['column'], $value['field']['column'], '=', 'JOIN', $tableLeft);
       unset($classVars);
     }
-    
+
 //    Getting declared select fields/expressions
     $declaredSelect = $this->getDeclaredSelectableFields();
 
 //    Define declared select into SELECT expression
     $fields .= $declaredSelect != FALSE ? $declaredSelect['fields'] : '';
-    
+
     //Creating the selectable fields
     if (!$declaredSelect['declaredOnly']) {
       //Selecting from the map
@@ -204,7 +204,7 @@ abstract class PhpBURN_Dialect implements IDialect {
           $fields .= sprintf("%s.%s AS %s", $value['field']['tableReference'], $value['field']['column'], $index);
         }
       }
-    } elseif(!$declaredSelect['declaredOnly'] && empty($fields)) {
+    } elseif (!$declaredSelect['declaredOnly'] && empty($fields)) {
       $model = get_class($this->modelObj);
       PhpBURN_Message::output("$model [!is not an mapped or valid PhpBURN Model!]", PhpBURN_Message::ERROR);
       exit;
@@ -243,7 +243,7 @@ abstract class PhpBURN_Dialect implements IDialect {
     //Construct SQL
     $sql = $this->buildSELECTQuery($fields, $from, $joinString, $conditions, $whereConditions, $orderConditions, $groupConditions, $limit, $limits);
     unset($fieldInfo, $fields, $from, $joinString, $conditions, $whereConditions, $orderBy, $orderConditions, $limit, $pkField, $parentFields, $parentClass, $groupConditions);
-    
+
     return $sql;
   }
 
@@ -261,7 +261,7 @@ abstract class PhpBURN_Dialect implements IDialect {
   }
 
   public function getWhereString($pk, $pkField) {
-    
+
     if (count($this->getModel()->_where) > 0) {
 
       foreach ($this->getModel()->_where as $index => $value) {
@@ -269,9 +269,9 @@ abstract class PhpBURN_Dialect implements IDialect {
         if (!empty($value['mwhere'])) {
           //Normal where
 //        THIS FIXES GROUPS WHEN MANUAL WHERE HAVE AND/OR CONDITION BUT HAVE NO PREDECESSOR
-          if(empty($whereConditions[$value['group']]))                  
+          if (empty($whereConditions[$value['group']]))
             $value['mwhere'] = preg_replace('(^(([ ]+)?AND|OR) )', ' ', $value['mwhere']);
-          
+
           $whereConditions[$value['group']] .= ( $value['mwhere'] );
         } else {
           //SuperWhere
@@ -307,17 +307,17 @@ abstract class PhpBURN_Dialect implements IDialect {
     if ($pk != null) {
       $pk = gettype($pk) == "string" ? addslashes($pk) : $pk;
       $pk = is_numeric($pk) ? $pk : sprintf("'%s'", $pk);
-      
+
       $whereConditions[$this->getModel()->_defaultWhereGroup] .= empty($whereConditions[$this->getModel()->_defaultWhereGroup]) ? sprintf('%s.%s= %s ', $this->getModel()->_tablename, $pkField['field']['column'], $pk) : sprintf(" AND %s.%s= %s ", $this->getModel()->_tablename, $pkField['field']['column'], ($pk));
     }
 
-    if(is_array($whereConditions)) {
-      foreach($whereConditions as $conditions) {
-        $finalConditions .= !empty($finalConditions) ? ' AND ' : '';
+    if (is_array($whereConditions)) {
+      foreach ($whereConditions as $conditions) {
+        $finalConditions .=!empty($finalConditions) ? ' AND ' : '';
         $finalConditions .= sprintf(' ( %s ) ', $conditions);
       }
     }
-    
+
     return $finalConditions;
   }
 
@@ -443,72 +443,85 @@ abstract class PhpBURN_Dialect implements IDialect {
         $this->getMap()->setFieldValue($field['field']['alias'], $lastId);
       }
 
-      foreach ($this->getMap()->fields as $fieldCheck => $infos) {
-        if ($this->getModel()->getMap()->getRelationShip($fieldCheck) == true && $this->getModel()->$fieldCheck instanceof $infos['isRelationship']['foreignClass']) {
-
-//					Just to short name
-          $relModel = &$this->getModel()->$fieldCheck;
-
-//					Checking the kind of relationship
-          switch ($infos['isRelationship']['type']) {
-            case PhpBURN_Core::ONE_TO_ONE:
-              $this->getModel()->$fieldCheck->save();
-              $this->getModel()->getMap()->setFieldValue($infos['isRelationship']['thisKey'], $relModel->getMap()->getFieldValue($infos['isRelationship']['thisKey']));
-              $this->getModel()->save();
-              break;
-
-            case PhpBURN_Core::ONE_TO_MANY:
-              $relModel->getMap()->setFieldValue($infos['isRelationship']['relKey'], $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']));
-              $this->getModel()->$fieldCheck->save();
-              break;
-
-            case PhpBURN_Core::MANY_TO_MANY:
-              $this->getModel()->$fieldCheck->save();
-
-//							SEARCH IF THE RELATIONSHIP ALREADY EXISTS
-              unset($sqlWHERE, $relationshipSQL, $rs);
-              $relKeyVal = $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']);
-              $relOutKeyVal = $relModel->getMap()->getFieldValue($infos['isRelationship']['relOutKey']);
-
-              $sqlWHERE = sprintf("%s.%s = '%s'", $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'], addslashes($relKeyVal));
-              $sqlWHERE .= " AND ";
-              $sqlWHERE .= sprintf("%s.%s = '%s'", $infos['isRelationship']['relTable'], $infos['isRelationship']['outKey'], addslashes($relOutKeyVal));
-
-              $relationshipSQL = sprintf('SELECT * FROM %s WHERE %s', $infos['isRelationship']['relTable'], $sqlWHERE);
-
-              $rs = $this->execute($relationshipSQL);
-              if ($this->getModel()->getConnection()->affected_rows() == 0) {
-                unset($sqlWHERE, $relationshipSQL, $rs);
-                $relationshipSQL = sprintf("INSERT INTO %s ( %s, %s ) VALUES ( '%s' , '%s' ) ", $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'], $infos['isRelationship']['relOutKey'], $relKeyVal, $relOutKeyVal);
-                $rs = $this->execute($relationshipSQL);
-              } else if($this->getModel()->getConnection()->affected_rows() > 0 && class_exists($infos['isRelationship']['relTable'])) {
-                $relModel = new $infos['isRelationship']['relTable'];
-                
-                $relModel->$infos['isRelationship']['relKey'] = $relKeyVal;
-                $relModel->$infos['isRelationship']['relOutKey'] = $relOutKeyVal;
-                
-                if($relModel->find() > 0) {
-                  $relModel->fetch();
-                                    
-                  foreach($relModel->toArray() as $relFieldName => $value) {
-                    $_name = sprintf('_rel_%s', $relFieldName);
-                    if(isset($this->getModel()->$_name))
-                      $relModel->$relFieldName = $this->getModel()->$_name;
-                  }
-                  
-                  $relModel->save();
-                }
-              }
-              
-//              @TODO maybe this is a nice place to put save relationship data to reltable
-              break;
-          }
-        }
-      }
+      $this->saveRelationships();
 
       return true;
     } else {
       return false;
+    }
+  }
+  
+  public function saveRelationships($name = NULL) {
+    if($name == NULL) {
+      foreach ($this->getMap()->fields as $fieldCheck => $infos) {
+        if ($this->getModel()->getMap()->getRelationShip($fieldCheck) == true && $this->getModel()->$fieldCheck instanceof $infos['isRelationship']['foreignClass']) {
+          $this->saveRelationship($infos, $fieldCheck);
+        }
+      }
+    } else {
+      $infos = $this->getMap()->fields[$name];
+      $this->saveRelationship($infos, $name);
+    }
+  }
+
+  protected function saveRelationship(&$infos, &$fieldCheck) {
+
+//					Just to short name
+    $relModel = &$this->getModel()->$fieldCheck;
+
+//					Checking the kind of relationship
+    switch ($infos['isRelationship']['type']) {
+      case PhpBURN_Core::ONE_TO_ONE:
+        $this->getModel()->$fieldCheck->save();
+        $this->getModel()->getMap()->setFieldValue($infos['isRelationship']['thisKey'], $relModel->getMap()->getFieldValue($infos['isRelationship']['thisKey']));
+        $this->getModel()->save();
+        break;
+
+      case PhpBURN_Core::ONE_TO_MANY:
+        $relModel->getMap()->setFieldValue($infos['isRelationship']['relKey'], $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']));
+        $this->getModel()->$fieldCheck->save();
+        break;
+
+      case PhpBURN_Core::MANY_TO_MANY:
+        $this->getModel()->$fieldCheck->save();
+
+//			SEARCH IF THE RELATIONSHIP ALREADY EXISTS
+        unset($sqlWHERE, $relationshipSQL, $rs);
+        $relKeyVal = $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']);
+        $relOutKeyVal = $relModel->getMap()->getFieldValue($infos['isRelationship']['relOutKey']);
+
+        $sqlWHERE = sprintf("%s.%s = '%s'", $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'], addslashes($relKeyVal));
+        $sqlWHERE .= " AND ";
+        $sqlWHERE .= sprintf("%s.%s = '%s'", $infos['isRelationship']['relTable'], $infos['isRelationship']['outKey'], addslashes($relOutKeyVal));
+
+        $relationshipSQL = sprintf('SELECT * FROM %s WHERE %s', $infos['isRelationship']['relTable'], $sqlWHERE);
+
+        $rs = $this->execute($relationshipSQL);
+        if ($this->getModel()->getConnection()->affected_rows() == 0) {
+          unset($sqlWHERE, $relationshipSQL, $rs);
+          $relationshipSQL = sprintf("INSERT INTO %s ( %s, %s ) VALUES ( '%s' , '%s' ) ", $infos['isRelationship']['relTable'], $infos['isRelationship']['relKey'], $infos['isRelationship']['relOutKey'], $relKeyVal, $relOutKeyVal);
+          $rs = $this->execute($relationshipSQL);
+        } else if ($this->getModel()->getConnection()->affected_rows() > 0 && class_exists($infos['isRelationship']['relTable'])) {
+          $relModel = new $infos['isRelationship']['relTable'];
+
+          $relModel->$infos['isRelationship']['relKey'] = $relKeyVal;
+          $relModel->$infos['isRelationship']['relOutKey'] = $relOutKeyVal;
+
+          if ($relModel->find() > 0) {
+            $relModel->fetch();
+
+            foreach ($relModel->toArray() as $relFieldName => $value) {
+              $_name = sprintf('_rel_%s', $relFieldName);
+              if (isset($this->getModel()->$_name))
+                $relModel->$relFieldName = $this->getModel()->$_name;
+            }
+
+            $relModel->save();
+          }
+        }
+
+//              @TODO maybe this is a nice place to put save relationship data to reltable
+        break;
     }
   }
 
@@ -538,7 +551,7 @@ abstract class PhpBURN_Dialect implements IDialect {
           $insertValues[$infos['field']['tableReference']] .= sprintf("'%s'", addslashes($value));
         }
       } else if ($this->getModel()->getMap()->getRelationShip($field) == true && !empty($this->getModel()->$field)) {
-
+        
       }
     }
 
@@ -557,25 +570,25 @@ abstract class PhpBURN_Dialect implements IDialect {
   public function prepareUpdate() {
     //Searching for compound PKs or all Pks ( including parent and childs ones )
     $pkFields = &$this->getMap()->getPrimaryKey(FALSE);
-    
+
     $updatedFields = null;
     //Checking each MAPPED field looking in cache for changes in field value, if existis it will be updated, if not we just update the right fields
     foreach ($this->getMap()->fields as $field => $infos) {
-      if ($this->getModel()->getMap()->getRelationShip($field) != true && ( isset($this->getModel()->getMap()->fields[$infos['field']['alias']]) && $this->getModel()->$infos['field']['alias'] != $infos['#fetch_value'] ) ) {
+      if ($this->getModel()->getMap()->getRelationShip($field) != true && ( isset($this->getModel()->getMap()->fields[$infos['field']['alias']]) && $this->getModel()->$infos['field']['alias'] != $infos['#fetch_value'] )) {
         $this->getMap()->setFieldValue($field, $this->getModel()->$field);
         $updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
         $updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], addslashes($this->getModel()->$field));
-        
+
 //      Prepare the wehere for one or many pk fields
-        if(is_array($pkFields)) {
-          foreach($pkFields as $pkFname => $pkArray) {
-            $pkWhere[$pkArray['field']['tableReference']] .= !empty($pkWhere[$pkArray['field']['tableReference']]) ? "AND" : "";
-            $pkWhere[$pkArray['field']['tableReference']] .= sprintf(" %s = '%s'",$pkFname, $pkArray['#fetch_value']);
+        if (is_array($pkFields)) {
+          foreach ($pkFields as $pkFname => $pkArray) {
+            $pkWhere[$pkArray['field']['tableReference']] .=!empty($pkWhere[$pkArray['field']['tableReference']]) ? "AND" : "";
+            $pkWhere[$pkArray['field']['tableReference']] .= sprintf(" %s = '%s'", $pkFname, $pkArray['#fetch_value']);
           }
-        } 
+        }
       }
     }
-    
+
     //Define sqls based on each table from the parent to the child
     if (count($updatedFields) > 0) {
       foreach ($updatedFields as $index => $updatedFieldsUnique) {

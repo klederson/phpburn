@@ -629,6 +629,10 @@ abstract class PhpBURN_Core implements IPhpBurn {
   public function save() {
     return $this->getDialect()->save();
   }
+  
+  public function saveRelationship($name) {
+    $this->getDialect()->saveRelationships($name);
+  }
 
   /**
    * Delete an entry
