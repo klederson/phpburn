@@ -710,6 +710,38 @@ abstract class PhpBURN_Core implements IPhpBurn {
 
     return $this;
   }
+  
+  /**
+   * Verify if an relationship exists and instance it if not instanced
+   * 
+   * @param String $linkName
+   * @return Mixed 
+   */
+  protected function instanceRelationship($linkName) {
+    if ($this->getMap()->getRelationShip($linkName) == TRUE) {
+      $infos = $this->getMap()->fields[$linkName];
+
+      if (!($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
+        $this->$linkName = new $infos['isRelationship']['foreignClass'];
+      }
+      
+      return $this->$linkName;
+    } else {
+      PhpBURN_Message::output($linkName . ' [!is not a valid relationship of!] ' . get_class($this), PhpBURN_Message::ERROR);
+      return false;
+    }
+  }
+  
+    
+  public function relationshipGroupBy($linkName, $field, $override = FALSE) {
+    if ($this->instanceRelationship($linkName) !== FALSE) {
+      $this->$linkName->groupBy($field, $override);
+      return $this;
+    } else {
+      return false;
+    }
+  }
+
 
   /**
    * Limits and/or Paginate your results by changing the query to bring
