@@ -100,7 +100,7 @@ class PhpBURN_Reverse {
 //            print_r($value);
 //            print_r($checkMany);
 
-            $outArr = self::$rawFks[strtolower($checkMany[2][0])];
+            $outArr = self::$rawFks[($checkMany[2][0])];
 
             if(is_array($outArr)) {
                 foreach($outArr as $index => $arrValue) {
