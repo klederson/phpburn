@@ -56,6 +56,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
   public $_limit = null;
   public $_select = array();
   public $_join = array();
+  public $_from = array();
 //      Utils
   public $_amount = 0;
   /**
@@ -898,7 +899,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
    *
    * @return PhpBURN_Core
    */
-  public function relationshipWhere($linkName, $condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false) {
+  public function relationshipWhere($linkName, $condition_start, $stringOperator = null, $conditon_end = null, $condition = "AND", $override = false, $whereGroup = NULL) {
     $existis = $this->getMap()->getRelationShip($linkName);
 
     if ($existis) {
@@ -913,7 +914,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
       $this->$linkName->mwhere($condition_start);
       return $this;
     } else if ($existis == true && $stringOperator != null) {
-      $this->$linkName->where($condition_start, $stringOperator, $conditon_end, $condition, $override);
+      $this->$linkName->where($condition_start, $stringOperator, $conditon_end, $condition, $override,$whereGroup);
 
       return $this;
     } else {
@@ -937,21 +938,11 @@ abstract class PhpBURN_Core implements IPhpBurn {
    * @return PhpBURN_Core
    */
   public function relationshipSelect($linkName, $field, $alias = null, $only = true, $override = false) {
-    $existis = $this->getMap()->getRelationShip($linkName);
-
-    if ($existis) {
-      $infos = $this->getMap()->fields[$linkName];
-
-      if (!($this->$linkName instanceof $infos['isRelationship']['foreignClass']) && $this->modelExist($infos['isRelationship']['foreignClass'])) {
-        $this->$linkName = new $infos['isRelationship']['foreignClass'];
-      }
-    }
-
-    if ($existis == true && $field != null && $alias != null) {
+    if ($this->instanceRelationship($linkName) != FALSE && $field != null && $alias != null) {
       $this->$linkName->select($field, $alias, $only, $override);
       return $this;
     } else {
-      PhpBURN_Message::output($linkName . ' [!is not a valid relationship or is missing parameters!]', PhpBURN_Message::ERROR);
+      PhpBURN_Message::output('[!Incorrect specification for $model->select()!]', PhpBURN_Message::ERROR);
       return false;
     }
   }
