@@ -245,6 +245,21 @@ class PhpBURN_Map implements IMap {
 
                 return $this;
 	}
+  
+  /**
+   * This method lists all relationships from a mapping and it's specifications
+   * 
+   * @return Array 
+   */
+  public function listRelationships() {
+    $rel = array();
+    foreach($this->fields as $index => $fieldInfo) {
+      if($this->isRelationship($index))
+        $rel[] = $fieldInfo;
+    }
+    
+    return $rel;
+  }
 	
 	public function isRelationship($index) {
 		if($this->fields[$index]['isRelationship'] == false) {
