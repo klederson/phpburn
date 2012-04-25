@@ -19,16 +19,16 @@ PhpBURN::load('Connection.IConnection');
 class PhpBURN_Connection_MySQL implements IConnection
 {
 
-	const CLOSED                                    = 100201;
-	const OPEN                                      = 100202;
+	const CLOSED					= 100201;
+	const OPEN					= 100202;
 
-	const SERVER_VERSION                            = 10;
-	const CLIENT_VERSION                            = 11;
-	const HOST_INFO                                 = 12;
+	const SERVER_VERSION				= 10;
+	const CLIENT_VERSION				= 11;
+	const HOST_INFO					= 12;
 	const PROTOCOL_VERSION                          = 13;
 	const RANDOM_FUNCTION                           = 'rand()';
 	
-	const ESCAPE_CHAR                               = '\\';
+	const ESCAPE_CHAR				= '\\';
 	
 	protected $_event_types = array(
 		'preExecute','posExecute','preConnect','onConnectSucess','preClose','posClose',
@@ -94,9 +94,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 			
 			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);			
 			return false;
-		} else {
-      PhpBURN_Message::output("[!Database connection well succeeded!] - ". $this->getDatabase());
-    }
+		}
 		
 		//Selecting database
 		mysql_select_db($this->getDatabase(), $this->conn_id);
@@ -114,8 +112,6 @@ class PhpBURN_Connection_MySQL implements IConnection
 		{
 			$this->state = self::CLOSED;
 			mysql_close($this->conn_id);
-      
-      PhpBURN_Message::output("[!Database connection closed!] - ". $this->getDatabase());
 		}
 		//$this->dispatchEvent('posClose', $this);
 	}

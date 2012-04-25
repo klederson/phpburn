@@ -544,6 +544,8 @@ abstract class PhpBURN_Dialect implements IDialect {
 
         $this->getModel()->getMap()->setFieldValue($field, $this->getModel()->$field);
         $value = $this->getModel()->getMap()->getFieldValue($field);
+        $this->getMap()->fetchFieldValue($field, $this->getModel()->$field);
+
         if (isset($value) && $value != null) {
           $insertFields[$infos['field']['tableReference']] .= $insertFields[$infos['field']['tableReference']] == null ? '' : ', ';
           $insertFields[$infos['field']['tableReference']] .= $infos['field']['tableReference'] . '.' . $infos['field']['column'];
@@ -576,6 +578,7 @@ abstract class PhpBURN_Dialect implements IDialect {
     foreach ($this->getMap()->fields as $field => $infos) {
       if ($this->getModel()->getMap()->getRelationShip($field) != true && ( isset($this->getModel()->getMap()->fields[$infos['field']['alias']]) && $this->getModel()->$infos['field']['alias'] != $infos['#fetch_value'] )) {
         $this->getMap()->setFieldValue($field, $this->getModel()->$field);
+        $this->getMap()->fetchFieldValue($field, $this->getModel()->$field);
         $updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
         $updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], addslashes($this->getModel()->$field));
 
