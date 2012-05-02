@@ -434,7 +434,7 @@ abstract class PhpBURN_Dialect implements IDialect {
           $value = str_replace('[#__fieldLinkValue#]', $parentValue, $value);
         }
         if ($value != null)
-          $this->execute($value);
+          if(!$this->execute($value)) return FALSE; //handle errors when saving
       }
       //$this->getModel()->get($this->getModel()->getConnection()->last_id());
       $field = $this->getMap()->getPrimaryKey();

@@ -12,7 +12,7 @@ PhpBURN::load("Dialect.IDialect");
  * @author Klederson Bueno <klederson@klederson.com>
  *
  */
-class PhpBURN_Dialect_MySQL extends PhpBURN_Dialect  implements IDialect {
+class PhpBURN_Dialect_MySQLi extends PhpBURN_Dialect  implements IDialect {
 		
 	/* Common Persistent Methods */
 	
