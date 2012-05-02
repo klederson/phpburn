@@ -104,7 +104,7 @@ abstract class PhpBURN_Dialect implements IDialect {
 
 //              Remove slashes
       foreach ($data as $index => $value) {
-        $data[$index] = stripslashes($value);
+        $data[$index] = ($value);
       }
 
       if ($data != null && count($data) > 0 && !$this->dataExists($this->getPointer())) {
