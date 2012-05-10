@@ -354,7 +354,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 		{	
 			$msg = "[!Database error:!] " . $this->getErrorMsg();
 			PhpBURN_Message::output($msg, PhpBURN_Message::ERROR);
-			return false;
+			return FALSE;
 			//$this->dispatchEvent('onExecuteError', $this, $sql, $msg);
 		} 
 		//$this->close();

@@ -632,7 +632,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
   }
   
   public function saveRelationship($name) {
-    $this->getDialect()->saveRelationships($name);
+    return $this->getDialect()->saveRelationships($name);
   }
 
   /**

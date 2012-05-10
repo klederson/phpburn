@@ -455,12 +455,12 @@ abstract class PhpBURN_Dialect implements IDialect {
     if($name == NULL) {
       foreach ($this->getMap()->fields as $fieldCheck => $infos) {
         if ($this->getModel()->getMap()->getRelationShip($fieldCheck) == true && $this->getModel()->$fieldCheck instanceof $infos['isRelationship']['foreignClass']) {
-          $this->saveRelationship($infos, $fieldCheck);
+          return $this->saveRelationship($infos, $fieldCheck);
         }
       }
     } else {
       $infos = $this->getMap()->fields[$name];
-      $this->saveRelationship($infos, $name);
+      return $this->saveRelationship($infos, $name);
     }
   }
 
@@ -474,16 +474,16 @@ abstract class PhpBURN_Dialect implements IDialect {
       case PhpBURN_Core::ONE_TO_ONE:
         $this->getModel()->$fieldCheck->save();
         $this->getModel()->getMap()->setFieldValue($infos['isRelationship']['thisKey'], $relModel->getMap()->getFieldValue($infos['isRelationship']['thisKey']));
-        $this->getModel()->save();
+        $saved = $this->getModel()->save();
         break;
 
       case PhpBURN_Core::ONE_TO_MANY:
         $relModel->getMap()->setFieldValue($infos['isRelationship']['relKey'], $this->getModel()->getMap()->getFieldValue($infos['isRelationship']['relKey']));
-        $this->getModel()->$fieldCheck->save();
+        $saved = $this->getModel()->$fieldCheck->save();
         break;
 
       case PhpBURN_Core::MANY_TO_MANY:
-        $this->getModel()->$fieldCheck->save();
+        $saved = $this->getModel()->$fieldCheck->save();
 
 //			SEARCH IF THE RELATIONSHIP ALREADY EXISTS
         unset($sqlWHERE, $relationshipSQL, $rs);
@@ -516,13 +516,15 @@ abstract class PhpBURN_Dialect implements IDialect {
                 $relModel->$relFieldName = $this->getModel()->$_name;
             }
 
-            $relModel->save();
+            $saved = $relModel->save();
           }
         }
 
 //              @TODO maybe this is a nice place to put save relationship data to reltable
         break;
     }
+    
+    return $saved;
   }
 
   public function prepareInsert() {

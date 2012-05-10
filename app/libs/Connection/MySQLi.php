@@ -16,7 +16,7 @@ PhpBURN::load('Connection.IConnection');
  * @author Klederson Bueno Bezerra da Silva
  *
  */
-class PhpBURN_Connection_MySQL implements IConnection
+class PhpBURN_Connection_MySQLi implements IConnection
 {
 
 	const CLOSED					= 100201;
@@ -52,7 +52,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		if(self::$instance == null)
 		{
-			self::$instance = new PhpBURN_Connection_MySQL();
+			self::$instance = new PhpBURN_Connection_MySQLi();
 		}
 		
 		return self::$instance;
@@ -63,7 +63,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 		
 		if($this->conn_id && $this->state == self::OPEN)
 		{
-			mysql_select_db($this->getDatabase(), $this->conn_id);
+			mysqli_select_db($this->conn_id,$this->getDatabase());
 			return true;
 		}
 		
@@ -82,9 +82,9 @@ class PhpBURN_Connection_MySQL implements IConnection
 					
 		if(isset($this->options['persistent']) && $this->options['persistent'] == true)
 		{
-			$this->conn_id = @mysql_pconnect($hostString, $this->getUser(), $this->getPassword(), $flags);
+			$this->conn_id = @mysqli_pconnect($hostString, $this->getUser(), $this->getPassword(), $flags);
 		} else {
-			$this->conn_id = @mysql_connect($hostString, $this->getUser(), $this->getPassword(), $flags);
+			$this->conn_id = @mysqli_connect($hostString, $this->getUser(), $this->getPassword(), $flags);
 		}
 		
 		if( !$this->conn_id )
@@ -97,7 +97,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 		}
 		
 		//Selecting database
-		mysql_select_db($this->getDatabase(), $this->conn_id);
+		mysqli_select_db($this->conn_id,$this->getDatabase());
 		$this->state = self::OPEN;
 		
 		//TODO onConnectSucess actions should be called from here
@@ -111,7 +111,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 		if($this->conn_id && $this->state != self::CLOSED)
 		{
 			$this->state = self::CLOSED;
-			mysql_close($this->conn_id);
+			mysqli_close($this->conn_id);
 		}
 		//$this->dispatchEvent('posClose', $this);
 	}
@@ -196,9 +196,9 @@ class PhpBURN_Connection_MySQL implements IConnection
 		$msg = '';
 		if($this->conn_id) 
 		{
-			$msg = mysql_error($this->conn_id);
+			$msg = mysqli_connect_error();
 		} else {
-			$msg = mysql_error();
+			$msg = mysqli_connect_error();
 		}
 		return $msg;
 	}
@@ -214,7 +214,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 		
 		$list = array();
 		
-		while($row = mysql_fetch_row($rs))
+		while($row = mysqli_fetch_row($rs))
 		{
 			$list[] = $row[0];
 		}
@@ -232,7 +232,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 		$fks = array();
                 $sql = sprintf("SHOW CREATE TABLE `%s`",$tablename);
 		$rs = $this->executeSQL($sql);
-		$result = mysql_fetch_row($rs);
+		$result = mysqli_fetch_row($rs);
 		$result[0] = preg_replace("(\r|\n)",'\n', $result[0]);
 
                 $matches = array();
@@ -280,17 +280,17 @@ class PhpBURN_Connection_MySQL implements IConnection
 			switch($type)
 			{
 				case self::CLIENT_VERSION:
-					return mysql_get_client_info();
+					return mysqli_get_client_info();
 					break;
 				case self::HOST_INFO:
-					return mysql_get_host_info($this->conn_id);
+					return mysqli_get_host_info($this->conn_id);
 					break;
 				case self::PROTOCOL_VERSION:
-					return mysql_get_proto_info($this->conn_id);
+					return mysqli_get_proto_info($this->conn_id);
 					break;
 				case self::SERVER_VERSION:
 				default:
-					return mysql_get_server_info($this->conn_id);
+					return mysqli_get_server_info($this->conn_id);
 					break;
 			}
 			return '';
@@ -305,7 +305,7 @@ class PhpBURN_Connection_MySQL implements IConnection
             $rs = $this->executeSQL( $sql );
 
             $data = array();
-            while($row = mysql_fetch_row($rs))
+            while($row = mysqli_fetch_row($rs))
             {
                 $name           = $row[0];
                 $type_native    = $row[1];
@@ -345,7 +345,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		//$this->dispatchEvent('preExecute', $this, $sql);
 		$this->connect();
-		$rs = @mysql_query($sql, $this->conn_id);
+		$rs = @mysqli_query($sql, $this->conn_id);
 		if( ! $rs )
 		{	
 			$msg = "[!Database error:!] " . $this->getErrorMsg();
@@ -361,7 +361,7 @@ class PhpBURN_Connection_MySQL implements IConnection
         public function unbuffExecuteSQL($sql) {
             //$this->dispatchEvent('preExecute', $this, $sql);
 		$this->connect();
-		$rs = @mysql_unbuffered_query($sql, $this->conn_id);
+		$rs = @mysqli_unbuffered_query($sql, $this->conn_id);
 		if( ! $rs )
 		{
 			$msg = "[!Database error:!] " . $this->getErrorMsg();
@@ -378,9 +378,9 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		if($this->state == self::OPEN)
 		{
-			return mysql_real_escape_string($str, $this->conn_id);
+			return mysqli_real_escape_string($str, $this->conn_id);
 		} else {
-			return mysql_escape_string($str);
+			return mysqli_escape_string($str);
 		}
 	}
 	
@@ -397,14 +397,14 @@ class PhpBURN_Connection_MySQL implements IConnection
 	{
 		if($this->state == self::OPEN)
 		{
-			return mysql_affected_rows($this->conn_id);
+			return mysqli_affected_rows($this->conn_id);
 		}
 		//throw new PhpBURN_Exception() TODO CREATE EXCETION CLASS AND INPUT AN EXCEPTION HERE;
 	}
 	
 	public function num_rows($rs)
 	{
-		return mysql_num_rows($rs);
+		return mysqli_num_rows($rs);
 	}
 	
 	public function random()
@@ -418,7 +418,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	}
 	
 	public function fetch($rs) {
-		return mysql_fetch_array($rs, $this->mode);
+		return mysqli_fetch_array($rs, $this->mode);
 	}
 	
 	//Transactions
@@ -437,7 +437,7 @@ class PhpBURN_Connection_MySQL implements IConnection
 	
 	//Utils
 	public function last_id() {
-		return mysql_insert_id($this->conn_id);
+		return mysqli_insert_id($this->conn_id);
 	}
 	
 	public function __destruct() {
