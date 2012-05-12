@@ -19,7 +19,7 @@ require_once('sysConfig.php');
 ################################
 # Getting current session if exists
 ################################
-session_name(SYS_SESSION_NAME);
+session_name(PHPBURN_SESSIONNAME);
 session_start();
 
 

@@ -38,7 +38,7 @@ $aclSettings = array(
     'defaultType' => 'unknown',
 
     'authInfo' => array(
-        'allowedMethods' => &$_SESSIONSYS_SESSION_NAME['userInfo']['allowedMethods']
+        'allowedMethods' => &$_SESSION[PHPBURN_SESSIONNAME]['userInfo']['allowedMethods']
     )
 );
 

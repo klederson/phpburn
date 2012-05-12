@@ -54,7 +54,7 @@ define('SYS_SPICES_EXT','spices.php',true);
 ################################
 # Infos
 ################################
-define('SYS_SESSION_NAME', md5(SYS_BASE_PATH), true);
+define('PHPBURN_SESSIONNAME', md5(SYS_BASE_PATH), true);
 define('PHPBURN_VERSION','0.9b',true);
 define('PHPBURN_WEBSITE','http://www.phpburn.com/',true);
 define('PHPBURN_REPOSITORY_TYPE','git',true);
