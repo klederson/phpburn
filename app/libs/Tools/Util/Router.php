@@ -88,7 +88,7 @@ class Router {
 
     if (count($this->urlDiff) > 0) {
       foreach ($this->urlDiff as $index => $value) {
-        if ($value != '' && !empty($value) && $value != ' ') {
+        if ($value != '' && isset($value) && $value != ' ') {
           array_push($this->uri, $value);
         }
       }

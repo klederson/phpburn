@@ -290,7 +290,7 @@ abstract class PhpBURN_Dialect implements IDialect {
       foreach ($this->getModel()->getMap()->fields as $field => $infos) {
         if ($this->getModel()->getMap()->getRelationShip($field) != true) {
           $value = $this->getModel()->$field;
-          if (isset($value) && !empty($value) && $value != null && $value != '') {
+          if (isset($value) && $value != NULL && $value != '') {
             $fieldInfo = $this->getModel()->getMap()->getField($field);
 
             $value = gettype($value) == "string" ? addslashes($value) : $value;
