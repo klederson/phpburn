@@ -456,6 +456,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
    * @param String/Integer $conditon_end
    * @param String $condition
    * @param Boolean $override
+   * @param String $whereGroup
    *
    * @return PhpBURN_Core
    */
