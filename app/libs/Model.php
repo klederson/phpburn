@@ -1176,8 +1176,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
     foreach ($this->getMap()->fields as $fieldName => $info) {
       if ($this->getMap()->getRelationShip($fieldName) == true && $recursive == true) {
         if (get_parent_class($this->$fieldName) == 'PhpBURN_Core') {
-          if (count($this->$fieldName->getDialect()->dataSet) > 0)
-            foreach ($this->$fieldName->getDialect()->dataSet as $index => $value) {
+          if (count($this->$fieldName->getAmount()) > 0)
+            while ($this->$fieldName->fetch()) {
               $return[$fieldName][] = $this->$fieldName->toArray();
             }
         }
