@@ -1180,6 +1180,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
             while ($this->$fieldName->fetch()) {
               $return[$fieldName][] = $this->$fieldName->toArray();
             }
+            
+            $this->$fieldName->_moveFirst();
         }
       } else {
 //        $return[$fieldName] = $this->getMap()->getFieldValue($fieldName);
