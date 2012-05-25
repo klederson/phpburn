@@ -1176,12 +1176,17 @@ abstract class PhpBURN_Core implements IPhpBurn {
     foreach ($this->getMap()->fields as $fieldName => $info) {
       if ($this->getMap()->getRelationShip($fieldName) == true && $recursive == true) {
         if (get_parent_class($this->$fieldName) == 'PhpBURN_Core') {
-          if (count($this->$fieldName->getAmount()) > 0)
+          if (count($this->$fieldName->getAmount()) > 0) {
+            $this->$fieldName->_moveFirst();
+
             while ($this->$fieldName->fetch()) {
               $return[$fieldName][] = $this->$fieldName->toArray();
             }
             
             $this->$fieldName->_moveFirst();
+          }
+            
+            
         }
       } else {
 //        $return[$fieldName] = $this->getMap()->getFieldValue($fieldName);
