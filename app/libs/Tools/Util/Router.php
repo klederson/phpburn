@@ -64,9 +64,9 @@ class Router {
   const MATCH_STRING_URLRAW = '([a-zA-Z %]+)';
   const MATCH_STRING_URLENCODE = '([a-zA-Z +]+)';
 
-  public function __construct($routes) {
-    $this->baseUrl = explode('/', $_SERVER['SCRIPT_NAME']);
-    $this->queryUrl = explode('/', $_SERVER['REQUEST_URI']);
+  public function __construct($routes, $url = NULL, $uri = NULL) {
+    $this->baseUrl = $url == NULL ? explode('/', $_SERVER['SCRIPT_NAME']) : explode('/',$url);
+    $this->queryUrl = $uri == NULL ? explode('/', $_SERVER['REQUEST_URI']) : explode('/',$uri);
 
     $this->urlDiff = array_diff_assoc($this->queryUrl, $this->baseUrl);
 
@@ -161,6 +161,28 @@ class Router {
   public function prepareRoute($route) {
     
   }
+  
+  public function getCallStructure() {
+    $route = $this->parseRoute();
+    
+    $route = explode('/', $route['action']);
+    $parms = array_slice($route, 2, count($route) - 2);
+    $controller = $route[0];
+
+    if (count($route) > 1) {
+      $action = count($route) == 1 ? $route[0] : $route[1];
+    } else {
+      $action = self::$routes['__defaultAction'];
+    }
+    
+    return array(
+        'url' => $this->uri,
+        'route' => $route,
+        'controller' => $controller,
+        'action' => $action,
+        'parms' => $parms
+        );
+  }
 
   public function executeRoute(array $route) {
 
@@ -179,6 +201,10 @@ class Router {
     }
 
     if (method_exists($controller, $action)) {
+      Controller::$stack['url'] = $this->uri;
+      Controller::$stack['controller'] = $controller;
+      Controller::$stack['action'] = $action;
+      Controller::$stack['methods'] = $parms;
       $controller->callAction($action, $parms);
     } else {
       Controller::callErrorPage('404');
