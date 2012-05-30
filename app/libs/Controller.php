@@ -14,6 +14,13 @@ PhpBURN::load('Tools.Controller.IController');
 abstract class Controller {
 
   public $_viewData = array();
+  
+  public static $stack = array(
+      'url',
+      'controller',
+      'action',
+      'params' => array()
+  );
 
   public function __construct() {
 
