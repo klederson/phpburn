@@ -282,8 +282,9 @@ abstract class PhpBURN_Dialect implements IDialect {
           $value['end'] = is_numeric($value['end']) || strpos($value['end'], 'LIKE (') !== false ? $value['end'] : sprintf("'%s'", $value['end']);
           $value['end'] = strpos($value['end'], 'LIKE (') !== FALSE ? stripslashes($value['end']) : $value['end'];
 
+          $fieldName = $fieldInfo['field']['tableReference'] != NULL ? sprintf("%s.%s",$fieldInfo['field']['tableReference'],$value['start']) : $value['start']; 
           $whereConditions[$value['group']] .= empty($whereConditions[$value['group']]) ? "" : sprintf(" %s ", $value['condition']);
-          $whereConditions[$value['group']] .= sprintf(' %s.%s %s %s ', $fieldInfo['field']['tableReference'], $value['start'], $value['operator'], ($value['end']));
+          $whereConditions[$value['group']] .= sprintf(' %s %s %s ', $fieldName, $value['operator'], ($value['end']));
         }
       }
     } else {
