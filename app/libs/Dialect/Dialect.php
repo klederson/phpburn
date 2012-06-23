@@ -282,7 +282,7 @@ abstract class PhpBURN_Dialect implements IDialect {
           $value['end'] = is_numeric($value['end']) || strpos($value['end'], 'LIKE (') !== false ? $value['end'] : sprintf("'%s'", $value['end']);
           $value['end'] = strpos($value['end'], 'LIKE (') !== FALSE ? stripslashes($value['end']) : $value['end'];
 
-          $fieldName = $fieldInfo['field']['tableReference'] != NULL ? sprintf("%s.%s",$fieldInfo['field']['tableReference'],$value['start']) : $value['start']; 
+          $fieldName = $fieldInfo['field']['tableReference'] != NULL ? sprintf("%s.%s", $fieldInfo['field']['tableReference'], $value['start']) : $value['start'];
           $whereConditions[$value['group']] .= empty($whereConditions[$value['group']]) ? "" : sprintf(" %s ", $value['condition']);
           $whereConditions[$value['group']] .= sprintf(' %s %s %s ', $fieldName, $value['operator'], ($value['end']));
         }
@@ -349,7 +349,11 @@ abstract class PhpBURN_Dialect implements IDialect {
     foreach ($this->getModel()->_orderBy as $index => $value) {
       $fieldInfo = $this->getModel()->getMap()->getField($value['field']);
       $orderConditions .= $orderConditions == null ? "" : ", ";
-      $orderConditions .= $fieldInfo['field']['tableReference'] . '.' . $fieldInfo['field']['column'] . ' ' . $value['type'];
+      if ($fieldInfo != NULL) {
+        $orderConditions .= $fieldInfo['field']['tableReference'] . '.' . $fieldInfo['field']['column'] . ' ' . $value['type'];
+      } else {
+        $orderConditions .= $value['field'] . ' ' . $value['type'];
+      }
     }
 
 
@@ -360,9 +364,16 @@ abstract class PhpBURN_Dialect implements IDialect {
 
     $clause = 'GROUP BY ';
     foreach ($this->getModel()->_groupBy as $index => $value) {
+
       $fieldInfo = $this->getModel()->getMap()->getField($value['field']);
+
       $conditions .= $conditions == null ? "" : ", ";
-      $conditions .= $fieldInfo['field']['tableReference'] . '.' . $fieldInfo['field']['column'];
+
+      if ($fieldInfo != NULL) {
+        $conditions .= $fieldInfo['field']['tableReference'] . '.' . $fieldInfo['field']['column'];
+      } else {
+        $conditions .= $value['field'];
+      }
     }
 
 
@@ -435,7 +446,10 @@ abstract class PhpBURN_Dialect implements IDialect {
           $value = str_replace('[#__fieldLinkValue#]', $parentValue, $value);
         }
         if ($value != null)
-          if(!$this->execute($value)) return FALSE; //handle errors when saving
+          if (!$this->execute($value))
+            return FALSE; //handle errors when saving
+
+          
       }
       //$this->getModel()->get($this->getModel()->getConnection()->last_id());
       $field = $this->getMap()->getPrimaryKey();
@@ -451,9 +465,9 @@ abstract class PhpBURN_Dialect implements IDialect {
       return false;
     }
   }
-  
+
   public function saveRelationships($name = NULL) {
-    if($name == NULL) {
+    if ($name == NULL) {
       foreach ($this->getMap()->fields as $fieldCheck => $infos) {
         if ($this->getModel()->getMap()->getRelationShip($fieldCheck) == true && $this->getModel()->$fieldCheck instanceof $infos['isRelationship']['foreignClass']) {
           return $this->saveRelationship($infos, $fieldCheck);
@@ -524,7 +538,7 @@ abstract class PhpBURN_Dialect implements IDialect {
 //              @TODO maybe this is a nice place to put save relationship data to reltable
         break;
     }
-    
+
     return $saved;
   }
 
