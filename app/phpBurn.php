@@ -39,7 +39,7 @@ abstract class PhpBURN {
     }
   }
 
-  public function loadSpice($name, array $versions) {
+  public static function loadSpice($name, array $versions) {
     self::load('Spices.' . $name);
   }
 

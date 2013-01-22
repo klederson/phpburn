@@ -26,7 +26,7 @@ class PhpBURN_ConnectionManager
 	 * @param PhpBURN_ConfigurationItem $config
 	 * @return PhpBURN_Connection
 	 */
-	public function create(PhpBURN_ConfigurationItem &$config) {
+	public static function create(PhpBURN_ConfigurationItem &$config) {
 		$conn = self::getConnection($config->package);
 		if(!$conn) {
 			//Create a new connection
@@ -73,7 +73,7 @@ class PhpBURN_ConnectionManager
 	 * @return PhpBURN_Connection
 	 * @return Boolean
 	 */
-	public function getConnection($package = null) {
+	public static function getConnection($package = null) {
 		if(!isset(self::$connections[$package])) {
 			return false;
 		} else {
@@ -87,7 +87,7 @@ class PhpBURN_ConnectionManager
 	 * @param String $dialect
 	 * @return PhpBURN_Connection
 	 */
-	private function getConnectionClass($dialect = null) {
+	private static function getConnectionClass($dialect = null) {
 		$dialect = $dialect = null ? "MySQL" : $dialect;
 		
 		return "PhpBURN_Connection_$dialect";

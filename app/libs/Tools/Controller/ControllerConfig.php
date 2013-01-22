@@ -8,19 +8,19 @@ class PhpBURN_ControllerConfig {
         
     }
 
-    public function addOnCallActionBefore($name, $func) {
+    public static function addOnCallActionBefore($name, $func) {
         self::$onCallActionBefore[$name] = $func;
     }
 
-    public function addOnCallActionAfter($name, $func) {
+    public static function addOnCallActionAfter($name, $func) {
         self::$onCallActionAfter[$name] = $func;
     }
 
-    public function getOnCallActionAfter($name = null) {
+    public static function getOnCallActionAfter($name = null) {
         return $name == null ? self::$onCallActionAfter : self::$onCallActionAfter[$name];
     }
 
-    public function getOnCallActionBefore($name = null) {
+    public static function getOnCallActionBefore($name = null) {
         return $name == null ? self::$onCallActionBefore : self::$onCallActionBefore[$name];
     }
 }

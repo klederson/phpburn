@@ -9,7 +9,7 @@ class PhpBURN_ACL {
   private static $aclSettings;
   public static $callBacks;
 
-  public function checkPermissions($controllerName, $action, $parms) {
+  public static function checkPermissions($controllerName, $action, $parms) {
     $methodRules = PhpBURN_ACL_Control::$classRules->$controllerName->$action;
 
     if (self::isAllowed($controllerName,$action,$parms)) {
@@ -45,7 +45,7 @@ class PhpBURN_ACL {
     return self::isAllowed($structure['controller'], $structure['action'], $structure['parms']);
   }
 
-  public function setCallBack(array $callBack) {
+  public static function setCallBack(array $callBack) {
     self::$callBacks = $callBack;
   }
 
@@ -87,7 +87,7 @@ class PhpBURN_ACL_Control {
 
       foreach ($methods as $method) {
         foreach (self::$aclProperties as $aclProp) {
-          self::$classRules->$className->$method->$aclProp = self::getMethodRule($className, $method, $aclProp);
+          @self::$classRules->$className->$method->$aclProp = self::getMethodRule($className, $method, $aclProp);
         }
       }
     }

@@ -27,7 +27,7 @@ class PhpBURN_DialectManager
 	 * @param PhpBURN_Core $obj
 	 * @return PhpBURN_Dialect
 	 */
-	public function create(PhpBURN_ConfigurationItem $config,PhpBURN_Core $obj) {
+	public static function create(PhpBURN_ConfigurationItem $config,PhpBURN_Core $obj) {
 		$dialect = self::getDialect($config->dialect);
 		if(!$dialect) {			
 			//Loads the interface for dialect uses
@@ -57,7 +57,7 @@ class PhpBURN_DialectManager
 	 * @return PhpBURN_Dialect
 	 * @return Booelan
 	 */
-	public function getDialect($package = null) {
+	public static function getDialect($package = null) {
 		if(!isset(self::$dialects[$package])) {
 			return false;
 		} else {
@@ -71,7 +71,7 @@ class PhpBURN_DialectManager
 	 * @param String $dialect
 	 * @return unknown_type
 	 */
-	private function getDialectClass($dialect = null) {
+	private static function getDialectClass($dialect = null) {
 		$dialect = $dialect = null ? "MySQL" : $dialect;
 		
 		return "PhpBURN_Dialect_$dialect";

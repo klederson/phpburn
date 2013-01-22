@@ -43,17 +43,17 @@ abstract class PhpBURN_Views implements IView {
   public static $autoLoad = PHPBURN_VIEWS_AUTOLOAD;
   public static $viewMethod = null;
 
-  public function autoLoad($status) {
+  public static function autoLoad($status) {
     self::$autoLoad = $status;
   }
 
-  public function setLang($lang = 'pt_BR', $domain = NULL, $translationFolder = NULL) {
+  public static function setLang($lang = 'pt_BR', $domain = NULL, $translationFolder = NULL) {
     self::$lang = $lang;
     self::$domain = $domain == NULL ? self::$domain : $domain;
     self::$translationFolder = $translationFolder == NULL ? self::$translationFolder : $translationFolder;
   }
 
-  public function getLang() {
+  public static function getLang() {
     return self::$lang;
   }
 
@@ -143,7 +143,7 @@ abstract class PhpBURN_Views implements IView {
     return $content;
   }
 
-  public function loadView($viewName, $data, $toVar = false, $statusCode = NULL) {
+  public static function loadView($viewName, $data, $toVar = false, $statusCode = NULL) {
     //Getting the path view
     $viewPath = SYS_VIEW_PATH . DS . $viewName . '.' . SYS_VIEW_EXT;
 
@@ -160,7 +160,7 @@ abstract class PhpBURN_Views implements IView {
     }
   }
 
-  public function loadViewFile($path, $data, $toVar = false) {
+  public static function loadViewFile($path, $data, $toVar = false) {
 
     if (file_exists($path)) {
       PhpBURN_Message::output('[!Loading view file:!] ' . $path);
@@ -183,13 +183,13 @@ abstract class PhpBURN_Views implements IView {
    * @param Array $__phpBurnData
    * @return String
    */
-  private function processViewData($___phpBurnFilePath, $__phpBurnData) {
+  private static function processViewData($___phpBurnFilePath, $__phpBurnData) {
     $viewProcess = self::chooseViewMethod();
 
     return $viewProcess->processViewData($___phpBurnFilePath, $__phpBurnData);
   }
 
-  public function chooseViewMethod() {
+  public static function chooseViewMethod() {
     self::$viewMethod = !defined('PHPBURN_VIEWS_METHOD') || !empty(self::$viewMethod) ? self::$viewMethod : PHPBURN_VIEWS_METHOD;
     if (self::$viewMethod == null) {
       self::$viewMethod = 'default';
@@ -200,7 +200,7 @@ abstract class PhpBURN_Views implements IView {
     return new $classString;
   }
 
-  public function setViewMethod($method) {
+  public static function setViewMethod($method) {
     self::$viewMethod = $method;
   }
 
@@ -208,7 +208,7 @@ abstract class PhpBURN_Views implements IView {
   # Inteligent View Methods
   #####################################################
 
-  private function loadInteligentView($template, $tokens, $lang = null) {
+  private static function loadInteligentView($template, $tokens, $lang = null) {
     if (is_array($tokens)) {
       preg_match_all("|\[#(.*)#]|U", $template, $out, PREG_SET_ORDER);
       foreach ($out as $index => $arrContent) {

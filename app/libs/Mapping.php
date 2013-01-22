@@ -28,7 +28,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @return PhpBURN_Map
 	 */
-	public function create(PhpBURN_Core &$modelObj,$fromMulti = false) {		
+	public static function create(PhpBURN_Core &$modelObj,$fromMulti = false) {		
 		$mapObj = self::getMapping(get_class($modelObj));
 		
 		/*
@@ -79,7 +79,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @return Boolean
 	 */
-	private function isChild(PhpBURN_Core &$modelObj) {
+	private static function isChild(PhpBURN_Core &$modelObj) {
 		if(get_parent_class($modelObj) != 'PhpBURN_Core' && empty($modelObj->_tablename)) {
 			return true;
 		} else {
@@ -93,7 +93,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @param PhpBURN_Map $mapObj
 	 */
-	public function addMap(PhpBURN_Core &$modelObj,PhpBURN_Map &$mapObj) {
+	public static function addMap(PhpBURN_Core &$modelObj,PhpBURN_Map &$mapObj) {
 		self::$mapping[get_class($modelObj)] = $mapObj;
 	}
 	
@@ -104,7 +104,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @param PhpBURN_Map $mapObj
 	 */
-	public function addMultiMap($parentMaps,PhpBURN_Core &$modelObj,PhpBURN_Map &$mapObj) {
+	public static function addMultiMap($parentMaps,PhpBURN_Core &$modelObj,PhpBURN_Map &$mapObj) {
 		
 	}
 	
@@ -114,7 +114,7 @@ class PhpBURN_Mapping
 	 * @param PhpBURN_Core $modelObj
 	 * @return PhpBURN_Map
 	 */
-	public function getMapping($className) {
+	public static function getMapping($className) {
 		if(self::$mapping[$className] != null && self::$mapping[$className] != '') {
 			return self::$mapping[$className];
 		} else {
@@ -128,7 +128,7 @@ class PhpBURN_Mapping
 	 * @param String $class
 	 * @return PhpBURN_MappingItem
 	 */
-	public function cascadeMaps(PhpBURN_Core &$modelObj) {
+	public static function cascadeMaps(PhpBURN_Core &$modelObj) {
 		if(self::isChild($modelObj)) {
 			$class = get_parent_class($modelObj);
 			$_parentMap = self::getMapping($class);

@@ -174,7 +174,7 @@ abstract class Controller {
    * @param String $action
    * @param Array $parms
    */
-  public function callActionBefore($controllerName, $action, array $parms) {
+  public static function callActionBefore($controllerName, $action, array $parms) {
     if (array_search('PhpBURN_ControllerConfig', get_declared_classes()) == true) {
       if (is_array(PhpBURN_ControllerConfig::getOnCallActionBefore()) && count(PhpBURN_ControllerConfig::getOnCallActionBefore()) > 0) {
         foreach (PhpBURN_ControllerConfig::getOnCallActionBefore() as $function) {
@@ -191,7 +191,7 @@ abstract class Controller {
    * @param String $action
    * @param Array $parms
    */
-  public function callActionAfter($controllerName, $action, array $parms) {
+  public static function callActionAfter($controllerName, $action, array $parms) {
     if (array_search('PhpBURN_ControllerConfig', get_declared_classes()) == true) {
       if (is_array(PhpBURN_ControllerConfig::getOnCallActionAfter()) && count(PhpBURN_ControllerConfig::getOnCallActionAfter()) > 0) {
         foreach (PhpBURN_ControllerConfig::getOnCallActionAfter() as $function) {

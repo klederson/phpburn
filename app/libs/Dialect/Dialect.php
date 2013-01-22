@@ -588,7 +588,7 @@ abstract class PhpBURN_Dialect implements IDialect {
 
   public function prepareUpdate() {
     //Searching for compound PKs or all Pks ( including parent and childs ones )
-    $pkFields = &$this->getMap()->getPrimaryKey(FALSE);
+    $pkFields = $this->getMap()->getPrimaryKey(FALSE);
 
     $updatedFields = null;
     //Checking each MAPPED field looking in cache for changes in field value, if existis it will be updated, if not we just update the right fields
