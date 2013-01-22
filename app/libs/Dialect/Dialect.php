@@ -75,7 +75,7 @@ abstract class PhpBURN_Dialect implements IDialect {
     $modelName = get_class($this->getModel());
 
     if ($sql != null) {
-      $this->resultSet = &$this->execute($sql);
+      $this->resultSet = $this->execute($sql);
     } else {
       PhpBURN_Message::output("[!No query found!] - <b>$modelName</b>");
       return false;

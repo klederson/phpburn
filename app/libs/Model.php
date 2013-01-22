@@ -1149,7 +1149,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
    */
   public function getConnection() {
     //return $this->_connObj;
-    return PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
+    return @PhpBURN_ConnectionManager::create(PhpBURN_Configuration::getConfig($this->_package));
   }
 
   /**
