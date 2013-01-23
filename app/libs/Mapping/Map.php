@@ -570,7 +570,8 @@ class PhpBURN_Map implements IMap {
 	 * @param String $name
 	 */
 	public function removeField($fieldName) {
-		
+		$this->fields[$fieldName] = NULL;
+    unset($this->fields[$fieldName]);
 	}
 	
 	/**
