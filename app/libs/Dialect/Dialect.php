@@ -598,14 +598,20 @@ abstract class PhpBURN_Dialect implements IDialect {
         $this->getMap()->fetchFieldValue($field, $this->getModel()->$field);
         $updatedFields[$infos['field']['tableReference']] .= $updatedFields[$infos['field']['tableReference']] == null ? '' : ', ';
         $updatedFields[$infos['field']['tableReference']] .= sprintf("%s='%s'", $infos['field']['column'], addslashes($this->getModel()->$field));
+      }
+    }
 
-//      Prepare the wehere for one or many pk fields
-        if (is_array($pkFields)) {
-          foreach ($pkFields as $pkFname => $pkArray) {
-            $pkWhere[$pkArray['field']['tableReference']] .=!empty($pkWhere[$pkArray['field']['tableReference']]) ? "AND" : "";
-            $pkWhere[$pkArray['field']['tableReference']] .= sprintf(" %s = '%s'", $pkFname, $pkArray['#fetch_value']);
-          }
-        }
+    //Prepare the where for one or many pk fields
+    if (is_array($pkFields)) {
+      foreach ($pkFields as $pkFname => $pkArray) {
+        $pkWhere[$pkArray['field']['tableReference']] .= !empty($pkWhere[$pkArray['field']['tableReference']]) ? "AND" : "";
+        
+        //Check where the value lies ( prefer to #fetch_value first )
+        $whereValue = isset($pkArray['#fetch_value']) ? $pkArray['#fetch_value'] : $this->getModel()->$pkArray['field']['alias'];
+
+        if(isset($whereValue) && $whereValue != NULL && !empty($whereValue))
+          $pkWhere[$pkArray['field']['tableReference']] .= sprintf(" %s = '%s'", $pkFname, $whereValue);
+        //$pkWhere[$pkArray['field']['tableReference']] .= sprintf("%s = '%s'", $pkFname, $this->getModel()->$pkArray['alias']);
       }
     }
 
