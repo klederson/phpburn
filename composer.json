@@ -1,0 +1,14 @@
+{
+    "name": "phpburn/common",
+    "type": "framework",
+    "description": "A kickass PHP HMVC framework built to be light and fast",
+    "keywords": ["phpburn", "orm", "framework", "persistence", "rest", "routes", "controller", "hmvc"],
+    "homepage": "http://www.phpburn.com",
+    "license": "GPL2",
+    "authors": [
+        {"name": "Klederson Bueno", "email": "klederson@phpburn.com"}
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
