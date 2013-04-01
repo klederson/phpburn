@@ -200,7 +200,7 @@ class Router {
       $action = self::$routes['__defaultAction'];
     }
 
-    if (method_exists($controller, $action)) {
+    if (method_exists($controller, $action) || method_exists($controller, "__call")) {
       Controller::$stack['url'] = $this->uri;
       Controller::$stack['controller'] = $controller;
       Controller::$stack['action'] = $action;
