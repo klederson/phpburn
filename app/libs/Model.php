@@ -1234,8 +1234,8 @@ abstract class PhpBURN_Core implements IPhpBurn {
    * @param Boolean $recursive
    * @return stdClass
    */
-  public function toStdClass($recursive = true) {
-    return $this->arrayToObject($this->toArray($recursive));
+  public function toStdClass($recursive = true, $full = false) {
+    return $this->arrayToObject($this->toArray($recursive, $full));
   }
 
   /**
@@ -1283,18 +1283,14 @@ abstract class PhpBURN_Core implements IPhpBurn {
    * @param Array $array
    * @return stdClass
    */
-  public function arrayToObject(array $array) {
-    $object = new stdClass();
-
-    foreach ($array as $index => $value) {
-      if (!is_null($index)) {
-        $object->$index = is_array($value) ? $this->arrayToObject($value) : $value;
-      } else {
-        $object->$index = new stdClass();
-      }
+  public function arrayToObject($array) {
+    if (is_array($array)) {
+      return (object) array_map(__METHOD__, $array);
     }
-
-    return $object;
+    else {
+      // Return object
+      return $array;
+    }
   }
 
 //      Iterator Utils
