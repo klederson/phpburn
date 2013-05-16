@@ -186,7 +186,7 @@ abstract class PhpBURN {
       if ($currentRoute != false) {
         $router->executeRoute($currentRoute);
       } else {
-        Controller::callErrorPage('404');
+        @Controller::callErrorPage('404');
       }
     }
   }
