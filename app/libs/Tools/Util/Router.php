@@ -66,7 +66,7 @@ class Router {
 
   public function __construct($routes, $url = NULL, $uri = NULL) {
     $this->baseUrl = $url == NULL ? explode('/', $_SERVER['SCRIPT_NAME']) : explode('/',$url);
-    $this->queryUrl = $uri == NULL ? explode('/', $_SERVER['REQUEST_URI']) : explode('/',$uri);
+    $this->queryUrl = $uri == NULL ? explode('/', $_SERVER['PATH_INFO']) : explode('/',$uri);
 
     $this->urlDiff = array_diff_assoc($this->queryUrl, $this->baseUrl);
 
