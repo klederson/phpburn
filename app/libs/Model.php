@@ -144,6 +144,7 @@ abstract class PhpBURN_Core implements IPhpBurn {
    */
   public function __destruct() {
     //Cleaning memory and activating __destruct triggers
+    $this->getConnection()->close();
     unset($this->_connObj, $this->_mapObj, $this->_dialectObj);
   }
 
