@@ -1,4 +1,5 @@
 <?php
+set_include_path(get_include_path() . ":" . realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "../../Addons/PHPTAL/");
 
 PhpBURN::load('Tools.Views.IProcessView');
 PhpBURN::load('Addons.PHPTAL.PHPTAL');

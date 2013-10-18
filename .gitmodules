@@ -1,0 +1,3 @@
+[submodule "app/libs/Addons/PHPTAL"]
+	path = app/libs/Addons/PHPTAL
+	url = git://github.com/pornel/PHPTAL
