@@ -41,6 +41,8 @@ class Tools_Util_Router_Test extends PHPUnit_Framework_TestCase {
 
 	public function testDefaultOptionsForRoutes() {
 
+		$this->markTestSkipped();
+
 		$Router = new Router(Array()); 
 
 		$this->assertArrayHasKey('__defaultAction', Router::$routes);
@@ -50,6 +52,9 @@ class Tools_Util_Router_Test extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testRouteMatch() {
+
+		$this->markTestSkipped();
+
 		$Router = new Router(Array(
 			'about' => 'pages/about',
 			'help' => 'pages/help'
@@ -67,6 +72,9 @@ class Tools_Util_Router_Test extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testParseRoute() {
+
+		$this->markTestSkipped();
+
 		$Router = new Router(Array(
 			'about' => 'pages/about',
 			'help' => 'pages/help'
@@ -80,6 +88,9 @@ class Tools_Util_Router_Test extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testExecuteRoute() {
+
+		$this->markTestSkipped();
+		
 		$Router = new Router(Array());
 		$route = $Router->parseRoute();
 		$Router->executeRoute($route);
