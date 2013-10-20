@@ -33,10 +33,10 @@ class Tools_Util_Router_Test extends PHPUnit_Framework_TestCase {
 		parent::setUp();
 
 		$this->scriptName = @$_SERVER['SCRIPT_NAME'];
-		$this->requestURI = @$_SERVER['REQUEST_URI'];
+		$this->requestURI = @$_SERVER['PATH_INFO'];
 
 		$_SERVER['SCRIPT_NAME'] = 'index.php';
-		$_SERVER['REQUEST_URI'] = '/tools/util/router';
+		$_SERVER['PATH_INFO'] = '/tools/util/router';
 	}
 
 	public function testDefaultOptionsForRoutes() {
@@ -91,7 +91,7 @@ class Tools_Util_Router_Test extends PHPUnit_Framework_TestCase {
 	 * Cannot test error 404... we need to change things
      */
 	public function testExecuteRouteError404() {
-		//$_SERVER['REQUEST_URI'] = '/tools/nonexisting/action';
+		//$_SERVER['PATH_INFO'] = '/tools/nonexisting/action';
 		//$Router = new Router(Array());
 		//$route = $Router->parseRoute();
 
@@ -107,7 +107,7 @@ class Tools_Util_Router_Test extends PHPUnit_Framework_TestCase {
 		parent::tearDown();
 
 		$_SERVER['SCRIPT_NAME'] = $this->scriptName;
-		$_SERVER['REQUEST_URI'] = $this->requestURI;
+		$_SERVER['PATH_INFO'] = $this->requestURI;
 
 		unset($this->scriptName, $this->requestURI);
 	}
