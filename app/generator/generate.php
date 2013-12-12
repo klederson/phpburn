@@ -3,8 +3,9 @@
 /**
  * Setting-up the PhpBURN information
  */
-$basePath = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR;
-$fullStructurePath = $basePath . DIRECTORY_SEPARATOR . 'structure' . DIRECTORY_SEPARATOR;
+define('DS',DIRECTORY_SEPARATOR,TRUE);
+$basePath = realpath(dirname(__FILE__)) . DS;
+$fullStructurePath = $basePath . DS . 'structure' . DS;
 
 echo "Wellcome to PhpBURN structure generator \r\n";
 echo "This tool will help you to generate the basics structure to create a PhpBURN based system\r\n";
