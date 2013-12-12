@@ -11,7 +11,8 @@ echo "This tool will help you to generate the basics structure to create a PhpBU
 echo "\r\n";
 echo "Please type the path to your system\r\n";
 echo "(if it does not exists will be created and all files and subfolders will be deleted - BE CAREFUL):\r\n ";
-$endPath = exec('read path ; echo $path', $endPathArr);
+$handle = fopen ("php://stdin","r");
+$endPath = fgets($handle);
 //echo "\r\n";
 //echo "Removing existent files...\r\n";
 //$removing = exec("rm -rf $fullStructurePath");
