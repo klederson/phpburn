@@ -1,5 +1,7 @@
 # phpBurn 
 
+[![Build Status](https://travis-ci.org/PhpBURN/phpburn.png?branch=master)](https://travis-ci.org/PhpBURN/phpburn)
+
 Developed by the manteiner Klederson Bueno, [phpBurn][phpburn] is a FRAMEWORK for [PHP][phpnet] usage, initialy born as an ORM like [hibernate][hn] and [Nhibernate][nhb].
 
 It allows you to create more and faster using [OO][woo] concepts and patterns with a log of time gain. Using resources for MVC (Model View Controller) [phpBurn][phpburn] will make your programming more easy, quick and fun.

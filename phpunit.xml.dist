@@ -1,0 +1,16 @@
+<phpunit
+    colors="true"
+    verbose="true"
+    bootstrap="app/tests/bootstrap.php">
+
+    <php>
+        <includePath>app</includePath>
+    </php>
+
+    <testsuites>
+        <testsuite name="PhpBURN - Test Suite">
+            <directory>app/tests/cases</directory>
+        </testsuite>
+    </testsuites>
+
+</phpunit>
