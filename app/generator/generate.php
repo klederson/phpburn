@@ -12,12 +12,25 @@ echo "\r\n";
 echo "Please type the path to your system\r\n";
 echo "(if it does not exists will be created and all files and subfolders will be deleted - BE CAREFUL):\r\n ";
 $handle = fopen ("php://stdin","r");
-$endPath = fgets($handle);
-//echo "\r\n";
-//echo "Removing existent files...\r\n";
-//$removing = exec("rm -rf $fullStructurePath");
+$endPath = trim(fgets($handle));
 echo "\r\n";
 echo "Creating Files...\r\n";
-$creatingFolder = exec("mkdir -p $fullStructurePath");
-$files = exec("cp -R $fullStructurePath $endPath", $filesArr);
+$creatingFolder = mkdir($endPath,0755,TRUE);
+$files = recurse_copy($fullStructurePath,$endPath);
+
+function recurse_copy($src,$dst) { 
+    $dir = opendir($src); 
+    @mkdir($dst); 
+    while(false !== ( $file = readdir($dir)) ) { 
+        if (( $file != '.' ) && ( $file != '..' )) { 
+            if ( is_dir($src . '/' . $file) ) { 
+                recurse_copy($src . '/' . $file,$dst . '/' . $file); 
+            } 
+            else { 
+                copy($src . '/' . $file,$dst . '/' . $file); 
+            } 
+        } 
+    } 
+    closedir($dir); 
+} 
 ?>
